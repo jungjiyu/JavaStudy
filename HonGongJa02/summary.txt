@@ -38,12 +38,14 @@ RAM 메모리 : 값을 저장할 수 있는 주소들로 구성
 	3. 논리값 
 		1) boolean : 1바이트
 			: true , false 값을 가짐(죄다 소문자)
-
+			: 1과 0으로 대체 불가
 
 :이클립스 특인지 모르겠으나 오버플로우 일어나면 에러 발생시키고 L이나 f 안붙임 에러남
 
 자주 쓰는 클래스타입(앞문자 대문자 주의)
-	1) String : 문자열 저장
+	1) String : (문자열) 타입처럼 사용
+	2) Scanner : 사용자로부터 문자열 입력받기 위한 도구인 Scanner를 생성 하기 위해 사용
+		   : 생성한 Scanner를 이후 코드에 적용할 수 있도록 변수에 담아 사용하기 위해 사용
 
 타입변환(=형변환)
 	: 캐스팅은 명시적 형변환일때나 사용할 수 있는 용어
@@ -84,8 +86,9 @@ RAM 메모리 : 값을 저장할 수 있는 주소들로 구성
 			: 정수형 변수에 실수형 변수 할당할땐 항상 명시적 형변환 필요
 		2. 문자열을 다른 타입으로 형변환
 			: 앞글자대문자자료형.parse앞글자대문자자료형(값) 활용
-				: 주의해야할 것은 예외적으로 int 형으로 형변환하는 경우 Int.parseInt("29"); 가 아닌 Integer.parase.Int("29");이다
-					: 왜냐면 int 타입명만 줄임말이기 때문 (char 형도 줄임명이긴 하지만 문자열을 문자로 형변환 하진 않으니)
+				: 주의해야할 것은 예외적으로 int 형으로 형변환하는 경우 Int.parseInt("29"); 가 아닌 Integer.paraseInt("29");이다
+					: 왜냐면 int 타입명이 줄임말이기 때문 
+				: 또 주의해야할 것은 char 타입이 아무리 정수형이라 해도 Integer.parseInt 통해 변환 안된다는 것. ( Integer.paraseInt( ) ; 는 찐 정수로만 이뤄진 문자열로만 가능)
 				: parse 는 구문을 의미. 
  		3. 다른 타입을 문자열로 형변환
 			: String.valueOf(값) 활용
@@ -101,11 +104,13 @@ RAM 메모리 : 값을 저장할 수 있는 주소들로 구성
 				ex)
 				int a =10, b =20;
 				System.out.println("result:"+(a+b)); // 괄호 없음 "result10"+20 되서 "result1020"됨.
-
+	
+: 문자열끼리 같은지 비교를 위해선 == 안쓰고 equals() 메서드 사용 
+	:문자열대상.equals(비교문자열) 
 
 자바 프로그램 문장 구성 ) 대상.입출력장치.메서드 ;
 	:해석) '대상'의 '입출력장치'에 '메서드'적용
-	:
+	
 
 표준 입출력 장치
 	in : 표준 입력 장치
@@ -144,4 +149,38 @@ RAM 메모리 : 값을 저장할 수 있는 주소들로 구성
 		: 만약에 printf 내에서 실제로 %를 문자로써 사용 원하면 %%로 씀됨
 	
 
+입력 메서드
+	1. read():키보드 입력
+		: 아스키코드나 유니코드가 아닌 가상 키코드 (virtual keycode)를 입력 받는다
+			: 문자가 아닌 정수값을 입력받는거라 char 형 아닌 int 형 쓴다.
+		: 엔터를 기준으로 입력받고 (이전에 남아있는게 있음 별도로 엔털 필요로 하진 않는다) 엔터키는 없어지지 않고 입력된다
+				: 자바에서는 엔터(줄바꿈) == 13(캐리지리턴) 이후 10(라인피드) 이다
+					: 캐리지 리턴 == '\r' ) 젤 왼쪽으로 커서를 옮김 
+					: 라인피드 == 개행문자 == '\n' )다음 행으로 커서 옮김	
+					: 참고로 에디터 밑의 CRLF 혹은 LF 는 \r\n 으로 줄바꾼다 혹은 \n으로 줄바꾼다 를 표기한거임
 
+		:main 메서드 뒤에 예외 처리 코드(throws Exception) 따로 써줘야 사용 가능하다.
+			 public static void main(String[] args) throws Exception{
+			int key;
+			while(true) {
+				key=System.in.read();
+				System.out.print(key);
+				if(key == 13 || key == 10) System.out.println("(Blank)");	
+				else System.out.println("("+(char)key+")");
+				}
+			}
+		: 단점) 키코드를 하나씩 읽는다 . 그래서 잘 안쓰고 scanner 쓴다
+			1. 그래서 2개 이상의 키가 조합된 한글(ex . 가 == ㄱ + ㅏ)을 읽지 못한다
+			2. 그래서 문자열을 통째로 읽지 못하고 일일이 한자 씩 읽는다
+	
+	2.  nextLine() :  
+		: read()의 단점 보완한것
+		: 엔터키를 기준으로 입력받고 엔터키 제외한 이전 내용까지 입력됨
+		: 사용법
+		1) java.util 패키지에 들어있는 Scanner 클래스를 불러옴
+			: import java.util.Scanner;
+		2) 새로운 Scanner 생성과 이를 담을 Scanner 타입의 변수 선언
+			: Scanner scanner = new Scanner(System.in); //보통 변수명은 scanner 로 하는 편
+		3) Scanner 타입의 변수를 대상으로 nextLine() 메서드 활용하여 입력받음
+			: String str = scanner.nextLine();
+		: 헷갈리지 말아야할게 
