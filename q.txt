@@ -1,0 +1,62 @@
+1. 오버플로우 일어나면 바로 에러 때려 박는데 이게 이클립스 특인지 자바 특인지 모르겠음 (형변환 시킴 에러가 안뜨긴 함)
+(61쪽 내용)
+
+2. 형변환 관련 질문.
+: 일반적으론 정수 리터럴이  int 형, 실수 리터럴이 double 형 이란거 알겠음 
+근데 int 형이나 double 형이 아닌 변수에 할당할때 왜 L, F 같은거 명시 안하면 에러뜨는게 이클립스 특인지 자바 특인지 모르겠음. (62쪽,68쪽 내용)
+	: 그리고 정수형의 경우 int 형보다 작은 변수에 값 할당할 땐 (byte 형이나 char 형) 별도의 명시가 필요 없는데 왜 실수형의 경우 double 형보다 작은 변수인 float 형에 할당할때 f명시 안함 에러남?
+
+
+3. c언어 왜 double 형이든 float 형이든 소수 뒷자리 6자리임
+
+
+4. 자바도 버퍼씀?
+
+5. read()는 getchar() 느낌인거임?
+
+6. 
+(94~96쪽 내용)
+c언어에서 엔터키(줄바꿈)이 단순히 '\n'인 반면 자바에서는 '\r''\n'이라고 함. (캐리지리턴이후라인피드)
+그럼 System.in.read();를 통해 입력받는 상황에서 종료 시점엔
+System.in.read();
+System.in.read(); 으로 2번 써야되는 거임? (캐리지리턴과 개행문자의 상쇄를 위해)
+
+단순히 키코드 입력받을때 뿐 아니라 자바에서 '\r'가 '\n'이랑 같은 효과 내는거임?
+( 실제로 System.out.print("\r");하면 줄바꿈됨. )
+맞다면 걍 캐리지 리턴만 하렴 어떻게 하는거임?
+
+아래 코드처럼 read() 2번 써야되는 거임?
+package makpkg01;
+
+import java.util.Scanner;
+
+public class mak {
+	public static void main(String[] args) throws Exception{
+		int key;
+		
+		while(true) {
+			key=System.in.read();
+			System.out.print(key);
+			if(key == 13 || key == 10) System.out.println("(Blank)");
+			else System.out.println("("+(char)key+")");
+			
+			if(key == 113) break; // q 입력하면 종료
+		}
+		System.in.read(); // q 입력하고 남아있는 cr 제거
+		System.in.read(); // q 입력하고 남아있는 lf 제거
+		
+		Scanner scanner = new Scanner(System.in);
+		String str = scanner.nextLine();
+		System.out.print("1:"+str);
+		str = scanner.nextLine();
+		System.out.print("2:"+str);
+		str = scanner.nextLine();
+		System.out.print("3:"+str);
+		str = scanner.nextLine();
+		System.out.print("4:"+str);
+		
+
+	}
+}
+
+
