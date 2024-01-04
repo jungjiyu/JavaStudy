@@ -1,0 +1,9 @@
+1. 난수 출력 : (int)( Math.random()*발생가능난수갯수 ) + 스타트숫자
+
+2. for문 외부에서도 index 쓸 수 있게 하는 법: for 문 밖에서 int i 를 선언
+    ex )  
+    int i;
+    for(i=0;i<10;i++){
+    System.out.println(i);
+    } 
+    System.out.prinln("for문 마지막 i값:"+i-1);
