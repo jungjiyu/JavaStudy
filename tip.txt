@@ -1,9 +1,32 @@
 1. 난수 출력 : (int)( Math.random()*발생가능난수갯수 ) + 스타트숫자
 
-2. for문 외부에서도 index 쓸 수 있게 하는 법: for 문 밖에서 int i 를 선언
+2. 최대한 간단하게 등급 매기기 : if - else if - else 성질 활용하여 한쪽변만 비교
+    ex)
+    int score = 69;
+		if(score >= 90) {
+			System.out.println("점수>=90");
+			System.out.println("등급:A");
+		}
+		
+		else if(score >= 80) {
+			System.out.println("90>점수>=80");
+			System.out.println("등급:b");
+		}
+		else if(score >= 50) {
+			System.out.println("80>점수>=50");
+			System.out.println("등급:c");
+		}
+		else {
+			System.out.println("50>점수");
+			System.out.println("등급:F");
+		}
+
+
+3. for문 외부에서도 index 쓸 수 있게 하는 법: for 문 밖에서 int i 를 선언
     ex )  
     int i;
     for(i=0;i<10;i++){
     System.out.println(i);
     } 
     System.out.prinln("for문 마지막 i값:"+i-1);
+
