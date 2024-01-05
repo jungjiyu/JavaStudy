@@ -30,3 +30,7 @@
     } 
     System.out.prinln("for문 마지막 i값:"+i-1);
 
+
+4. 유명한 예외
+	1. NullpointerException : 아무것도 가리키고 있지 않는 참조변수 사용시 발생
+	2. ArrayIndexOutOfBoundsException : 인덱스 초과하여 사용
