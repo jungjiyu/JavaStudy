@@ -1,1 +1,139 @@
+제어문
+	1. 조건문
+		1) if 문 : 참 , 거짓 따라 분기
+			:구성
+				if (조건식){    어쩌구; }
+				else if (조건식){    어쩌구; }
+				else { 어쩌구; }
+			: 최대한 간결하게 성적 매기는법 : 앞에가 거짓이여야 뒤에것을 검사하고 실행하는 if - else if - else 구조의 특성을 활용하여 한쪽만 검사 
+			
+			int score = 69;
+			
+			if(score >= 90) {
+			System.out.println("점수>=90");
+			System.out.println("등급:A");
+			}
+			else if(score >= 80) {
+			System.out.println("90>점수>=80");
+			System.out.println("등급:b");
+			}
+			else if(score >= 50) {
+			System.out.println("80>점수>=50");
+			System.out.println("등급:c");
+			}
+			else {
+			System.out.println("50>점수");
+			System.out.println("등급:F");
+			}
+		
+	2) switch 문: 변수 값 따라 분기
+			: 정수형 변수 혹은 문자열형 변수에 사용가능(실수형 변수는 불가)
+			switch(변수){
+				case 값1:
+					실행내역;
+					break;
+
+				case 값2:
+					실행내역;
+					break;
+				.
+				.
+				default:
+					실행내역
+			}
+
+	2. 반복문
+		: 자바의 경우 루프 헤드에 라벨을 부여하여 원하는 지점에서 바로 break/ continue 가능 ( 가장 인접한 루프 헤드가 아니더라도)
+			: break 라벨의 경우 해당 루프헤드로 가서 그 루프를 중단시킴
+				: 그 루프헤드를 break 시켰다고 다시 못쓴다는게 아님. 루프헤드가 완료 된걸로 치겠단 거임.  다만 바깥 루프가 존재해 또 실행된다면 처음부터 실행되겠지.
+			: continue 라벨의 경우 해당 루프헤드로 가서 그 루프를 계속진행시킴
+				: 해당 루프번째는 진행됬다 치고(루프 헤드 자체가 완료됬다고 치는게 아니라 그 번째만) continue 만난 이후 부분이 실행됬다 쳐서 생략한 후 다음 루프 번째를 실행하는 것
+
+			ex 1 : continue 라벨
+				a: for (char h ='a';h<='c'; h++) {
+				System.out.println("======first loop======");
+				b : for(char p = 'A' ; p<='C' ; p++) {
+					System.out.println("======second loop======");
+						c: for(int q = 1 ; q <=5; q++) {
+							System.out.println("=====third loop=====");
+							System.out.printf("%c %c %d\n",h,p,q);
+							if(q == 2) {
+								//System.out.println(" break b");
+								//break b;
+								System.out.println("continue b\n");
+								continue b;
+							}
+						}
+				}
+				
+			}
+
+			
+			ex 2 : break 라벨
+				a: for (char h ='a';h<='c'; h++) {
+				System.out.println("======first loop======");
+				b : for(char p = 'A' ; p<='C' ; p++) {
+					System.out.println("======second loop======");
+						c: for(int q = 1 ; q <=5; q++) {
+							System.out.println("=====third loop=====");
+							System.out.printf("%c %c %d\n",h,p,q);
+							if(q == 2) {
+								System.out.println(" break b");
+								break b;
+							}
+						}
+				}
+				
+			}
+
+		1) for문: 반복횟수를 명확히 알거나 뭔가 인덱스적, 순차적인 접근이 필요할때
+			: for(초기화식 ; 조건식 ; 연산식){ 실행내용 ; }
+			: 참고로 n회 실행 방법
+				1. for(int i = 0 ; i <n; i++) // 0부터 시작
+				2. for(int i = 1 ; i <=n ; i++) // 1부터 시작
+			: for 문 내부에 2개 이상의 변수도 사용 가능하고 이때는 쉼표로 구분함
+				ex) for(int i = 10,j=0 ; i>0 && j<6 ;i-- , j++) {
+				System.out.println("i:"+i+" j:"+j);
+				}
+			: 초기화식, 조건식, 연산식 각각 생략 가능
+				: 초기화식을 생략한다는건 for 문 외부서 정의된 변수값을 조건식과 연산식에 활용하겠단 뜻
+					ex)
+						int k = 10;
+						for(;k>0;k--) {
+						System.out.println(k);
+						}
+
+				: 조건식 생략시 무조건 true 취급 (근데 이럴꺼면 while 씀)
+			:  보통 for 문 헤드 부분서 쓰이는 변수는 int 형 . 실수로 실행이 안되는건 아닌데 실수 특성상 소수점이후로 부정확하기 때문에 원하는 횟수만큼 실행 안될 확률 높음
+				ex)
+				for( float f = 0.0f ; f <1.0f ; f+=0.1f )
+			: 중첩 for 문 : for 문 안에 for 문을 또 쓴것
+
+		2) while 문:  반복횟수를 명확히 모르거나 무한루프 필요할때 활용
+			: while (조건식) {  실행내용; }
+			: while 문 탈출 방법
+				1. while 문 조건식이 false 가 되는 시정
+				2. while 문 내부에서 if 와 break 사용
+
+		3) do-while 문 : 우선적으로 실행한 후 조건 검사
+			do {
+			실행내역;
+			}while(조건문);
+				: while 뒤에 세미콜론 잊지x
+
+
+난수발생	
+	: Math.random() 
+		: 기본적으로 0.0<= <1.0의 실수난수 생성
+		: Math클래스는 java.lang 패키지에 있으므로 별도로 import 필요 없음
+		: random()는 정적 메서드라 객체 생성 없이 Math.random() 으로 클래스명 그 자체로 사용 가능
+		: 자체적으로 현재시간을 seed 로 설정하므로 별도로 seed값 설정 안해줘도 됨
+		: 주로  " (int)(Math.random() * 가능한난수갯수) + 스타트숫자 " 꼴로 사용
+			: (int) Math.random() * 가능한난수갯수 + 스타트숫자 하면 0*가능난수갯수 + 스타트 숫자 == 스타트숫자 되므로 꼭  Math.random() * 가능한난수갯수 덩어리에 int 를 적용시켜야됨
+			: c언어에서와 다르게 %가 아닌 *를 쓰는것 주의 
+
+
+
+
+
 
