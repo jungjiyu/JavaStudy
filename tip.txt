@@ -34,3 +34,6 @@
 4. 유명한 예외
 	1. NullpointerException : 아무것도 가리키고 있지 않는 참조변수 사용시 발생
 	2. ArrayIndexOutOfBoundsException : 인덱스 초과하여 사용
+
+5. 배열을 첨부터 끝까지 복사시키는 한줄 코드 
+	: System.arraycopy(복사시키는배열1 , 0 , 복사받는배열2, 0 , 복사시키는배열1.length);
