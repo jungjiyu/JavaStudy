@@ -1,0 +1,1 @@
+나중에 Enum 파트 다시 봐야됨. CloneNotSupportedException 존나 뜸
