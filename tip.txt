@@ -66,6 +66,7 @@ public class Student {
 	Student(String  name){ // 생성자1
 		this(name , 70); // 똑같은 코드 귀찮게 또 쓰지 않기 위해 첫줄에 this( ) 사용
 		System.out.println("1번째 Student 생성자애 들어왔습나다");
+
 	}
 	
 	Student(int age){ // 생성자2
@@ -76,11 +77,17 @@ public class Student {
 		
 	
 	Student(String name , int age){ // 생성자3
-		this.name = name; // 필드명과 겹치는 param명을 사용하기 위해 this 객체( 클래스 자기자신)를 사용
-		this.age = age;
-		
+		this(age,name);
 		System.out.println("3번째 Student 생성자애 들어왔습나다");
 	}
+	
+	Student( int age, String name){ // 생성자4
+		this.name = name; // 필드명과 겹치는 param명을 사용하기 위해 this 객체( 클래스 자기자신)를 사용
+		this.age = age;
+		System.out.println("4번째 Student 생성자애 들어왔습나다");
+
+	}
+	
 
 }
 
