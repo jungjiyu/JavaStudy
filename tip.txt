@@ -45,8 +45,7 @@
 
 7. 문법 추측(아마도)
 	보편적인 객체 생성법
-		1. new 키워드 사용) new 클래스명( arg )
-		2. getInstance 사용) 클래스명.getInstance( )
+		new 키워드 사용) new 클래스명( arg )
 	특수한 객체 생성법
 		1. 새로운 문자열 할당
 		2. 중괄호 할당
@@ -55,3 +54,32 @@
 8. 한 블럭 내부에서 똑같은 변수명으로 선언 못하는거지 한 프로그램 내에서는 같은 변수명으로 여러 변수 선언가능하고 이경우 가장 가까운 변수를 사용한다
  
 
+9. 오버라이딩 할 경우 param 적은 쪽을 앞쪽에 배치하는게 가독성이 좋고 max 인 param을 가진 생성자를 적극 활용하는게 좋다
+
+public class Student {
+	
+	String name;
+	int age;
+	
+	Student(){ } // 기본생성자
+	
+	Student(String  name){ // 생성자1
+		this(name , 70); // 똑같은 코드 귀찮게 또 쓰지 않기 위해 첫줄에 this( ) 사용
+		System.out.println("1번째 Student 생성자애 들어왔습나다");
+	}
+	
+	Student(int age){ // 생성자2
+		this("Trump",age);
+		System.out.println("2번째 Student 생성자애 들어왔습나다");
+
+	}
+		
+	
+	Student(String name , int age){ // 생성자3
+		this.name = name; // 필드명과 겹치는 param명을 사용하기 위해 this 객체( 클래스 자기자신)를 사용
+		this.age = age;
+		
+		System.out.println("3번째 Student 생성자애 들어왔습나다");
+	}
+
+}
