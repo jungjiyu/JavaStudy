@@ -1,0 +1,105 @@
+--------------------------------------------------------------------------------
+package Chapter1;
+
+import java.util.Scanner;
+
+public class Quiz4 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Scanner input = new Scanner(System.in);
+		System.out.print("생년월일 8자리를 입력해주세요: ");
+		String birth = input.nextLine();
+		
+		// 2024|01|08
+		
+		String year = birth.substring(0,4);
+		String month = birth.substring(4,6);
+		String day = birth.substring(6,8);
+		
+		System.out.println("년: " + year);
+		System.out.println("월: " + month);
+		System.out.println("일: " + day);
+		
+		input.close();
+	}
+
+}
+
+--------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz7 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		for (int i=0; i<=100; i++) {
+			if (i%5==0) {
+				System.out.println(i);
+			}
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz10 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int j = 0;
+		while (j <= 100) {
+			System.out.println(j);
+			j += 5;
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz12 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int i = 0;
+		while (true) {
+			i += 1;
+			if (i > 5) {
+				break;
+			}
+			for (int j = 0; j < i; j++) {
+				System.out.print("*");
+			}
+			System.out.println();
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------
+package Chapter1;
+
+import java.util.Scanner;
+
+public class Quiz14 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Scanner input = new Scanner(System.in);
+		System.out.print("수 입력: ");
+		String st = input.next(); 	
+		
+		if(st.equals("1") || st.equals("2") || st.equals("3") || st.equals("4") || st.equals("5")) {
+			System.out.println(st + "입니다.");
+		} 
+		
+		input.close();
+	}
+
+}
+
+--------------------------------------------------------------------------------
