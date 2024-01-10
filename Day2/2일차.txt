@@ -1,0 +1,153 @@
+------------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz17 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int sum = 0;
+		int total = 0;
+		
+		for (int i = 1; i <= 100; i++) {
+			sum += i;
+			total += sum;
+		}
+		
+		System.out.println("합: " + total);
+	}
+
+}
+
+------------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz19 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int i = 0;
+		while (i <= 10) {
+			int j = 0;
+			while (j <= i) {
+				System.out.print("*");
+				j++;
+			} 
+			System.out.println();
+			i++;
+		}
+		
+	}
+
+}
+
+------------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz21 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String str = "12345";
+		int sum = 0;
+		
+		for (int i = 0; i < str.length(); i++) {
+			sum += str.charAt(i) - '0';
+		}
+		
+		System.out.println("sum : " + sum);
+	}
+
+}
+
+------------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz22 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int value = (int)(Math.random()*10)+1;
+		System.out.println(value);
+	}
+
+}
+
+------------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz23 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int num = 12345;
+		int sum = 0;
+		
+		while(num > 0) {
+			sum += num % 10;
+			num /= 10;
+		}
+		System.out.println("sum: " + sum);
+	}
+
+}
+
+------------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz25 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int[][] arr = {
+				{5,5,5,5,5},
+				{10,10,10,10,10},
+				{20,20,20,20,20},
+				{30,30,30,30,30}
+		};
+		
+		int total = 0;
+		float average = 0;
+		
+		for (int i = 0; i < arr.length; i++) {
+			for (int j = 0; j < arr[i].length; j++) {
+				total += arr[i][j];
+			}
+			
+		average = total / (float)(arr.length * arr[0].length);
+		
+		System.out.println("total: " + total);
+		System.out.println("average: " + average);
+		}
+	}
+}
+
+------------------------------------------------------------------------------------
+package Chapter1;
+
+public class Quiz26 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int[] ballArr = {1,2,3,4,5,6,7,8,9};
+		int[] ball3 = new int[3];
+		
+		for (int i = 0; i < ballArr.length; i++) {
+			int j = (int)(Math.random() * ballArr.length);
+			int tmp = 0;
+			
+			tmp = ballArr[i];
+			ballArr[i] = ballArr[j];
+			ballArr[j] = tmp;
+		}
+		System.arraycopy(ballArr, 0, ball3, 0, 3);
+		
+		for (int i = 0; i < ball3.length; i++) {
+			System.out.print(ball3[i]);
+		}
+		
+		System.out.println();
+	}
+
+}
+
+------------------------------------------------------------------------------------
