@@ -1,0 +1,491 @@
+---------------------------------------------------------------------------------------------
+package Chapter1;
+
+import java.util.Scanner;
+
+public class Quiz27 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		boolean run = true;
+		int balance = 0;
+		Scanner input = new Scanner(System.in);
+		while(run) {
+			System.out.println("----------------------------------------");
+			System.out.println("1. 예금 * 2. 출금 * 3. 잔고 * 4. 종료");
+			System.out.println("----------------------------------------");
+			System.out.print("선택: ");
+			int choice = input.nextInt();
+			switch (choice) {
+				case 1:
+					System.out.print("예금 하실 금액을 입력해주세요: ");
+					int money = input.nextInt();
+					balance += money;
+					System.out.println("예금액: " + money); break; 
+				
+				case 2:
+					System.out.print("출금 하실 금액을 입력해주세요: ");
+					money = input.nextInt();
+					balance -= money;
+					System.out.println("출금액: " + money); break;
+					
+				case 3:
+					System.out.println("잔고: " + balance); break;
+					
+				case 4:
+					System.out.println("프로그램 종료!");
+					run = false;
+					input.close();
+					break;
+					
+				default:
+					System.out.println("잘못입력하셨습니다."); break;
+			}
+		}
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Calculator {
+	static int result = 0;
+	
+	static int add(int num) {
+		result += num;
+		return result;
+	}
+}
+
+public class EX01 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println(Calculator.add(3));
+		System.out.println(Calculator.add(7));
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Calculator1 {
+	static int result = 0;
+	
+	static int add(int num) {
+		result += num;
+		return result;
+	}
+}
+
+class Calculator2 {
+	static int result = 0;
+	
+	static int add(int num) {
+		result += num;
+		return result;
+	}
+}
+
+public class EX02 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println(Calculator1.add(3));
+		System.out.println(Calculator1.add(7));
+		System.out.println();
+		System.out.println(Calculator2.add(3));
+		System.out.println(Calculator2.add(4));
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Calculator3 {
+	int result = 0;
+	
+	int add(int num) {
+		result += num;
+		return result;
+	}
+}
+
+public class EX03 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Calculator3 calc1 = new Calculator3();
+		Calculator3 calc2 = new Calculator3();
+		
+		System.out.println(calc1.add(3));
+		System.out.println(calc1.add(7));
+		System.out.println();
+		System.out.println(calc2.add(3));
+		System.out.println(calc2.add(4));
+		
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Calculator4 {
+	int result = 0;
+	
+	int add(int num) {
+		result += num;
+		return result;
+	}
+	
+	int sub(int num) {
+		result -= num;
+		return result;
+	}
+}
+
+public class EX04 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Calculator4 calc1 = new Calculator4();
+		Calculator4 calc2 = new Calculator4();
+		
+		System.out.println(calc1.add(3));
+		System.out.println(calc1.add(7));
+		System.out.println(calc1.sub(3));
+		System.out.println();
+		System.out.println(calc2.add(3));
+		System.out.println(calc2.add(4));
+		System.out.println(calc2.sub(4));		
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Character {
+}
+
+public class EX05 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Character timo = new Character();
+		Character lulu = new Character();
+		Character tristana = new Character();
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Character2 {
+	int speed = 0;
+}
+
+public class EX06 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Character2 timo = new Character2();
+		System.out.println("Speed: " + timo.speed);
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Character3 {
+	int speed;
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+}
+
+public class EX07 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Character3 timo = new Character3();
+		
+		timo.setSpeed(10);
+		System.out.println("Speed: " + timo.speed);
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Character4 {
+	int speed;
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+}
+
+public class EX08 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Character4 timo = new Character4();
+		timo.setSpeed(10);
+		System.out.println("Speed: " + timo.speed);
+		
+		// lulu객체 생성 및 Speed값 출력
+		Character4 lulu = new Character4();
+		lulu.setSpeed(20);
+		System.out.println("Speed: " + lulu.speed);
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+public class EX09 {
+	
+	int sum(int a, int b) { // 매개 변수
+		return a + b;
+	}
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int a = 3;
+		int b = 4;
+		EX09 ex = new EX09();
+		int c = ex.sum(a, b); // 변수(인수를 저장하는 역할)
+		System.out.println("Sum: " + c);
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+// 입력값과 리턴값이 모두 있는 메서드
+// 입력값: a, b
+// 리턴값: a + b
+
+class Test1 {
+	int sum(int a, int b) {
+		return a + b;
+	}
+}
+
+public class EX10 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Test1 test1 = new Test1();
+		int result = test1.sum(3, 4);
+		System.out.println("합: " + result);
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+// 입력값은 없고 출력값은 있는 메서드
+// 입력값: 
+// 출력값: String
+
+class Test2 {
+	String hi() {
+		return "Hello, Java";
+	}
+}
+
+public class EX11 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Test2 test2 = new Test2();
+		String result = test2.hi();
+		System.out.println(result);
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+// 입력값은 있고 리턴값은 없는 메서드
+// 입력값: a, b
+// 리턴값: 
+
+class Test3 {
+	void sum(int a, int b) {
+		System.out.println("합: " + (a+b));
+	}
+}
+
+public class EX12 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Test3 test3 = new Test3();
+		test3.sum(3,4);
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+// 입력값과 리턴값이 모두 없는 메서드
+// 입력값: 
+// 리턴값:
+
+class Test4 {
+	void hi() {
+		System.out.println("Hello, Java");
+	}
+}
+
+public class EX13 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Test4 test4 = new Test4();
+		test4.hi();
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Character_1 {
+	int speed;
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+}
+
+class Character_2 extends Character_1 {
+	
+}
+
+public class EX14 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Character_2 timo = new Character_2();
+		timo.setSpeed(10);
+		System.out.println("Speed: " + timo.speed);
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Character_3 {
+	int speed;
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+}
+
+class Character_4 extends Character_3 {
+	void speedSay() {
+		System.out.println("현재 속도는 " + this.speed + "입니다.");
+	}
+}
+
+public class EX15 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Character_4 timo = new Character_4();
+		timo.setSpeed(10);
+		System.out.println("Speed: " + timo.speed);
+		timo.speedSay();
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Character_5 {
+	int speed;
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+}
+
+class Character_6 extends Character_5 {
+	void speedSay() {
+		System.out.println("현재 속도는 " + this.speed + "입니다.");
+	}
+}
+
+class Character_7 extends Character_6 {
+	void speedSay() {
+		System.out.println("The Current speed is " + this.speed);
+	}
+}
+
+public class EX16 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Character_7 timo = new Character_7();
+		timo.setSpeed(10);
+		timo.speedSay();
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+package Chpater2;
+
+class Character_8 {
+	int speed;
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+}
+
+class Character_9 extends Character_8 {
+	void speedSay() {
+		System.out.println("현재 속도는 " + this.speed + "입니다.");
+	}
+}
+
+class Character_10 extends Character_9 {
+	void speedSay() {
+		System.out.println("The Current speed is " + this.speed);
+	}
+	
+	void speedSay(int speed) {
+		System.out.println("현재 속도는 " + this.speed + "입니다.");
+		System.out.println("증가될 속도는 " + speed + "입니다.");
+	}
+}
+
+public class EX17 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Character_10 timo = new Character_10();
+		timo.setSpeed(10);
+		timo.speedSay();
+		timo.speedSay(20);
+	}
+
+}
+
+---------------------------------------------------------------------------------------------
+
