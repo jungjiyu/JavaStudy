@@ -1,0 +1,226 @@
+--------------------------------------------------------------------------------------
+package Chapter3;
+
+public class EX01 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println("Hello, Java");
+	}
+
+}
+
+--------------------------------------------------------------------------------------
+package Chapter3;
+import java.io.IOException;
+public class EX02 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int i;
+		try {
+			System.out.print("문자 하나 입력: ");
+			i = System.in.read();
+			System.out.println(i);
+			System.out.println((char)i);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------------
+package Chapter3;
+import java.io.IOException;
+public class EX03 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int i;
+		
+		try {
+			System.out.print("문자열 입력: ");
+			while((i = System.in.read()) != '\n') {
+				System.out.println((char)i);
+			} 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------------
+package Chapter3;
+
+import java.util.Scanner;
+
+public class EX04 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Scanner input = new Scanner(System.in);
+		System.out.print("성함: ");
+		String name = input.nextLine();
+		System.out.print("주소: ");
+		String addr = input.nextLine();
+		System.out.println("나이: ");
+		int age = input.nextInt();
+		
+		System.out.println("성함: " + name);
+		System.out.println("주소: " + addr);
+		System.out.println("나이: " + age);
+		
+		input.close();
+	}
+
+}
+
+--------------------------------------------------------------------------------------
+package Chapter3;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class EX05 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// FileInputStream사용하여 파일로 부터 자료 읽기
+		try {
+			FileInputStream fis = new FileInputStream("input.txt");
+			System.out.println(fis.read());
+			System.out.println(fis.read());
+			System.out.println(fis.read());
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println();
+			System.out.println(e);
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------------
+package Chapter3;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class EX06 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// FileInputStream사용하여 파일로 부터 자료 읽기
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream("input.txt");
+			System.out.println((char)fis.read());
+			System.out.println((char)fis.read());
+			System.out.println((char)fis.read());
+			fis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println();
+			System.out.println(e);
+		}
+		
+	}
+
+}
+
+--------------------------------------------------------------------------------------
+package Chapter3;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class EX07 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try (FileInputStream fis = new FileInputStream("input.txt")){
+			int i;
+			while ((i = fis.read()) != -1) {
+				System.out.println((char)i);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------------
+package Chapter3;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.File;
+
+public class EX08 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		File file = new File("C:/DailyJava21/Java3/input.txt");
+		
+		try (FileInputStream fis = new FileInputStream(file)) {
+			int i;
+			while ((i = fis.read()) != -1) {
+				System.out.println((char)i);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------------
+package Chapter3;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class EX09 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try (FileInputStream fis = new FileInputStream("input2.txt")) {
+			byte[] bs = new byte[10];
+			int i;
+			while ((i = fis.read(bs)) != -1) {
+				for (byte b : bs) {
+					System.out.print((char)b);
+				}
+				System.out.println(": " + i + "바이트 읽음");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+--------------------------------------------------------------------------------------
+package Chapter3;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class EX10 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try (FileInputStream fis = new FileInputStream("input2.txt")) {
+			byte[] bs = new byte[10];
+			int i;
+			while ((i = fis.read(bs)) != -1) {
+				for (int j = 0; j < i; j++) {
+					System.out.print((char)bs[j]);
+				}
+				System.out.println(": " + i + "바이트 읽음");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+--------------------------------------------------------------------------------------
