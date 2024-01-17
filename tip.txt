@@ -326,3 +326,8 @@ public class Student {
 for(int i ='a' ; i <='z' ; i++){
 	ary[ i - 'a'] = (char)i;
 }
+
+
+35 추상클래스, 인터페이스는 직접 객체를 생성하지 못하는거지 그 타입으로 레퍼런스 변수는 만들 수 있다
+	ex) new InputStream();은 못하지만 InputStream is; 는 가능 
+
