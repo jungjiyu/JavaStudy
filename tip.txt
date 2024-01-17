@@ -321,3 +321,8 @@ public class Student {
 	int a ;
 	while( (a=10) <9 ){ 어쩌구 저쩌구 }
 
+
+34. for 문으로 간단하게 char 형 배열에 a 부터 z까지 저장하기
+for(int i ='a' ; i <='z' ; i++){
+	ary[ i - 'a'] = (char)i;
+}
