@@ -1,0 +1,294 @@
+자바 입출력(I/O)
+	: 데이터를 주고받는것
+	: I /O == 인풋 아웃풋
+	: 스트림
+		: 이걸 가능하게 해주는 것
+		: 데이터 다니는 가상의 통로
+			: 자바응용프로그램 < ----- > 입출력 장치
+		: 입출력 장치의 종류와 무관
+		: 클래스의 형태로 제공됨
+		: 하나의 스트림은 단방향 동작(입출력따로)
+		: 3가지 유형
+			1. 입력스트림 ,출력스트림(out , wirte 붙은거)
+			2. 바이트 스트림,문자 스트림
+				바이트 스트림
+					: 바이트 단위로 데ㅔ이터 주고 받음
+			 	문자 스트림
+					: 깨짐 현상없이 2바이트 단위로 읽어옴
+			3. 기반 스트림,보조 스트림
+				기반스트림
+					: 입출력 기능 직접 할 수 있는 스트림
+				보조 스트림
+					: 부가적 기능 제공 (지혼잔 못함)
+
+
+스트림 == 클래스
+	: 객체( out, in ,error 같은)  생성 후 그 객체로 해당 클래스의 멤버 접근 가능
+
+입출력 스트림
+	: static PrintStream ) 표준 출ㄹ력 스트림
+		: 객체 - out
+			: System.out.println( ) == out 이란 스트림 클래스의 객체를 대상으로 println() 이란 매서드를 실행
+	: static InputStream ) 표준 입력 스틂
+		: 객체 - in
+		: 사용할 때 에러 처리 해줘야됨
+			: read( ) == 한바이트만 정수값 을 읽고 반환
+				: java.io.IOException 받아야됨
+				: 문자를 반환하고 싶으면 (char) 강제형변환
+				: 문자열 입력 받으로면 반복뮨 써야됨
+				: 한바이트 단위라 아스키 단위로밖에 못함
+					: 유니코드를 입력받음 깨진다
+				: 예외 처리 해줘야됨
+
+			: scanner
+				: java.util.Sacnner 불러와야됨
+				: read() 의 단점 보완
+					: 한글읽어올 수 있고 문자열도 쉽게 읽어옴
+				: 다양한 자료형의 값을 읽어올 수 있음
+				: 객체 생성 후 사용해야됨
+
+	: static OutputStream) 표준 오류 출력 스트림
+		: 객체 - error
+	
+
+
+
+바이트스트림 : 인풋스트림의 하위 클래스	
+	: 인풋 스트림의 하위 클래스들
+	: 클래스 종류
+	: 종류
+		FileInputStream
+			: 파일에서 바이트 단위로 자료를 읽어옴
+			: 멤버
+				생성자
+					FileInputStream(String name) 
+						파일 이름을 매개변수로 받아 입력 스트림을 생성함
+					FileInputStream(FIle f)
+						File 클래스 정보(파일 경로)를 매개변수로 받아 입력 스트림을 생성함
+
+		ByteArrayInputStream
+			: byte 배열 ㅁ[모리에서 바이트 단위 읽어옴
+		FilterInputStream	
+			: 기반 스트림에서 자료를 읽을때 추가 기능을 제공하는 보조 스트림의 상위 클래스
+	
+
+	:대표 메서드
+		int read( )
+			:import java.io.IOException; 필요
+			: 한바이트 단위로 읽고 , 읽은 값을 반환함
+			: 더이상 읽을 자료가 없음 -1 값 반환
+		int read( byte b[])
+			: 입력 스트림으로부터 b[] 크기 자료를 b[] 에 읽으며 , 읽은 자료의 바이트 값을 반환
+			: 선언한 바이트 배열의 크기 만큼 "한번에" 자료를 반환함
+
+ 		int read( byte[] b , int off , int len)
+			: ㅇㅂ력스트림으로부터 b[] 크기의 자료를 off 변수 위치부터 저장하여 len 만큼 읽으며, 읽은 자료의 바이트 수 반환
+
+		void close( )
+			: 입력 스트림과 연결된 대상 리소스를 닫음  
+
+try 괄호 안에 선언 하고 대입하면 자동으로 close해줘 개꿀이다 			
+인풋스트림 다 쓰고 나면 close 해줘라
+	: 스트림 객체를 넘 많이 생성하면 에러 발생 확률이 높아짐
+
+
+for 무슨무슨 구문 >> 기존의 자료를 덮어쓰기 하ㄱ ㅗ 새로운거 저장해서 그렇다
+
+OutputStream
+	: 바이크 단위로 쓰는 스트림 중 최상위 스트림
+	: 종류
+		FileOutputStream
+			: 파일에서 바이트 단위로 자료를 씀
+			: 멤버
+				": 생성자
+					FileOutputStream(String name)	
+						: 파일 이름을 매개변수로 받아 출력 스트림 생성하는 생성자
+					FileOutputStream( String name, boolean append)
+						: append 값이 true 이면 이어쓰기함
+							: defualt 론 flase 부여되있음
+					FileOutputStream(File f)
+						: 파일 경로를 매개변수로 받아 출력 스트림 생성
+					FileOutputStream(Filen f, boolean append)
+						: append 값 true 면 파일 스트림 닫고 다시 생성할때 파일 끝에 이어서 씀.
+							: default 값 = flase
+						: 걍 파일 경로 버전인거임
+
+		ByteArrayOutStream
+			: byte 배열 메모리에서 바이트 단위로 자료를 씀
+		FilterOutStream
+			: 기반 스크림서 자료를 쓸 때 추가기능 제공하는 보조 스트림의 상위 클래스
+
+
+	: 자주쓰는 메서드
+		void write(int b)
+			: 한 "바이트"를 출력
+		void write(byte[] b)
+			: b[] 배열에 있는 자료를 출력
+		 void write(byte[] b , int off , int len)
+			: b[] 배열에 있는 자료의 off 위치부터 len 개수만큼 자료를 출력
+		void flush()
+			: 출력버퍼를 강제로 비워 자료 출력
+		void close()
+			: 출력 스트림과 연결된 대상 리소스를 닫음 && 춮력버퍼가 비워짐
+
+출력 == 쓴다
+
+
+
+Reader 
+	: 문자단위로 읽는 스트림 중 최상위 클래스
+	: 하위 클래스 )
+		FileReader : 파일에서 문자단위로 읽는 스트림 클래스
+		InputStreamReader : 바이트 단위로 읽는 자료를 문자로 변환해주는 보조 스트림 클래스
+		BufferedReader : 문자로 읽을 때 배열을 제공하여 한꺼번에 ㅣㅇㄺ을 ㅜ 있는 기능을 제공하는 보조 스트리ㅁ
+	: 메서드) 
+		int read() 
+			: 파일로부터 한 문자를 읽으며 , 읽은 값을 반환
+		int read( char[ ] buf)
+			: 파일로부터 문자 배열의 문자를 읽음
+		int read( char [ ] buf, int off , int len )
+			: 파일로부터 buff 배열의 off 위치서부터 len 개수 만큼 문자 읽음
+		void close()
+			: 스트림과 연결된 파일 리소스를 닫음
+
+	: 생성자)
+		FileReader ( String name) : 파일 이름 name(경로포함) 을 매변으로 받아 입력스트림 생성
+		FileReader( File f) : 파일 경로를 매변으로 받아 입력 스트림 생성
+
+
+Writer
+	: 문자단위로 출력하는 스트림 중 최상위 스트림
+	: 하위 클래스
+		Filewriter
+			: 파일에서 문자단위로 출력하는 스트림 클래스
+		OutputStreamWriter
+			: 바이트 단위로 출력한 자료를 문자로 변환해주는 보조 스트림 클래스
+		BufferedWriter
+			: 문자로 쓸 때 배열을 제공하여 한꺼번에 읽을 수 있는 기능을 제공하는 보조 스트림
+	: 메서드
+		viod writer()
+			: 한 문자 파일을 출력
+		void write( char [] buf)
+			: 문자 배열 buf 내용을 파일에 출력
+		void write( char [ ] buf , int off , int len)
+			: 문자 배열 off 위치부터 len 개수의 문자를 파일에 출력
+		void write( String str)
+			: 문자열 str을 파일에 출력
+		void write(String str , int off , int len)
+			: 몽말인지 알지? 
+
+	: 생성자
+		FileWriter( String name)	
+		FileWriter(String name , boolean append)
+		FileWriter(File f)
+		FileWriter(File f, boolean append)
+
+
+보조스트림
+	: 직접 쓰거나 읽는 기능이 없음
+		: 반드시 기반 스트림을 동반해야됨
+	: 보조 기능을 하는 스트림으로 여러 스트림에 여러개 적용 가능함
+		: 커피에 우유 , 시럼 같은거 넣는거..
+
+	InputStreamReader( InputStream in)
+		: InputStream 클래스의 생성자의 매개변수로 받아 매개변수로 생성
+	InputStreamReader(InputStream in , Charset , cs)
+	:	: inputstream 가ㅗ charset 크ㅡㄹㄹ래스를 매개변수로 받아 reader 를 생성
+	InputStreamReader(InputSteram in ,CharsetDecoder dec)
+		: InputStream 과 charsetdecoder 를 매개변수로 ㅂ받아 reader  를 생성
+	InputStreamReader(InputSteram in , String charsetname)
+		: inputstream 과 string 으로 문자 세트 이름을 받아 reader 생성 
+
+; 바이트 단위로 데이터를 읽고 반환하기를 문자로 반환한다
+
+zip 파일 마저 전송이 가능하다! 존나 신기
+	: 일반적으로 출력할때, 출력할 파일이 존재하지 않으면 에러난다 (FileNotFoundException)
+	: 그런데 zip 파일을 불러오고, 불러온 내용을 FileOutputStream 을 통하여 다른 zip 파일로 출력할때 , 결과를 보면 없던 파일들이 에러없이 생겨났음을 알  수 있다. 왜 애초에 없던 파일들이 존재하지 않았음에도 정상적으로 출력된 것일까?
+		: 내 뇌피셜로는 Zip 파일로 출력할때도 생성자 부분에 썼던 해당 Zip 파일의 경로가 존재하는 경로였고, 그 존재하는 경로에 ㄴ내용을 출력하는거라서 괜찮았던거다
+
+Buffered 보조스트림
+	: 이미 생성된 스트림에 배열 기능을 추가하여 더 빠르게 입출력을 가능하게 하는 버퍼링 기능을 제공
+	: 하위스트림
+		BufferedInputStream
+			: 바이트 단위로 읽는 스트림에 버퍼 기능을 ㅈ공
+		BufferedOutpitStream
+			: 출력하는
+		BufferedReader
+			: 문자단위로 읽는 스트림에 버퍼 기능제공
+		BufferedWriter
+			: 출력하는		
+
+	: 데이터를 한번에 배열로 불러온다
+
+	; 생성자
+		BufferdInputStream( InputStream in)
+			: InputStream 클래스를 생성자의 매개변수로 받아 BufferedInputStrean 생성
+		BufferedInputStream( InputStream in , int size)
+			: InputStream 클래스와 사이즈를 생성자의 매ㅐㅂ녀수로 받아 생성
+
+
+DataInputStream, DataOutputStream
+	: 메모리에 저장된 0,1 상태를 그대로 읽고 씀
+	: 생성자
+		DataInputStream(InputStream in)
+			 InputStream 을 생성자의 매개변수로 받아 DataInputStream 을 생성
+		DataOutputStream(OutputStream out)
+			OutputStream 을 생성자의 매개변수로 받아 생성
+
+	: DataInputStream메서드
+		byte readByte( )
+			: 1 바이트를 읽어 반환
+		boolean readBoolean( )
+			: 읽은 자료가 0 이면 false . 아님 true 반환
+		char readChar( )
+			: 한 문자를 읽어 반환
+		short readShort()
+			: 2바이트를 읽어 정수값을 반환
+		int readInt( )
+			: 4바이트 읽, 정수 반환
+		long readLong()
+			: 8 바트 읽, 정수 반환
+		float readFloat()
+			: 4바트 읽, 실수 반환
+		double readDouble
+			: 8바트 읽, 실수 반환
+		String readUTF( ) 
+			: 수정된 UTF-8 기반으로 인코딩된 문자를 반환
+
+	: 메서드
+		void write( int v)
+		: 1바트 자료 출력
+		void writeBoolean( boolean b)
+			: 1밭트값출
+		void writeChar(int v)
+			: 2바트값 출
+		void wirteShort( int v)
+			: 2바트값출
+		void writeLong(long v)
+			: 8바트 값
+		void writeFloat(flaot v)
+		void writeDouble(double v)
+		void writeUTF(String str)
+			: 문자열 출력
+
+
+
+스레드 tread
+	: 응용프로그램 실행 시 동시에 다수의 처리를 병해ㅇ하기 위해 여러개의 처리단위인 스레드를 생성하여 운영하는 법
+	: 실행중인 프로그램 == 프로세스
+		: 메모리에 올라간거 프로세스
+		: 보통 한가지의 일을 하게 되어있음
+	: 근데 스레드는 동시에 여러가지 일을 할 수 있게 해줌
+	: 크롬 같은 웹 브라우져에ㅅㅓ 동시에 여러가지 일을 하게 해주는게 스레드
+
+: 무조건 run ( )  이라는 메서드 구현 필요
+	: 실행됬을때 어떤 동작을 할건지 구현해줌 됨
+	: 객체에 start( )라는 메서드 썼을때 run ( ) 실행됨
+: 생성은 순서대로 되도 동작 시작은 지 맘대로 실행된다
+: 메인메서드가 종료 되도 thread 는 종료 안될 수 있다
+: 	: join 메서드로 해결
+
+: 클래스로 다중상속은 불가능하기 때문에 보통 인터페이스로 thread 만드는 편
+
+: Runnable
+	: 여러개 상속받기 위해 Runnalbe 인터페이스를 implements 한다 (Thread 를 상속받는게 아니라)
