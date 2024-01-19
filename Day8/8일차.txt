@@ -1,0 +1,290 @@
+-------------------------------------------------------------------------
+package Chapter4;
+
+// 공유 객체 클래스
+class WorkObject {
+	public synchronized void methodA() {
+		System.out.println("threadA");
+		notify();
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	public synchronized void methodB() {
+		System.out.println("threadB");
+		notify();
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	public synchronized void notifyMainThread() {
+		notify();
+	}
+}
+
+class Test5_1 implements Runnable {
+	private WorkObject workObject;
+	public Test5_1(WorkObject workObject) {
+		this.workObject = workObject;
+	}
+	public void run() {
+		for(int i = 0; i < 5; i++) {
+			workObject.methodA();
+		}
+	workObject.notifyMainThread();
+	}
+}
+
+class Test5_2 implements Runnable {
+	private WorkObject workObject;
+	public Test5_2(WorkObject workObject) {
+		this.workObject = workObject;
+	}
+	public void run() {
+		for(int i = 0; i < 5; i++) {
+			workObject.methodB();
+		}
+	workObject.notifyMainThread();
+	}
+}
+
+public class EX05 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		WorkObject sharedObject = new WorkObject();
+		
+		Thread t1 = new Thread(new Test5_1(sharedObject));
+		Thread t2 = new Thread(new Test5_2(sharedObject));
+		
+		t1.start();
+		t2.start();
+		
+		try {
+			t1.join();
+			t2.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("main end");
+	}
+
+}
+
+-------------------------------------------------------------------------
+package Chapter4;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class Quiz1 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// 1. 파일 쓰기
+		try (FileOutputStream fos = new FileOutputStream("Quiz1.txt")) {
+			byte[] bs = new byte[26];
+			byte data = 65;
+			for (int i = 0; i < bs.length; i++) {
+				bs[i] = data;
+				data++;
+			}
+			fos.write(bs);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		// 2. 파일 읽기
+		try (FileInputStream fis = new FileInputStream("Quiz1.txt")) {
+			byte[] bs = new byte[26];
+			int i;
+			while ((i = fis.read(bs)) != -1) {
+				for (int j = 0; j < bs.length; j++) {
+					System.out.print((char)bs[j]);
+					}
+				System.out.println(": " + i + "바이트 읽음");
+			}
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+-------------------------------------------------------------------------
+package Chapter4;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class Quiz2 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// 1. 파일 쓰기
+		try (FileWriter fw = new FileWriter("Quiz2.txt")) {
+			fw.write("안녕하세요. 반갑습니다. 또만나요.");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// 2. 파일 읽기
+		try (FileReader fr = new FileReader("Quiz2.txt")) {
+			int i;
+			while((i = fr.read()) != -1) {
+				System.out.print((char)i);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+-------------------------------------------------------------------------
+package Chapter4;
+
+class NumberPrinterThread1 implements Runnable {
+	public void run() {
+		for (int num = 1; num <= 3; num++) {
+			System.out.println("Thread: " + num);
+		}
+	}
+}
+
+
+public class Quiz3 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Thread singleThread = new Thread(new NumberPrinterThread1());
+		
+		singleThread.start();
+	}
+
+}
+
+-------------------------------------------------------------------------
+package Chapter4;
+
+class NumberPrinterThread2 implements Runnable {
+	String ThreadName;
+	public NumberPrinterThread2(String ThreadName) {
+		this.ThreadName = ThreadName;
+	}
+	
+	public void run() {
+		for (int num = 1; num <= 3; num++) {
+			System.out.println("Thread" + ThreadName + ":" + num);
+		}
+	}
+}
+
+public class Quiz4 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Thread threadA = new Thread(new NumberPrinterThread2("A"));
+		Thread threadB = new Thread(new NumberPrinterThread2("B"));
+		
+		threadA.start();
+		threadB.start();
+	}
+
+}
+
+-------------------------------------------------------------------------
+package Chapter4;
+
+class WorkObjects {
+	public synchronized void methodA(int num, String ThreadName) {
+		System.out.println("Thread" + ThreadName + ":" + num);
+		notify();
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public synchronized void methodB(int num, String ThreadName) {
+		System.out.println("Thread" + ThreadName + ":" + num);
+		notify();
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public synchronized void notifyMainThread() {
+		notify();
+	}
+}
+
+class Test5_01 implements Runnable {
+	private WorkObjects workObjects;
+	String ThreadName;
+	public Test5_01(WorkObjects workObjects, String ThreadName) {
+		this.workObjects = workObjects;
+		this.ThreadName = ThreadName;
+	}
+	
+	public void run() {
+		for (int i = 1; i <= 3; i++) {
+			workObjects.methodA(i, ThreadName);
+		}
+		
+		workObjects.notifyMainThread();
+	}
+}
+
+class Test5_02 implements Runnable {
+	private WorkObjects workObjects;
+	String ThreadName;
+	public Test5_02(WorkObjects workObjects, String ThreadName) {
+		this.workObjects = workObjects;
+		this.ThreadName = ThreadName;
+	}
+	
+	public void run() {
+		for (int i = 1; i <= 3; i++) {
+			workObjects.methodB(i, ThreadName);
+		}
+		
+		workObjects.notifyMainThread();
+	}
+}
+
+public class Quiz5 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		WorkObjects sharedObject = new WorkObjects();
+		
+		Thread threadA = new Thread(new Test5_01(sharedObject, "A"));
+		Thread threadB = new Thread(new Test5_02(sharedObject, "B"));
+		
+		threadA.start();
+		threadB.start();
+		
+		try {
+			threadA.join();
+			threadB.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("main end");
+
+	}
+
+}
+
+-------------------------------------------------------------------------
+
