@@ -10,3 +10,6 @@
 10. 왜 복사때는 ㅂ바이트 스트림 써도 안깨지는데 직접 출력하면 깨지는지
 11. 버퍼 스트림 이후 부터 스트림 부분
 12. https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html 마저보기
+https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462306750
+https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462283731#
+https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462488097
