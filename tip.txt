@@ -370,3 +370,38 @@ for(int i ='a' ; i <='z' ; i++){
 35 추상클래스, 인터페이스는 직접 객체를 생성하지 못하는거지 그 타입으로 레퍼런스 변수는 만들 수 있다
 	ex) new InputStream();은 못하지만 InputStream is; 는 가능 
 
+36. 한 스레드로 뭔가 순차적인 출력을 해야할때는 스레드의 run( ) 내부서 반복문 돌리는게 좋다
+	: run ( ) 내부서 한번만 실행하게 하고 스레드 객체를 여러번 순차적으로 생성시키는게 더 어렵기 때문에 한 스레드 객체 내부에서 반복문을 돌리는게 깔끔하다
+		: ex) 
+public class A extends Thread{
+int index;
+A(int index){
+this.index = index;
+}
+public void run(){
+	System.out.println(index);
+}
+}
+로 정의하고 메인스레드서
+
+for(int i = 0 ; i <10 ; i++){
+	A a = new A(i);
+	a.start();
+}
+를 썼을때
+0 1 2 3 4 5 6 7 8 9 처럼 예쁘게 출력된다는 보장이 없지만( 대부분 9 2 8 3 7 0 4 6 5 1 처럼 무작위 순서로 더럽게 나옴)
+
+public class A extends Thread{
+
+public void run(){
+	for(int i=0;i<10;i++){
+	System.out.println(i);
+	}
+}
+}
+로 run()내부에 반복문 쓰고 메인스레드서
+A a = new A();
+a.start();
+한번만 쓰는게 훨씬 간단하고 출력도 실제로 이쁘게 나온다
+
+
