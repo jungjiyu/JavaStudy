@@ -480,6 +480,8 @@ a.start();
 	: 되도록 걍 문자 스트림으로 읽기
 		: 만약에 문장으로 읽어들어야하는 상황이면 보조스트림 BufferedReader 쓰고 readLine() 을 이용하기
 
-37. System. 어쩌구로 쓰는 메서드는 별다른거 import 안해도 걍 쓸 수 있다
+37. import
+	: 클래스 뿐 아니라 인터페이스도 import 해와서 써야된다
+	: System. 어쩌구로 쓰는 메서드는 별다른거 import 안해도 걍 쓸 수 있다
 
 
