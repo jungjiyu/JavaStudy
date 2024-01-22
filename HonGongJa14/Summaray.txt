@@ -411,9 +411,8 @@
 								: 종류)
 									1. 바이트 기반 스트림
 										(1) BufferedInputStream
-											: 
 											: 생성자
-												BufferedInputStream(InputStream os)
+												BufferedInputStream(InputStream is)
 										(2) BufferedOutputStream
 											: 버퍼가 다 차야지 데이터를 실제로 목적지로 출력한다
 											; 생성자
@@ -421,6 +420,9 @@
 
 									2. 문자 기반 스트림
 										(1) BufferedReader
+											: 생성자
+												BufferedReader(Reader rd)
+													: 주의해야될것은 BufferedReader 는 (InputStream 을 Reader 로 바꾸고자 쓰는게 아니라) BufferedReader 만의 메서드인 readLine( ) 을 쓰기 위해 사용하는 보조 스트림이기 때문에 BufferedReader 로 생성한 객체는 BufferedReader 타입의 변수로 받아야된다(아니면 굳이 쓴 이유가 없다)
 											: String readLine( ) 메서드 제공 
 												: 라인 단위(엔터단위)로 문자열을 읽음 << 문장 읽어야되는 상황이면 개유용(기본 스트림의 read( )차원에선 문자 배열 혹은 문자 단위로 밖에 못가져옴)
 													: 엔터를 포함하여 버퍼에서 가져오되 엔터는 버림 (엔터 이전 까지의 내용만 실제로 저장함)
