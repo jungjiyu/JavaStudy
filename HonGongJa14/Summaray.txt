@@ -426,10 +426,46 @@
 											: String readLine( ) 메서드 제공 
 												: 라인 단위(엔터단위)로 문자열을 읽음 << 문장 읽어야되는 상황이면 개유용(기본 스트림의 read( )차원에선 문자 배열 혹은 문자 단위로 밖에 못가져옴)
 													: 엔터를 포함하여 버퍼에서 가져오되 엔터는 버림 (엔터 이전 까지의 내용만 실제로 저장함)
+														: 엔터 버리고 저장하는거 진짜 주의
 													: 라인 단위 == 줄바꿈 == 엔터 == '\r'+'\n'
 												: 더이상 읽어올 문자열이 없으면 null 을 리턴
 						
-							ㅇㄷ
+							3. 기본타입입출력보조시스템
+								: 기본 타입( boolean, char, short , int ..) + 자주쓰는 클래스인 String 타입을 입출력할 수 있음
+									: Interger, Character 말하는게 아니라 찐으로 기본타입들을 말하는 거다
+								: 주의해야할 것은 기반 스트림으로  바이트 스트림만 사용 가능
+								: 종류
+									(1) DataInputStream
+										: 생성자
+											DataInputStream(InputStream is)
+												: 마찬가지로 일반적인 InputStream 에는 없는 메서드를 사용하기 위함이므로 생성한 객체는 InputStream 으로 받음 안되고 딱 DataInputStream 으로 받아야된다
+										: 메서드 >> read기본타입( ) 꼴 (String 은 예외적으로 UTF)
+											1. boolean readBoolean()
+											2. byte readByte()
+											3. short readShort()
+											4. char readChar()
+											5. int readInt()
+											6. long readLong()
+											7. float readFloat()
+											8. double readDouble()
+											9. String readUTF()
+												: 내가 봤을땐 UTF-8 말하는 듯?
+
+
+
+
+									(2) DataOutputStream
+										: 메서드 >> write헤딩타입( 매개변수  ) 꼴
+											: 매개변수 타입 tip >> 싱수 대입할때의 상수 타입과 비슷(int 이하 정수 >> int , long 정수는 long ,boolean 은 boolean , float 는 float , double 은 double)
+											1. void readBoolean(boolean v)
+											2. void readByte(int v)
+											3. void readShort(int v)
+											4. void readChar(int v)
+											5. void readInt(int v)
+											6. void readLong(long v)
+											7. void readFloat(float v)
+											8. void readDouble(double v)
+											9. void readUTF(String v)
 
 
 
