@@ -293,5 +293,15 @@ notifyAll( ) , wait( )
 			sol2 ) synchronized method 내에서 수행 완료 시점을 특정하기 어려우면 notifyAll( ) 만을 내용으로 하는 메서드를 만들고 구현 클래스의 run ( )에서 모든 수행 완료했음 그 메서드를 호출하여 간접적으로 notifyAll( ) 시킨다
 				: 맨 마지막으로 종료되는 스레드 객체의 run( ) 뿐 아니라 그 전에 종료되는 스레드 객체의 run( )에도 notifyAll( ) 을 간접적으로 발생시키는게 좋다 
 					: 스레드 객체가 종료된다 >> 더이상 wait( ) 을 개선시킬 힘이 없다 >> 남아있는 스레드 객체를 waiting pool 에서 꺼내줄 수 있는 얘가 없다 가 되니까  아예 꺼내주고 죽는것.
+
+
+	: Semaphore 세마포어 << 나중에 더 보기
+		: 공유 객체를 두고 스레드의 경쟁이 심한 경우 사용
+		: 경쟁이 심해지면 공유객체는 Heavy Weight lock 상태가 됨
+			: Heavy weight lock 상태 == monitor 방식으로 상호 배제를 구현
+				: semaphore 방식 >> monitor 방식이 나올 수 있게 영감을 준 알고리즘
+		: JVM은 semaphore 방식을 사용하지 않고 synchronized 를 통한 monitor 방식으로 상호 배제를 구현하긴 하지만 , java 표준 api 라이브러리 내부엔 semaphore 클래스도 존재
+		: 
+
 	
 	//current thread is not owner 오류 >> synchronized 메서드도 아닌데 wait ( ) , notify() 같은거 썼을때
