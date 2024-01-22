@@ -467,13 +467,32 @@
 											8. void readDouble(double v)
 											9. void readUTF(String v)
 
+							4. 프린터 보조 스크린
+								: 출력하는 메서드를 가지는 보조 스트림
+								: System.out 도 출력보조스트림 이라서 println() , print( ) 같은거 쓸 수 있었던거임
+									: System.out >> PrintStream 타입
+								: 종류
+									(1) PrintStream
+										: 특이하게 짝꿍은 PrintWirter 이지만 PrintOutputStream 가 아니라 PrintStream 임을 주의
+					 					: 생성자
+											PrintStream(OuputStream os)
+
+									(2) PrintWriter
+										: 생성자
+											PrintWriter(Writer w)
+								: 메서드 
+									: PrintStream 과 PrintWriter 가 똑같은 메서드 사용험
+									: print, println 이 오버라이딩 되있는 구조임
+									:종류
+										void print(여러가지 자료형타입의 매개변수)
+										void println(여러가지 자료형타입의 매개변수)
+											: 끝에 '\n' 자동 추가해 출력
+											: print() 메서드와 다르게 괄호 안에 암것도 안넣은 버전도 오버라이딩 되있어서 괄호 안에 아무런 arg 없이도 사용 가능
 
 
-(2) BufferedWriter
-					
+										
 
-					: 종류
-						문자 변환보조스트림
+										
 
 
 
