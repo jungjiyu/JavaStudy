@@ -405,3 +405,58 @@ a.start();
 한번만 쓰는게 훨씬 간단하고 출력도 실제로 이쁘게 나온다
 
 
+
+
+33. call by value 
+	: 자바는 call by value 라서 arg 로 넘긴 레퍼런스 변수를 타 메서드에서 다른 객체를 가리키게 했다고 해도 해당 메서드를 벗어나면 소용 없는 짓이 된다.
+		: 예시 )
+			public static void main(String[] args) {
+				
+				int[] ary = new int[10];
+				for(int i  =  0 ; i <5;i++) {
+					mthd(ary); // mthd 내부에서 ary 가 다른 객체를 가리키게 한다
+					System.out.println(ary); // 똑같은 주소만 나온다
+				}	
+			}
+		
+		
+			public static void mthd(int[] ary) {
+				ary = new int[100];	
+			}
+
+		: 해결방법 << 일단 c언어처럼 포인터 개념으로 call by reference 흉내를 내진 않는다
+			(1) 타 메서드에서의 변경사항을 반영하고 싶은 레퍼런스 변수를 필드로 만들어서 모든 메서드가 공유하게 한다
+			(2) return 값으로 그 객체의 주소를 넘긴다 << 근데 이건 딱히 변경사항을 반영한다기 보다는 걍 새로운 값 생성해서 넘겨준거임.
+				: 예시
+
+			public static void main(String[] args) {
+				
+				int[] ary = new int[10];
+				for(int i  =  0 ; i <5;i++) {
+					ary = mthd(); 
+					System.out.println(ary); // 변경하고 싶은 내용이 적용됬다
+				}	
+			}
+		
+		
+			public static int[] mthd( ) {
+				int [] ary = new int[100];	
+				return ary;
+			}
+
+	: 주의 ) 다른 메서드에서 변경한 사항이 적용되지 않는거지 같은 메서드내에서 어떤 블럭의 내부에서 적용됬다 하더라도 그 메서드 내에선 다 적용된다
+		: 예시
+			
+				public static void main(String[] args) {
+					int[] tmp = new int[15];								for(int i = 0 ; i <10;i++) {	
+						System.out.println(tmp); // if 문 블럭 내부서 변경한 내용이 블럭 밖에서도 적용 >> 같은 메서드 내부에 있는거니까
+						if((i+1) %2 == 0) {
+							tmp = new int[15];
+						}
+					}
+						
+				}		
+					
+
+
+
