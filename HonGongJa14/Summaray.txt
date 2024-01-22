@@ -503,6 +503,7 @@
 										: 메서드
 											object readObject()
 												: 리턴 타입이 object 타입이기 때문에 강제형변환해서 사용해야됨
+												: 왜그런지 몰라도 예외 발생시키기 때문에 throws Exception 처리하고 써야된다
 									(2)ObjectOutputStream
 										: 객체를 직렬화 함
 											: 직렬화 ) 객체를 바이트 배열로 만드는 것	
