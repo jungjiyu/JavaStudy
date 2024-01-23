@@ -514,6 +514,222 @@
 																								
 
 
+: 입출력 관련 API
+	: API == application programming interface
+		: 응용프로그램에서 사용할 수 있게 만든 (어떤 기능을 가진) 인터페이스
+
+	: 입출력관련 API 는 기반 스트림과 보조 스트림을 사용하여 다양한 기능들을 제공한다
+
+	: 콘솔 console
+		: 시스템을 사용하기 위해 키보드로 입력받고 모니터로 출력하는 솦웨어
+		: 종류
+			: 유닉스 , 리눅스 운영체제 >> 터미널
+			:  윈도우 운영체제 >> 명령 프롬프트
+
+	: 이클립스의 콘솔 
+		: 키보드로 입력받고 내영ㅇ,ㄹ 출력
+		: how 입력받을까
+			System.in 
+				: System == 클래스
+				: in
+					: 콘솔에서 키보드로 입력된 데이터를 읽기 위해 사용하는 필드
+					: System 클래스의 정적 필드로, InputStream 타입이다.
+						: public static final InputStream in ;
+						: InputStream 타입의 변수 처럼 활용 가능하다
+							: 그래서 사실 read( )  같은 것도 쓸 수 있다
+							: ex)
+								InputStream si = System.in;
+								int keyCode = si.read( ); // 한 바이트 읽어온다
+
+								Reader reader = new InputStreamReader(si); // InputStream 타입의 스트림을 기반스트림으로 하여 보조스트림을 활용하여 Reader 타입으로 변환
+
+								BufferedReader br = new BufferedReader( reader );
+								String str = br.readLine( ); // BufferedReader 타입의 스트림을 활용하여 문장을 읽어온다
+
+
+			System.out 
+				: System == 클래스
+				: out
+					: 콘솔에서 모니터로 데이터를 출력하기 위해쓰는 필드
+					: System 클래스의 정적 필드로 , PrintStream 타입이다
+						: public static final PrintStream out
+						: PrintStream 타입의 변수처럼 사용이 가능하다
+							: 그래서 print( ) , println( ) , printf( ) 같은 걸 쓸 수 있는거다
+
+			
+
+			System.err >> 노코멘트
+
+			Scanner 클래스
+				: 입출력 스트림도 아니고 보조 스트림도 아님
+					: 그래도 스캐너 썼음 close( ) ;해야된다
+				: 문자 파일이나 바이트 기반 입력스트림에서 모두 사용 가능한 클래스
+					: 객체를 만들어 사용한다
+					: 근데 특이한건 생성자 매개변수로 InputStream 는 있는데 Reader 타입 매개변수인건 없음
+				: java.util.Scanner
+					: 유명한 생성자 (생성자 여러가지 오버라이딩 되있긴한데 뭐 지금까지 써본적이 없음)
+						1. Scanner( InputStream is )
+							: 그래서 Scanner 객체 만들때 System.in 을 arg 로 넣어서 만들었던거
+
+						2. Scanner(File source)
+							: 파일 객체를 매변으로 함
+						3.  Scanner(String source)
+							: 경로 ? 뭐 그런것같다
+				: 제공 메서드
+					( 1 ) 닫기
+						1. void close( ) 
+							: 스캐너 객체도 닫는다
+					(2) 문자열 읽기
+						1. String next( )
+							: 단어단위로 읽음(화이트스페이스를 단위로 구분하여 문자열을 읽음)
+								: 단순 띄어쓰기나 탭으로도 구분 가능
+						2.  String nextLine( )
+							: 문장단위로 읽음(띄어쓰기가 아닌 엔터를 기준으로 구분하여 문자열을 읽음.)
+								: 엔터까지 버퍼에서 꺼내오는거 맞는데 가져오는 과정에서 엔터 버림(엔터까지 읽어오진 않음)
+
+					(3) 기본타입 읽기 << next기본타입( ) 꼴
+						: 주의!!! char 타입은 이렇게까지 쉽게는 못읽어옴
+						1. byte nextByte( )
+						2. short nextShort( )
+						3. int nextInt( )
+						4. long nextLong( )
+						5. float nextFloat( )
+						6. double nextDouble( )
+						7. boolean nextBoolean( )
+
+					(4) 더 읽어올것이 있는지조사 
+						1. boolean hasNext( )
+							: 더 읽어올 토큰이 있으면 true, 아님 false 를 반환
+								: 토큰은 int 든 boolean 이든 상관없는거다 (next기본타입으로 불러오기 전까진 어차피 다 문자열이다)
+						2. boolean hasNext( String pattern )
+							: 다음 토큰이 매변으로 넣은 문자열과 일치하면 true 를 반환함 (아니면 당연히 false)
+						3. boolean hasNext기본타입( )
+							: 특정 타입의 토큰이 바로 뒤에 있는지 검사한다
+								(1) boolean hasNextByte( )
+								(2) boolean hasNextShort() 
+								(3) boolean hasNextInt( )
+								(4) boolean hasNextLong( )
+								(5) boolean hasNextFloat( )
+								(6) boolean hasNextDouble( )
+
+					(5) 값의 구분기준 커스터마이징
+						Scanner useDelimiter( String pattern)
+							: delimilter 뜻이 구분자란 뜻임
+
+
+
+				: char 타입으로 입력받는법
+					: String charAt(int index)
+						: scanner 클래스의 메서드가 아니라 String 클래스의 메서드임
+							: 직접적으로 scanner 객체에 사용ㅇ할 수 있는 메서드는 없고 scanner 로 일단 문자열을 반환받은다음 String 객체를 대상으로 사용해야됨
+						: index 는 0 ~ 문자열길이-1 까지 가능ㄴ
+						: 사용 ex)
+							Scanner scanner = new Scanner(System.in);
+							char c =scanner.next( ).charAt(0); // 가장 앞문자를 불러옴
+
+							
+			File 클래스
+				: 파일 , 디렉토리 정보를 제공하는 클래스
+				: java.io.File		
+					: 유명한 생성자
+						File( String pathname )
+							: 파일의 경로를 매변으로ㅏ여 파일 객체 만든다
+								윈도우형식 ) c:/SelfStudyJava/test.txt 
+								리눅스형식 ) c:\\SelfStudyJava\\test.txt 
+									: \\ 처럼 2번 써야되는건 \자체는 이스케이프 문자이기 때문이다
+ 							: 실제로 해당 경로에 파일이 존재하지 않더라도 예외가 발생하지 않는다
+								: FileNotFoundException 은 존재하지 않는 파일경로로 파일 스트림 객체를  생성할떄 발생하는거다
+									: 참고로 파일 경로 뿐 아니라 파일 객체로도 파일 스트림 객체 만들 수 있게 되있다 (ex : FileInputStream(File file ) , FileReader(File file))
+								: 해당 경로에 파일,폴더가 존재하지 않는다고 해서 새로 만들어주는 것도 아니다
+									: 새로 만들려면 별도의 메서드를 사용한다
+						File( URI uri )
+							: 인터넷 경로같은걸로 파일 객체 만든다
+
+					: 유명한 메서드
+						: 뭔가 리눅스 느낌 난다
+			
+						(1) 파일 경로 유효 여부 검사
+							 boolean exists( )
+								: 파일객체 생성할때 생성자 부분에 들어갔던 경로가 유효한 경로인지(실제로 존재하는 경로인지) 검사한다
+
+						(2) 파일 경로가 유효하지 않을때 쓰는 유용한 메서드
+							: exists( )로 검사했을떄 false 나왔음 햊줄 수 있는 조치이다
+							1. boolean createNewFile ( )
+								: 새로운 파일을 생성한다 
+							2. boolean mkdir( )
+								: 새로운 폴더를 생성한다
+
+						(3) 파일 경로가 유효할때 쓰는 유용한 메서드													: exists( ) 검사했을때 true ㅏ나왔을 떄 할 수 있는 조치
+							
+							1. 삭제
+								(1) boolean delete( )
+									: 파일 | 폴더 삭제
+
+							2. 권한 검사
+								(1) boolean canRead( )
+									: 읽기 권한ㄴ 있는 파일인지 여부 화긴
+
+								(2) boolean canWrite( )
+									: 쓰기 권한있는 파일인지 여부 확임
+	
+								(3) boolean canExcute( )
+									: 실행권한 있는 파링인지 여부 확인
+
+							3. 파일인지 폴더인지 종류 검사
+								(1) boolean isFile( )
+								(2) boolean isDirectory( )
+
+							4. 숨김 여부 검사
+								(1) boolean isHidden( )		
+				
+							5. 경로 관련 정보
+								(1) String getName( )
+									: 파일의 이름을 리턴
+								(2) String getPath( )
+									: 전체 경로를 리턴
+								(3) String getParent( )
+									: 부모 디렉터리 이름 리턴
+
+							6. 부모 관련 정보
+								: 부모로 파일은 불가하므로 이건 폴더를 대상으로만 쓰는거임
+									(1) String getParent( )
+										: 부모 디렉터리 이름 리턴
+									(2) File getParentFile( )
+										: 부모 디렉터리를 FIle 객체로 생성한 후 리턴
+
+							7. 자식 관련 정보
+								: 파일이 자식을 가질 순 없으므로 이것도 폴더를 대상으로만 씀
+									(1) String[ ]  list( )
+										:  해당 폴더의 하위 폴더, 파일 목록을 "String 배열" 형태로 리턴
+									(2) String[ ] list(FilenemeFileter filter)
+										: 해당 폴더의 하위폴더, 파일 중에 filter 를 충족시키는 것만 String 배열 형태로 리턴
+
+									(3) File[ ] listFiles( )
+										: 해당 폴더의 하위 폴더, 파일 들을 "File 배열" 형태로 반환
+										: 뒤에 s 붙어있는거 주의
+
+									(4) File[ ] listFiles( FilenameFilter filter)
+										: 해당 폴더의 하위 폴더,파일  증에 filter 를 충족시키는 것만 File 배열  형태로 리턴
+
+										
+
+							8. 세부정보
+								(1) long  lastModified( )
+									: 언제 마지막으로 수정됬는지 리턴
+										: 날짜와 시간
+								(2) long length( )
+									: 파일의 크기를 리턴
+										: 단위:
+
+
+String getName( )
+								: 파일 이름 리턴
+							6. String get Parent( )
+								: 부모 폴더 리턴
+							7. File getParentFile( )
+								: 부모폴더를 파일 객체로 생성하고 리턴
+									: 주의할게 FIle 객체라고 해서 그 객체가 파일만 가리키느게 아니라 폴더까지 가리키는걸 잊지 말아야한다
+
 
 
 자바 입출력 스트림의 인코딩 방식	
