@@ -486,4 +486,10 @@ a.start();
 
 
 38. 년 월 일 시간 예쁘게 출력하기
-	
+	>> ???
+
+39. 메서드나 생성자 내부에서 this.멤버명 으로 안쓰고 this 자체로도 쓸 수 있다. 이때 this 는 객체 자체를 의미한다
+	ex)
+public boolean equals(Object o) {
+        if (this == o) return true; // 만일 현 객체 this와 매개변수 객체가 같을 경우 true
+    }
