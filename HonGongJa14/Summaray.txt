@@ -693,13 +693,11 @@ IOException
 									: 파일의 이름을 리턴
 								(2) String getPath( )
 									: 전체 경로를 리턴
-								(3) String getParent( )
-									: 부모 디렉터리 이름 리턴
-
+								
 							6. 부모 관련 정보
 								: 부모로 파일은 불가하므로 이건 폴더를 대상으로만 쓰는거임
 									(1) String getParent( )
-										: 부모 디렉터리 이름 리턴
+										: 부모 디렉터리 경로 리턴
 									(2) File getParentFile( )
 										: 부모 디렉터리를 FIle 객체로 생성한 후 리턴
 
