@@ -493,3 +493,6 @@ a.start();
 public boolean equals(Object o) {
         if (this == o) return true; // 만일 현 객체 this와 매개변수 객체가 같을 경우 true
     }
+
+
+40. 줄바꿈 ) \n == \r == \r\n == 한번 줄바꿈  >> \n , \r 로 나눠 출력하면 두번 줄바꿈이 된다.
