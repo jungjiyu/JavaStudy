@@ -11,3 +11,6 @@
 https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462306750
 https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462283731#
 https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462488097
+
+
+13. java.lang.Class 의 원리와 클래스 로더
