@@ -496,3 +496,5 @@ public boolean equals(Object o) {
 
 
 40. 줄바꿈 ) \n == \r == \r\n == 한번 줄바꿈  >> \n , \r 로 나눠 출력하면 두번 줄바꿈이 된다.
+
+41) 웹 서핑하다 보면 자주 보이는 It cannot be instantiated. >> 객체를 만들 수 없다
