@@ -1,0 +1,365 @@
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+// Fuction의 합성2
+// compose 메서드 : compose 메서드는 다른 함수를 실행 한 후에 현재 함수를 실행
+
+import java.util.function.Function;
+
+public class EX19 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// 1. 함수 정의
+		Function<Integer, Integer> addOne = x -> x + 1;
+		Function<Integer, Integer> multiplyByTwo = x -> x * 2;
+		
+		// 2. compose를 사용한 함수 합성
+		Function<Integer, Integer> addOneComposeMultiplyByTwo2 = addOne.compose(multiplyByTwo);
+		
+		// 3. 결과 출력
+		int result = addOneComposeMultiplyByTwo2.apply(3);
+		System.out.println(result);
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+// Predicate 결합
+import java.util.function.Predicate;
+
+public class EX20 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Predicate<Integer> isEven = num -> num % 2 == 0;
+		Predicate<Integer> isPositive = num -> num > 0;
+		
+		// and 연산
+		Predicate<Integer> isEvenAndPositive = isEven.and(isPositive);
+		
+		// or 연산
+		Predicate<Integer> isEvenOrPositive = isEven.or(isPositive);
+		
+		// not 연산
+		Predicate<Integer> isNotEven = isEven.negate();
+		
+		// 테스트
+		System.out.println("6은 짝수이면서 양수인가? " + isEvenAndPositive.test(6));
+		System.out.println("-5는 짝수이거나 양수인가? " + isEvenOrPositive.test(-5));
+		System.out.println("3은 짝수가 아닌가? " + isNotEven.test(3));
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+// 메소드 참조1
+
+import java.util.Arrays;
+import java.util.List;
+
+public class EX21 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		List<String> words = Arrays.asList("apple", "banana", "orange");
+		
+		// 람다 표현식
+		words.forEach(word -> System.out.println(word));
+		
+		System.out.println();
+		
+		// 정적 메소드 참조
+		// 형식 : 클래스명::정적메서드명
+		words.forEach(System.out::println);
+		
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+// 메소드 참조2
+
+import java.util.function.Consumer;
+
+public class EX22 {
+	public void print(String message) {
+		System.out.println(message);
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		EX22 instanceRef = new EX22();
+		
+		// 람다 표현식
+		Consumer<String> lamdaConsumer = message -> instanceRef.print(message);
+		lamdaConsumer.accept("Hello from lamda!");
+		
+		// 인스턴스 메소드 참조
+		// 형식: 객체::인스턴스메소드명
+		Consumer<String> methodReference = instanceRef::print;
+		methodReference.accept("Hello from method reference!");
+		
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+// 메소드 참조3
+
+import java.util.function.Function;
+
+public class EX23 {
+	public EX23 (String message) {
+		System.out.println(message);
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// 람다 표현식
+		Function<String, EX23> lamdaConstrustor = message -> new EX23(message);
+		lamdaConstrustor.apply("hello from lamda");
+		
+		// 생성자 참조
+		// 형식: 클래스명::new
+		Function<String, EX23> constructorReference = EX23::new;
+		constructorReference.apply("Hello from constructor reference");
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+interface Number1 {
+	int max(int num1, int num2);
+}
+
+public class Quiz1 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Number1 max = (a,b) -> a > b ? a : b;
+		
+		System.out.println(max.max(100, 200));
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+interface Number2 {
+	void printVar(String name, int age);
+}
+
+public class Quiz2 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Number2 printvar = (name, age) -> System.out.println("이름 " + name + "\n" + "나이: " + age);
+		
+		printvar.printVar("펭수", 20);
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+interface Number3 {
+	int square(int x);
+}
+
+public class Quiz3 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Number3 square = num -> num * num;
+		
+		System.out.println("제곱값: " + square.square(3));
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+interface Number4 {
+	int roll();
+}
+
+public class Quiz4 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Number4 random = () -> (int)(Math.random()*6);
+		
+		System.out.println("난수: " + random.roll());
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+interface Number5 {
+	int sumArr(int[] arr);
+}
+
+public class Quiz5 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Number5 sa = (int[] arr) ->  {
+			int sum = 0;
+			for (int i : arr)
+				sum += i;
+			return sum;
+		};
+		
+		int[] array = {1,2,3,4,5,6,7,8,9,10};
+		System.out.println("배열 합: " + sa.sumArr(array));
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+import java.util.function.Function;
+
+public class Quiz6 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// 함수 A
+		Function <Integer, Integer> A = x -> x * x;
+		
+		// 함수 B
+		Function <Integer, Integer> B = x -> x * 2;
+		
+		// 합성
+		Function<Integer, Integer> FunctionAB = A.andThen(B);
+		
+		int result = FunctionAB.apply(3);
+		System.out.println("함수 합성 결과: " + result);
+		
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter5;
+
+import java.util.function.Predicate;
+
+public class Quiz7 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		// 첫번째 Predicate
+		Predicate<Integer> A = x -> x > 10;
+		
+		// 두번째 Predicate
+		Predicate<Integer> B = x -> x % 2 == 0;
+		
+		// Predicate > and()조합
+		Predicate<Integer> PredicateAB = A.and(B);
+		
+		System.out.println(PredicateAB.test(15));
+		System.out.println(PredicateAB.test(20));
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter6;
+
+public class EX01 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// Quiz1.
+		
+		int[] arr1 = {1,2,3,4,5};
+		
+		// for문 사용
+		for (int i = 0; i < arr1.length; i++) {
+			System.out.println(arr1[i]);
+		}
+		
+		// forEach문 사용
+		int[] arr2 = {1,2,3,4,5};
+		
+		for (int i : arr2) {
+			System.out.println(i);
+		}
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter6;
+
+import java.util.Arrays;
+
+public class EX02 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// 스트림 사용
+		int[] arr3 = {1,2,3,4,5};
+		Arrays.stream(arr3).forEach(n -> System.out.println(n));
+		
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter6;
+
+public class EX03 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String[] stringArray = {"apple", "banana", "orange", "kiwi", "grape"};
+		
+		for (String fruit : stringArray) {
+			if (fruit.length() >= 5) {
+				System.out.println(fruit);
+			}
+		}
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+package Chapter6;
+
+import java.util.Arrays;
+
+public class EX04 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String[] stringArray = {"apple", "banana", "orange", "kiwi", "grape"};
+		
+		// filter() : 조건을 넣고 그 조건에 맞는 참인 경우만 실행하는 경우에 사용 
+		Arrays.stream(stringArray).filter(str -> str.length() >= 5).forEach(System.out::println);
+		
+	}
+
+}
+
+-----------------------------------------------------------------------------------------------------
+
