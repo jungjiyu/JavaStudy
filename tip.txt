@@ -512,7 +512,8 @@ public boolean equals(Object o) {
 
 	4. case - sensitive
 		: 대소문자 구분
-				
+	5. offset
+		: 시작위치
 
 42) 유명한 interface
 	1. Runnable
