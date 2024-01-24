@@ -500,6 +500,20 @@ public boolean equals(Object o) {
 41) 자주 보이는 용어
 	1. cannot be instantiated. >> 객체를 만들 수 없다
 	2. resource >> 외부의 데이터(File , Network , db)
+	3. charSet >> 추후 마저 기록
+		: Character Set 와 동의어다. 즉 한국어로 해석함 문자 집합이다
+		: 인코딩 ) 우리가 쓴걸 기계어로 변환하는 것
+		: 디코딩 ) 기계어를 우리가 알아볼 수 있게 변ㄴ한하는 것
+		: 문자 집합 ) 인코딩,디코딩 과정을 위해 필요한 약속
+			: 왜필요>> 안그럼 중간에 글짜 깨진다
+			: 종류
+				(1) UTF-8
+
+
+	4. case - sensitive
+		: 대소문자 구분
+				
+
 42) 유명한 interface
 	1. Runnable
 		: run ( ) 메서드를 가지고 있고, 이 인터페이스의 구현 객체를 Thread 클래스 생성자의 arg  로 사용하여 Thread 객체를 만들 수 있다
