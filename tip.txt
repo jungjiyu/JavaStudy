@@ -546,5 +546,7 @@ public boolean equals(Object o) {
 
 
 45) 대소문자 구분없이 순수 내용상의 동일성 판단하는 법
-	1. toUppercase () 혹은 toLowercase( ) 로 일단 다 규격을 맞춘다
-	2. equals( ) 로 비교한다
+	(1) 걍 이미 만들어져있는 equalsIgnoreCase( )를 사용한다
+	(2) 직접 두단계 작업을 한다
+		1. toUppercase () 혹은 toLowercase( ) 로 일단 다 규격을 맞춘다
+		2. equals( ) 로 비교한다
