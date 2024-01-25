@@ -525,4 +525,6 @@ public boolean equals(Object o) {
 43 ) 자바 api 사전에서 선언부에 있는 "thorws 어떤예외 " >> try catch(어떤예외) 내부서 호출해야된다.(예외가 발생하든 안발생하든 뭊조건 그 예외를 반환하게 되있어서 그렇다) 하지만 선언부에 없고 밑에 설명부분에 throws 어떤예외2 로 되있는 건 따로 try catch(어떤예외2) 처리 안하고 써도 된다.
 
 
-\
+
+
+44) 유독 String 관련한 작업에서 char 이 다른 타입들보다 좀 튀는편인데(String--> char 할때 parse 어쩌구 아니고 charAt( )가 별도로 있음 ,  char[ ] --> String 으로 가능 ) 이는 String 과 char 이 워낙 다른 타입들보다 긴밀한 관계를 가져서 그렇다고 암기하자
