@@ -8,7 +8,7 @@
 	: 예외가 발생하면 원래 에러와 같이 바로 종료되지만 예외처리하면 계속 실행이 가능하다
 	: 예외도 클래스임 << 예외가 발생한 것은 예외 클래스의 객체가 생성된 것
 		java.lang.Exception 클래스를 상속받아 만든 클래스들로 이루짐 
-		
+			: 모든 예외가 java.lang.Exception 을 상속받아 만든 것이긴 하지만 모든 (자식) 예외클래스들이 java.lang 에 속해있는 것이 아니기에 필요에 따라서 따로 import 해줘야될 수도 있다
 		: 자식클래스 종류 << java.어쩌구.저쩌구Exception 형태임
 			1. java.lang.RuntimeException  또는 이의 자식 클래스>> 실행 예외 runtime exception
 				: 컴파일러 non 체크 예외라고도함
