@@ -552,8 +552,19 @@ public boolean equals(Object o) {
 		2. equals( ) 로 비교한다
 
 
-46) 
+46) 뭔가 헷갈리는 문자열 <---> wrapper 클래스<---> 기본타입
+	public static ?? valueOf(!!!)
+		: 각 wrapper 클래스들, String 클래스 가 가지고 있음
+		: 반환값은 valueOf( ) 를 메서드로 가지는 클래스의 타입
+		: 매개변수 타입은 String 클래스의 경우 Object 로 모든타입 다 가능하고, wrapper 클래스들은 각각 String 타입과 자기자신의 일반 버전 타입 총 2개가 가능하다 
+			ex) Integer 클래스에는 valueOf(String str) , valueOf(int i) 총 2개 있고 반환값은 Integer.  Character 클래스엔 valueOf(String str), valueOf(Character c) 총 2 개 있고 반롼값은 Character
+	일반타입 --> 문자열
+		1. XXX.parseXXXX(문자열)
+			: Character 에는 예외적으로 없다
+		2.valueOf
 	다른 타입의 값으로 문자열 만들기는 쉽다 >> String.vauleOf(값)
 		: valueOf()의 매변 타입이 Object 이기 떄문에 심지어 char 까지 쉽게 변환 가능하고 , static 타입이기 때문에 걍 String 클래스를 대상으로 사용하면 된다
 	문자열로 다른 타입의 값을 만들기는 살짝 까다롭다 >> XXXX.parseXXX(문자열객체) 혹은 문자열객체.charAt(인덱스)
 		: parseXXX는 static 이긴 헤도 String 클래스의 static 이 아니라 각 Wrapper 클래스의 static 메서드이기 때문에 일일이 대상클래스 맞춰줘야되고,  문자는 예외적으로 이를 지원하지 않고 String 클래스의 인스턴스 멤버인 charAt() 을 사용해야된다
+
+
