@@ -568,3 +568,6 @@ public boolean equals(Object o) {
 		: parseXXX는 static 이긴 헤도 String 클래스의 static 이 아니라 각 Wrapper 클래스의 static 메서드이기 때문에 일일이 대상클래스 맞춰줘야되고,  문자는 예외적으로 이를 지원하지 않고 String 클래스의 인스턴스 멤버인 charAt() 을 사용해야된다
 
 
+47) 베열 타입 한번에 출력하기
+	String str = Arrays.toString(배열명); 이용 
+		: 물론 import java.util.Arrays ; 해줘야됨
