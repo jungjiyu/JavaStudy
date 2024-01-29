@@ -445,7 +445,21 @@ a.start();
 			}
 
 	: 주의 ) 다른 메서드에서 변경한 사항이 적용되지 않는거지 같은 메서드내에서 어떤 블럭의 내부에서 적용됬다 하더라도 그 메서드 내에선 다 적용된다
-		: 예시
+		: try-catch 구문의 경우에도 적용되는 사항이다
+			: 다만 주의해야 할 것은 try 블럭 내부서 초기화를 시켜야 try 구문 내에서 수정을 하든지 말든지 할 수 있다. 그냥 변수 선언만 하고 try 구문 내에서 수정한 것을 try 구문 밖에서 사용하려고 하면 오류난다. 내 생각엔 try {} 구문 내에 모든 내용이 실행된다는 보장이 없으니까 컴파일 차원에서 에러 발생시키는 것 같다
+			
+				public class Main {
+					public static void main(String[] args) {
+						int i=0 ; // 걍 int i; 만 하면 뒤에 System.out.println(i) 부분서 에러난다
+						try {
+							i=10;
+						}catch(Exception e) {}
+						System.out.println(i);
+					}
+				
+				}
+	
+		: 또다른 예시
 			
 				public static void main(String[] args) {
 					int[] tmp = new int[15];								for(int i = 0 ; i <10;i++) {	
