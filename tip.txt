@@ -571,3 +571,7 @@ public boolean equals(Object o) {
 47) 베열 타입 한번에 출력하기
 	String str = Arrays.toString(배열명); 이용 
 		: 물론 import java.util.Arrays ; 해줘야됨
+
+
+48 ) 객체가 new 연산자로 생성자를 호출하는 방식으로만 생성되진 않는다. static 메서드를 사용하여 객체를 생성시키는 클래스도 있다 
+	: ex) InetAddress
