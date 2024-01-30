@@ -1,0 +1,313 @@
+------------------------------------------------------------------------------------------------------------
+package Chapter7;
+
+import java.net.ServerSocket;
+import java.io.IOException;
+
+public class EX01 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		for (int i = 0; i < 65535; ++i) {
+			try {
+				ServerSocket serverSocket = new ServerSocket(i);
+				serverSocket.close();
+			} catch(IOException e) {
+				System.out.println(i + "번은 현재 사용중인 포트번호 입니다.");
+			}
+		}
+	}
+
+}
+
+------------------------------------------------------------------------------------------------------------
+package Chapter7;
+
+// 에코 서버
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class EX02 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		final int PORT = 12345;
+		try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+			System.out.println("에코 서버가 " + PORT + "포트에서 실행 중...");
+			
+			while(true) {
+				try (Socket clientSocket = serverSocket.accept();
+					InputStream inputStream = clientSocket.getInputStream();
+					OutputStream outputStream = clientSocket.getOutputStream()) {
+					
+					int data;
+					while ((data = inputStream.read()) != -1) {
+						outputStream.write(data);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+------------------------------------------------------------------------------------------------------------
+package Chapter7;
+
+// 에코 클라이언트
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.Scanner;
+
+public class EX03 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		final String SERVER_IP = "localhost";
+		final int SERVER_PORT = 12345;
+		try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+			InputStream inputStream = socket.getInputStream();
+			OutputStream outputStream = socket.getOutputStream();
+			Scanner input = new Scanner(System.in)) {
+			System.out.println("에코 클라이언트가 서버에 연결되었습니다.");
+			
+			while (true) {
+				System.out.print("메세지를 입력하세요 (종료하려면 'exit' 입력): ");
+				String message = input.nextLine();
+				
+				if ("exit".equalsIgnoreCase(message)) {
+					break;
+				}
+				outputStream.write(message.getBytes());
+				
+				int data;
+				while ((data = inputStream.read()) != -1) {
+					System.out.print((char)data);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+------------------------------------------------------------------------------------------------------------
+package Chapter7;
+
+// 에코 서버2
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.IOException;
+
+public class EX04 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		final int PORT = 12345;
+		
+		try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+			System.out.println("에코 서버가 " + PORT + " 포트에서 실행 중...");
+		
+		while(true) {
+			try (Socket clientSocket = serverSocket.accept();
+				BufferedInputStream bufferedInputStream = new BufferedInputStream(clientSocket.getInputStream());
+				BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream())) {
+				
+				int data;
+				while ((data = bufferedInputStream.read()) != -1) {
+					bufferedOutputStream.write(data);
+					bufferedOutputStream.flush();
+					// flush() 사용1
+				} 
+				
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+------------------------------------------------------------------------------------------------------------
+package Chapter7;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.net.Socket;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class EX05 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		final String SERVER_IP = "localhost";
+		final int SERVER_PORT = 12345;
+		
+		try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+			BufferedInputStream bufferedinputStream = new BufferedInputStream(socket.getInputStream());
+			BufferedOutputStream bufferedoutputStream = new BufferedOutputStream(socket.getOutputStream());
+			Scanner input = new Scanner(System.in)) {
+			System.out.println("에코 클라이언트가 서버에 연결되었습니다.");
+			
+			while (true) {
+				System.out.print("메세지를 입력하세요 (종료하려면 'exit' 입력): ");
+				String message = input.nextLine();
+				
+				if ("exit".equalsIgnoreCase(message)) {
+					break;
+				}
+				
+				bufferedoutputStream.write(message.getBytes());
+				bufferedoutputStream.flush();
+				// flush() 사용2
+				
+				int data;
+				while ((data = bufferedinputStream.read()) != -1) {
+					System.out.print((char) data);
+					if (data == '\n') {
+						break;
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+------------------------------------------------------------------------------------------------------------
+package Chapter7;
+
+// 에코 서버3
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.IOException;
+
+public class EX06 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		final int PORT = 12345;
+		
+		try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+			System.out.println("에코 서버가 " + PORT + " 포트에서 실행 중...");
+		
+		while(true) {
+			try (Socket clientSocket = serverSocket.accept();
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
+				BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"))) {
+				
+				String data;
+				while ((data = bufferedReader.readLine()) != null) {
+					bufferedWriter.write(data + "\n");
+					bufferedWriter.flush();
+				} 
+				
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+------------------------------------------------------------------------------------------------------------
+package Chapter7;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class EX07 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		final String SERVER_IP = "localhost";
+		final int SERVER_PORT = 12345;
+		
+		try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+			Scanner input = new Scanner(System.in)) {
+			System.out.println("에코 클라이언트가 서버에 연결되었습니다.");
+			
+			while (true) {
+				System.out.print("메세지를 입력하세요 (종료하려면 'exit' 입력): ");
+				String message = input.nextLine();
+				
+				if ("exit".equalsIgnoreCase(message + "\n")) {
+					break;
+				}
+				
+				bufferedWriter.write(message + "\n");
+				bufferedWriter.flush();
+				// flush() 사용2
+				
+				String data;
+				data = bufferedReader.readLine();
+				System.out.println(data);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+------------------------------------------------------------------------------------------------------------
+package Chapter7;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class EX08 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Date currentDate = new Date();
+		
+		SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm:ss");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy/MM/dd");
+		SimpleDateFormat sdf3 = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+		
+		String formattedDate1 = sdf1.format(currentDate);
+		String formattedDate2 = sdf2.format(currentDate);
+		String formattedDate3 = sdf3.format(currentDate);
+		
+		System.out.println("현재 시간: " + formattedDate1);
+		System.out.println("현재 날짜: " + formattedDate2);
+		System.out.println("현재 시간 및 현재 날짜: " + formattedDate3);
+		
+	}
+
+}
+
+------------------------------------------------------------------------------------------------------------
