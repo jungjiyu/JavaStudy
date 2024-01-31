@@ -1,0 +1,247 @@
+--------------------------------------------------------------------------------
+package Chapter7;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class EX10 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		final String SERVER_IP = "localhost";
+		final int SERVER_PORT = 12345;
+		
+		try (
+			Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+			Scanner input = new Scanner(System.in)) {
+			System.out.println("에코 클라이언트가 서버에 연결 되었습니다.");
+			
+			System.out.print("메세지를 입력하세요 (date, time, date&time): ");
+			String message = input.nextLine();
+			
+			bufferedWriter.write(message + "\n");
+			bufferedWriter.flush();
+			
+			String data;
+			data = bufferedReader.readLine();
+			System.out.println("결과: " + data + "\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------
+package Chapter7;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
+
+public class EX11 {
+	private static final int PORT = 12345;
+	private static final Set<BufferedWriter> clients = new HashSet<>();
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+			System.out.println("에코 서버가 " + PORT + " 포트에서 실행 중...");
+			
+			while(true) {
+				Socket clientSocket = serverSocket.accept();
+				System.out.println("클라이언트가 연결되었습니다.");
+				
+				BufferedWriter clientWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"));
+				
+				clients.add(clientWriter);
+				
+				Thread clientThread = new Thread(new ClientHandler(clientSocket, clientWriter));
+				clientThread.start();
+	
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static class ClientHandler implements Runnable {
+		private final Socket clientSocket;
+		private final BufferedReader clientReader;
+		private final BufferedWriter clientWriter;
+		
+		public ClientHandler(Socket clientSocket, BufferedWriter clientWriter) throws IOException {
+			this.clientSocket = clientSocket;
+			this.clientReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
+			this.clientWriter = clientWriter;
+		}
+			@Override
+			public void run() {
+				try {
+					String message;
+					while ((message = clientReader.readLine()) != null) {
+						System.out.println("클라이언트에서 받은 메세지: " + message);
+						
+					for (BufferedWriter writer : clients) {
+						if (writer != clientWriter) {
+							writer.write(message + "\n");
+							writer.flush();
+							}
+						}
+					}
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					clients.remove(clientWriter);
+					try {
+						clientSocket.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+				}
+			}
+		}
+	}
+}
+
+--------------------------------------------------------------------------------
+package Chapter7;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.util.Scanner;
+
+public class EX12 {
+	private static final String SERVER_IP = "localhost";
+	private static final int SERVER_PORT = 12345;
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+			Scanner input = new Scanner(System.in)) {
+			System.out.println("에코 클라이언트가 서버에 연결되었습니다.");
+			
+			Thread sendMessageThread = new Thread(() -> {
+				try {
+					while(true) {
+						System.out.print("메세지를 입력하세요 (종료하려면'exit' 입력): ");
+						String message = input.nextLine();
+						
+						if ("exit".equalsIgnoreCase(message)) {
+							break;
+						}
+						
+						bufferedWriter.write(message + "\n");
+						bufferedWriter.flush();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+			sendMessageThread.start();
+			
+			Thread receiveMessageThread = new Thread(() -> {
+				try {
+					String data;
+					while ((data = bufferedReader.readLine()) != null) {
+						System.out.println("서버에서 받은 메세지: " + data);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+			
+			receiveMessageThread.start();
+			
+			sendMessageThread.join();
+			receiveMessageThread.join();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------
+package Chapter7;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.util.Scanner;
+
+public class EX13 {
+	private static final String SERVER_IP = "localhost";
+	private static final int SERVER_PORT = 12345;
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+			Scanner input = new Scanner(System.in)) {
+			System.out.println("에코 클라이언트가 서버에 연결되었습니다.");
+			
+			Thread sendMessageThread = new Thread(() -> {
+				try {
+					while(true) {
+						System.out.print("메세지를 입력하세요 (종료하려면'exit' 입력): ");
+						String message = input.nextLine();
+						
+						if ("exit".equalsIgnoreCase(message)) {
+							break;
+						}
+						
+						bufferedWriter.write(message + "\n");
+						bufferedWriter.flush();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+			sendMessageThread.start();
+			
+			Thread receiveMessageThread = new Thread(() -> {
+				try {
+					String data;
+					while ((data = bufferedReader.readLine()) != null) {
+						System.out.println("서버에서 받은 메세지: " + data);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+			
+			receiveMessageThread.start();
+			
+			sendMessageThread.join();
+			receiveMessageThread.join();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------------

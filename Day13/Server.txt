@@ -1,0 +1,538 @@
+try-with-resources
+	: try - catch 에서 try 문에서 "선언"된 autocloseable 의 구현 객체들에 대해 try 가 종료될따 자동으로 자원을 해제해주는 기능
+		: try 구문의 코드 끝까지 가지 않고 에러 나서 catch 문으로 넘어가도 try 구문이 종료되기만 하면 close 해준다
+		: 이미 선언된 레퍼런스 변수에 새로운 객체를 생성하는것만은 안되고 걍 선언과 생성을 try ( ) 의 내부서 해야됨
+
+=======================
+네트워크 기본 개념
+
+원격지 == 도착지
+로컬 == 자신 == 출발지 
+host ==( ip주소가 할당된 ) 장치
+	: host 는 자신 뿐 아니라 상대 장치 까지 가리킬 수 있는거임
+
+로컬host == 자신의 장치
+
+패킷 packet : 데이터 뭉치( 데이터의 형식화된 블럭.)
+
+루프백 loopback , 로컬호스트( localhost )주소
+	: 루프백을 원격지로 하면 수신받은 데이터를 그대로 송신지에 수신해준다. ( 반환해준다)
+	: ip 주소는 127.0.0.1 로 고정되어있다
+	: 가상 ip 이기 떄문에 인터넷이 연결되있지 않아도 사용 가능하다
+	: 루프백 주소를 로컬호스트 주소라고도 하는 것은 결국 자기 자신에서 송신하는 것과 같은 효과를 내기 때문이다.
+
+ip : 인터넷 프로토콜ㄹ. 장치를 식별하는 주소
+	IPv4 >> ip 버전 4 . 
+		: 근데 인구 수에 비해 가능한 개수가 넘 작음
+		: 0 ~ 255의 "10진수" 4개를 쩜으로 구분해 표기( xxx . xxx . xxx .xxx ) << 32비트로 표기 . ( 0~255 는 총 256가지 , 8비트 필요 , 이게 4개니까 32비트 )
+		: 특정용도로 쓰이는 ip 도 있음.
+		: 어쨌뜬 43 억개로는 커버치기 너무 부족
+	IPv6 >> ip 버전 6 . 
+		: ip 부족 현상 해결 위해 나온 방법으로 128비트짜리
+		: 0~FFFF 까지의 "16진수" 8갤 콜론으로 구분하여 표기(xxxx : xxxx : xxxx : xxxx : xxxx : xxxx : xxxx : xxxx)
+			: FFFF = 65535
+		: 16진수 하나는 4비트를 차지( 2**4 ==F) >> 2바이트(16진수 숫자 4개) 짜리 8개>> 16 바이트(==128바이트)
+			: 그러니까 IPv4 의 4배를 쓰는 것
+
+	: ip 확인 방법 >> ipconfig 해서 이더넷어댑터이너뎃 란
+
+
+ip 주소 분류
+	: A~C 클래스>> netId 에 몇 바이트를 할당했느냐 따라 갈림. netId 의 바이트 수는 네트워크의 개수 . hostId 의 수는 장치의 개수를 의미
+	:  hostid 에서 모든 비트가 0인경우와 1인 경우는   각각 network 주소 ( .netId.0.0.0),broadecast 주소(netId.2255.255.255)로 빼둔다 << 그러니까 2^(hostid의 비트수) -2 가 최종적으로 할당 가능한 장치의 수가 되는거다
+		: networkid >>그러니까 걍 netID 그 잡채란 얘기다
+		: braodcast (방송한다 )>> 특정 장치를 가리키는게 아니라 해당 netID를 가지는 모든 장치를 동시에 가리킴
+
+		: A == netId >> 1바이트 이고 , 나머지 3바이튼 HostId
+			: 최상위 비트는 1로 고정
+		: B == ndetId >> 2 바이트 , 나머지 2바이튼 HostId
+			: 최상위 비트는 10 으로 고정
+			: 2^16 == 65535
+		: C == netId >> 3바이트 , 나머지 1바이튼 HostId
+			: 최상위 비트는 110 으로 고정
+
+	: D , E 클래스
+		: D == 최상위비트가 1110으로 고정
+			: 멀티캐스트 주소
+		: E == 최상위비트가 1111으로 고정
+			: 향후 사용을 위해 예약하는 주소로 지금은 사용하지 않는다고 함다
+
+
+ 
+서브넷 마스크 << 뭔소린지 모르겠음
+	: ip 에서 netID 를 뽑아낼 수 있게 해주는 존재
+	: A,B,C 클래스 간의 부여할 수 있는 호스트 id 차가 넘 크다보니까 그 사이들의 애매한 개수를 부여하기 위해 사용한다(ex- 각각10000대의 컴터를 가진 부서가  4개 있다. 그냥 각 부서별로 B 클래스를 주자니 너무 낭비가 심하고 걍 B클래스 하나만 사용하되 HostId MSB 의 2비트를 사용하여 구분함으로써 각 부서에 1/4 호스트를 가질 수 있게 하겠다)
+		: SubnetID == hostID 에서 구분하기 위해 쓰인 비트 부분
+		: netID + subnet == subnetwork
+	: sub network== 서브 네트워크
+	: ip주소 & 서브넷 마스크 == netid
+		 : ip 주소와 서브넷 마스크를 and 연산을 함 net id 가 나온다
+	: 왜 쓰는가?
+		; hostid 의 비트 일부를 netid 에 부여함으로써 network 를 구분하여 ㅜㅂ여하는 것
+
+공인 IP , 사설 IP
+	: 공인 ip > 인터넷 상에서 서로 다른 장치간의 "유일한" 식별에 사용되는 IP
+	: 사설 ip > 내부망 내서만 "한정적"으로 사용하는 IP
+		: 내부서만 사용되기 떄문에 네트워크별로 중복사용 가능
+		: 사설 ip 가 있기에 아직까지도 IPv4 를 사용할 수 있는 것
+
+	: 바깥으로 나갈 수가 없다
+	: 공유기(NAT)
+		: 사설 IP 는 기본적으로 클래스로 정의되있음. 
+			: A클 == 10.XXX.XXX.XXX
+			: B클 == 172.[16-31]. XXX.XXX
+			: C클 == 192.168.XXX.XXX
+		: 사설 IP 는 직접적으로 외부에 나가지 못하고(=인터넷 상에서 실제로 존재하는게 아니고) 공유기를 통하여 나가는데 이때 공유기의 공인 IP 로 바뀌어 나간다. 그러니까 딸랑 하나의 공유 ip 가 여러개의 사설 ip 에 배정되는 거다
+
+
+
+포트port
+	: 호스트 내에서 실행되고 있는 "프로세스"를 구분하기 위한 16 비트의 논리적 할당(0~65535)
+		: 0~0123 == well-known port 
+			:  유명한 프로그램이 미리 예약하여 사용하는 포트
+				: 53)  DNS : 도메인네임을 ip 주소로 변환
+				: 80 ) HTTP: web 서비스
+					: 구글이나 네이버 ip 로 TCP 객체 생성하는 경우 port 번호는 80 으로 설정해야된다. (UCP 일땐 또 다르다)
+		: 사용자 정의 포트 번호론 1024 이상의 포트 번호를 사용하는편(기존 프로그램과 충돌을 일으키지 않으려고)
+
+	: 그러니까 IP는 host 즉 기기에 할당되는거고 포트는 그 host 내의 여러 프로세스 즉 프로그램에 할당되는거다
+		: IP == 어떤 기기가 쓰는지 정보를 나타냄
+		: port == 어떤 프로그램이 쓰는지 정보를 나타냄
+
+
+TCP/UDP
+	: TCP
+		: Transmission Control Protocol
+		: 신뢰성 높음(== 오류시 재전송한다)
+			: 데이터 받은 결과를 전송해준다(잘 받았다 , 잘 못 받았다)	
+			: 잘 못받으면 잘 못받았다고 연락주니까 신뢰성 높다고 하는 것
+		: 연결형 프로토콜
+			: 전화 통신과 유사한 개념
+			: 둘중에 하나가 끊지 않는 이상 계속 연결이 유지되고, 양방향으로 데이터가 이동 가능
+			: 통신과정에서 연결 상태가 유지되어야된다
+			: 소규모 서비스에서 유용하다 (너무 많이 연결하면 과부하)
+			: 전송순서가 보장되어ㅣㅆ다
+		: 파일 전송과 같이 신뢰성이 필요한 서비스에 주로 사용된다
+		: 파일 크기 제한이 없음
+		: 1:1 통신
+		: 속도 상대적 느림
+		: 클라이언트 끼리 직접 소통할 수 없고 오직 서버와만 소통이 가능하기에 클라이언트 끼리 소통하기 위해선 서버를 거쳐 간접적으로 소통해야된다.
+
+	: UDP
+		: User Datagram Protocol 
+		: 신뢰성이 낮다
+			: 잘 받았는지 못받았는지 이야기하지 않아준다
+		: 비연결 프로토콜
+			: 통신과정에서 연결유지가 불필요하다
+			: 전송순서가 비보장 ( 가는길이 고정되있지 ㅇ낳음)
+		: 실시간성과 같은 성능이 중요한 서비스에 주로 사용
+			: 좀 끊겼다고 이전 내용 다시 필요한게 아니라 현재 내용 나오고 있는게 중요한 거니까
+		: 우편과 유사
+		: 파일 크기가 제한되어있음(최대 65536 바ㅣ트)
+			: 크기 초과시 나누어 전송
+
+		: 1; n 또는 n:n 통신
+		: 속도 상대적 빠름
+
+
+유니캐스팅 unicasting
+	: 두 장치간 1:1 통신 방식 
+	: mac 주소 기반 통신
+		: mac 주소 == 랜 카드 고유번호
+			: 랜 카드 == 인터넷 카드
+	: "동일한" 내용을 여러 사용자에게 보내고자 하는 경우 비효율적임
+
+브로드캐스팅 broadsasting
+	: 1:N 통신 방식
+	: 동일한 내용을 여러 사람에게 보낼 때 효율적
+	: 종류
+		1. netId + subnetId 제외 나머지가 다 1111..
+			: 해당 네트워크의 모든 ㅈ장치에 전달
+		2. 모두 다 111...
+			: 호스트가 속한 네트워크의 모든 장치에 전달
+멀티캐스팅 multicasting
+	: 1:n 통신 방식
+	: 브로드 캐스팅과 유사하지만 차이점이 있다면 특정 호스트들( 실제 호스트 주소가 아닌 가상의 D 클래스 IP 주소에 가입된 호스트들에게만)에게만 데이터 전달
+	
+
+
+
+------------------------------------------------------------------------
+
+클래스 구분 팁
+	IP 주소 저장 클래스 >> InetAddress
+	IP 주소 저장 + port 번호 저장 클래스>> SocketAddress >> InetSocketAddress
+	IP 주소 저장 + port 번호 저장 + 연결 클래스 >> Socket
+	host name 저장 클래스 >> 따로 host name 저장 전용 클래스는 없어 IP 주소 저장 필요할때 저장 가능
+
+
+
+
+로컬 단어가 들어가는 메서드 네이밍 팁
+	: local 표현은 원격과 로컬 개념을 구분짓기 위한 네이밍이다
+		: InetAddress 의 경우 생성자 역할을 대신하는 메서드 하나를 제외하곤 로컬 원격 구분할 것 없이 같은 메서드를 사용한다
+			: InetAddress 의 경우 애초에 로컬 , 원격 구분지어 객체 생성되어서 그런거다
+		: InetSocketAddress 의 경우 로컬전용 메서드와 원격전용 메서드가 따로 있고, 로컬 전용 메서드의 경우 local이라고 써있다(암것도 안써있음 원격 꺼임)
+			: InetSocketAddress의 경우 한 객체가 로컬 정보와 원격정보 둘 다 포함하고 있기에 메서드로 구분지어 사용하는거다
+
+	1. 주소만 뽑아내는거면 
+		1-1 . address 들어간다
+		1-2 . Host 란 표현이 들어간다(local 만 쓰긴 뻘쭘하니까)
+	2. 포트번호만 뽑아내는거면 port 들어간다
+	3. 주소와 포트번호 둘다 들어가는거면 SocketAddress 들어간다
+
+
+도메인네임 혹은 ip주소를 arg 로 하는 메서드의 네이밍 팁
+	: name 이 들어가 있다 >> 빼박 도메인 네임을 arg 로 해야된다
+	: address 표현 >> 일단 InetAddress 객체(InetAddress 클래스의 경우 byte[ ] 타입의 ip주소)는 무조건 되고 , 대체로 도메인 네임으로 대신 써도 된다.
+		
+도메인네임 혹은 ip주소를 반환하는 메서드의 네이밍 팁
+	: name 이 들어가 있다 >> 걍 도메인 네임을 반환한다
+	: address 표현 >> 걍 InetAddress 객체를 반환한다(InetAddress 클랫스의 경우 byte[ ] 타입혹은 String 타입의 ip 주소)
+
+
+
+Inet 의미 == InterNET 
+	
+호스트네임정보는 젤 앞에 나오고 , ip 정보는  호스트 네임 뒤의 '/'뒤에 ' . ' 단위로 구분되어 출력되고 , port 번호는 ip 정보 뒤의 : 뒤에 나온다	
+	
+
+왠진 몰라도 Socket 객체 자체론 도메인 네임을 출력하는 메서드를 제공하지 않는다(InetAddress , InetSocketAddress 만 제공한다) 
+
+ip 주소만을 arg 로 하거나 반환값으로 하는 경우 걍 String 타입 혹은 byte[ ] 타입이 아니라 대부분 InetAddress 타입의 변수를 사용하여 객체 단위로 활용한다.
+	: 예외적으로 InetAddress 클래스 자체에서의 메서드가 ip 주소를 반환하는 경우, arg 로 하는 경우엔 String 혹은 byte[ ] 로 한다.
+
+ip 주소와 port 번호를 세트로 arg 로 하는 경우 대부분 (SocketAddress 타입이라서) InetSocketAddress 타입의 객체를 대입한다.
+
+
+
+InetAddress: IP주소 저장 및 관리 클래스 (순수 IP 정보만 포함하고 있지, Port 번호 정보는 가지고 있지 않음)
+	: IP 주소를 독립된 arg 로 하는 경우 그 arg에 InetAddress 의 객체를 대입하는 편이다
+	: 필드. 생성자는 전혀 없고 메서드만 가지고 있음
+		: 근데 특이한건 생성자는 없지만 인스턴스 메서드를 가지고 있는걸 보면 new 연산자를 통한 방법은 아닐지라도 객체 생성을 어쨌거나 할 수 있음을 알 수 있다
+
+	: tip )
+		메서드명에 name 들어가는거 == 도메인 네임 관련
+		메서드명에 address 들어가는거 == ip 주소 관련된거
+
+	InetAddress 객체 
+		객체 생성: 생성자가 아니라 static 메서드를 사용하여 객체 생성
+			: InetAddress.메서드명(arg .. )의 형태로 서야됨
+			: 생성된 객체를 참조하는 레퍼런스 변수를 print 하면 "호스트네임/IP" 의 형식으로 출력됨
+				: hostname 정보가 없는 경우 hostname은 제외하고 출력됨
+			: 결국 얘도 입출력 관련된거라 IOException 발생(그중 UnknownHostException )
+				: 그런데 얘는 딱히 close( ) 하는 대상이 아니기 때문에 close( ) 할 필요가 없고, 당연히 Autocloseable 인터페이스의 구현 클래스도 아니기 때문에 try ( ) 의 괄호 내부에 선언하는게 아니라 { } 내부에 쓰는ㄱㅓ다
+
+			static InetAddress getByName(String host) throws UnknownHostException
+				: host 이름( "www.google.com" 과 같은 도메인)을 arg 로 하여 DNS 서버로부터 실제 IP 주소를 받아서 그 정보를 바탕으로 객체를 생성함
+					: 해당 host 이름이 도메인에 없음 에러남
+					: "localhost" 를 arg 로 하면 자동으로 127.0.0.1 로 매치됨
+			
+			static InetAddress getByAddress(byte[] addr) throws UnknownHostException
+				: byte[ ] 의 형태로 IP 자체를 arg 로 하여 객체를 생성함 
+				: byte[ ] 로 넘겨주게 되면 192,168, 255 같은 값을 그냥은 담지 못함(byte 의 범위는 -128 ~ 127). (byte) 로 형변환 필요함. 근데 이래도 값 이상하게 나오긴 함
+				: InetAddress 의 목적은 IP 주소를 저장하는 것이기 때문에 이미 Ip를 받은 이상 host 네임까진 찾지 않는다
+
+			static InetAddress getByAddress(String host , byte[] addr) throws UnknownHostException
+				: host 이름도 저장하고 ip 도 따로 저장
+				: IP 가 주어졌기 때문에 DNS 서버를 안간다!!!!
+					: 그래서 IP 주소에 엉뚱한 호스트 네임을 붙여도 오류가 나오진 않는다
+
+			static InetAddress getLocalHost() throws UnknownHostException
+				: local 호스트 IP 를 바탕으로 하는 객체를 리컴
+				: 로컬호스트의 주소를 알 소 싶을떄도 사용 가능
+
+			static InetAddress getLoopbackAddress(	)
+				: 루프백 주소를 바탕으로 하는 객체 리턴
+					: 루프백 >> 데이터 받고 받은 결과를 다시 반환하는 장치
+						: 루프백 주소를 수신지로 하여 데이터를 전송하면 그 데이터가 송신지에 그ㅡ대로 다시 온다
+					: 루프백주소 : 127.0.0.1
+				: 생성자 역할을 하는 메서드 중에서 얘만 throws UnknownHostException 이 없는건 Loopback 주소는 127.0.0.1 로 고정되어ㅣㅇㅆ기 때문
+
+	
+			static InetAddress[ ] getAllByName(String host)
+				: arg 로 하는 host 가 여러개의 IP을 사용하는 경우 모든 host IP를 바탕으로하는 객체를 리턴
+
+
+	주요 ( 인스턴스 ) 메서드
+		(1) InetAddress 객체가 저장하고 있는 IP 주소를 리턴
+			byte[ ] getAddress( )
+				: byte[ ] 의 형태로 리턴. 하지만 127 을 넘는 값의 경우 마이너스 값으로 나오기 때문에 가독성이 떨어지니 비추
+					: InetAddress 객체 생성할때 getByAddress 로 생성하지 않고 getByName 으로 생성했어도 반환형이 byte[ ]이기 때문에  저따구로 나오는게 맞음
+
+			String getHostAddress( ) 
+				: String 의 형태로 우리가 평소에 읽던 방식으로 리턴 . 추천
+
+		(2) host name 을 리턴
+			String getHostName( )
+				: InetAddress 객체가 저장하고 있는 호스트의 이름을 문자열로 리턴
+					: 호스트 이름 == 데스크탑 이름 같은거
+
+		(3) 특수한 주소인지 조사
+			boolean isLoopbackAddress( )
+				: IP가 루프백 주소인지 확인
+			boolean isMulticastAddress( )
+				: IP가 멀티캐스팅 영역의 주소인지 확인
+			boolean isReachable(int timeout) throws IOException 
+				; ping 명령으로 리턴받을 수 있는지 여부 확인
+				: 모든 사이트가 ping 명령어를 허용하진 않아서 false 로 ㅏㄴ올 수도 있음
+				: timeout 은 ping 를 몇 ms 동안 기다릴건지를 의미
+
+			
+
+SocketAddress : IP 주소(+호스트 이름)와 Port 번호까지 관리하는 "추상" 클래스
+	: 추상클래스이기 때문에 직접 이걸로 객체를 생성하진 못하고 실체 클래스(자식클래스)인 InetSocketAddress 클래스의 생성자로 객체 생성
+
+InetSocketAddress
+	: IP주소와 port 번호 정보를 하나의 arg에서 요구하는 경우 InetSocketAddress 객체를 할당하는 편이다 
+	: 생성자
+		InetSocketAddress(int port)
+			: IP 주소 없이 내부의 포트 정보만 지정
+
+		InetSocketAddress(String hostname , int port)
+			: hostname과 포트 번호를 지정 , 이때 hostname 에 해당하는 Ip 주소를 DNS 에서 자동으로 추출해서 Ip 주소도 저장함
+
+		InetSocketAddress(InetAddress addr , int port)
+			: 포트번호와, InetAddress 객체 자체에 IP 정보가 들어있기 때문에 그 객체의 IP 주소를 저장
+
+		
+	: 유명한 메서드
+		InetAddress getAddress( ) 
+			: InetAddress 에 IP 정보가 들어있는 것이기 때문에 주소 반환 요청할때 InetAddress 를 주는거다
+			: 주의 ) InetAddress 객체를 대상으로 메서드를 쓰면 byte[ ] 를 반환하지만 , InetSocketAddress 를 대상으로 메서드를 쓰면 InetAddress 객체를 반환한다(그러니까 각 클래스에 다르게 선언되어있다 ) 
+ 
+		String getHostName( )
+			: hostname 을 문자열의 형태로 리턴
+
+		int getPort( ) 
+			: 포트번호 리턴
+
+
+		
+---------------------------------------------------------------------------------------------------------------------------------
+TCP 통신(Transmission control protocol 통신)
+
+
+	: 매커니즘
+		: 단계
+			0. 서버소켓측에서 accept( ) 메서드로 (클라이언트로부터 request 받기를 무한 기다림) 대기탐
+			1. 클라이언트가 자신의 소켓을 통하여 서버소켓한테 request
+			2. 서버소켓이 request 받으면 accept( ) 메서드는 서버소켓에 request 날린 클라이언트에 대한 소켓을 (서버소켓에) 생성
+			3. 소켓과 소켓 간의 InputStream , OutputStream 을 생성함
+			4. 서버소켓의 소켓과 클라이언트의 소켓 간의 stream 을 통하여 데이터가 왔다갔다 함 
+
+		: 용어
+			Socket : 전화기 같은거. 
+				: 클라이언트 측의 소켓,  서버소켓의 소켓 따로 있다
+			Server : 교환국 같은 거. 장소 느낌.
+				: 여러개의 서버 소켓을 가질 수 있음
+			ServerSocket : 교환국 내부의 특정 부서
+				: 서버 소켓은 클라이언트 소켓으로부터 호출 되길 기다리다가 호출이 되면 Socket 객체를 생성하고(반환하고) 이를 이용하여 클라이언트 소켓과 서버의 소통을 가능하게 한다
+				: 하나의 서버 소켓은 하나의 클라이언트 소켓과 연결된 하나의 소켓만 생성 가능
+					: 클라이언트 별로 서버측에 서버소켓과 서버소켓의 소켓이 생성되있어야하므로 TCP 통신의 경우 클라이언트가 많아지면 서버에 과부하가 걸리는 것
+
+			ServerSocket 의 소켓 : 교환국 내부의 특정 부서의 담당 전화기
+
+			: TCP 통신에서 클라이언트는 무조건 서버와만 통신이 가능하기에 클라이언트가 2개 이상인 경우에도 클라이언트끼리는 직접 통신을 할 수 없고 서버를 경유하여 간접적으로 통신해야된다.
+
+
+	: Socket
+		: TCP 통신에서 "두" 호스트간 입출력 스트림을 제공하는 클래스
+		: 객체의 생성과 동시에 연결 요청이 이루어진다
+		: AutoCloseable 의 구현 클래스이기 때문에 try ( ) 내부서 객체 생성시 추가적으로 close( ) 해주지 않아도 된다.
+
+		: 원격과 로컬 개념이 모두 존재하기에 둘을 구분짓기 위해 로컬이면 local 이라 들어간다. 따로 별다른 표현 없음 원격개념이다
+			ex) getLocalAddress , getInetAddress
+
+		: 생성자
+			: 객체를 생성할 시 원격지(도착지)의 정보를 필수적으로 arg 로 하여 생성해야된다
+				: 원격지 정보 == IP + port		
+				: 예외 ) 기본생성자
+				: 송신자 정보는 써도되고 안써도 된다
+					: 송신자 정보를 쓰면 직접 송신자의 port 번호를 지정할 수 있다
+
+			: 생성과 동시에 연결 요청시키는 생성자의 경우 모두 throws IOException 을 한다
+
+			Socket( )
+				: 예외적으로 원격지정보를 arg 로 하지 않아 유일하게 연결없이 생성되는 소켓
+					: 사용하기 이전에 따로 메서드 (connect ) 사용해서 송신자 정보를 저장해야된다
+
+			Socket(String host , int port) throws IOException
+				: 원격지 정보 ( host name && 포트 번호) 를 arg 로 하여 소켓을 생성과 동시에 연결 요청
+					: 송신자정보를 포함하지 않는다
+
+			Socket( InetAddress localAddr , int port ) throws IOExcpetion
+				:  host name 대신 InetAddress 객체를 arg 로 하여 IP 정보를 입력한다
+
+			Socket( String host , int port , InetAddress localAddr , int localPort ) throws IOExcpetion
+				: 원격지 정보뿐 아니라 송신지 정보까지 직접 arg 로 하여 연결 요청
+					: 직접 송신지 정보를 arg 로 하지 않아도 모든 왔다갔다 하는 데이터엔 송수신자 정보 모두 포함되어있다(누가 전화했는지 다 뜬다). 근데 이 방법으로 생성을 하면 송신자의 직접 포트번호를 지정할 수 있게 된다( 이렇게 localPort 를 명시하지 않으면 남은 포트 중 하나를 무작위로 이용하게 된다)
+
+			Socket( InetAddress address , int port , InetAddress localAddr , int localPort )
+				: host name 대신 InetAddress 객체를 arg 로 한다
+		
+		: 주요 메서드
+			(1) 소켓에 원격지 주소 저장
+				void connect(SocketAddress endpoint) throws IOException
+					: 원격지 정보가 없는 소켓에 ㅜ언격지 주소 정보를 제공하여 연결 요청을 수헹ㅇ힌디
+						: 까먹었을까봐 말해주면 InetSocketAddress 는 SocketAddress 의 구현 클래스인거고 SocketAddress 는 IP 주소와 port 번호 정보를 저장하는 인터페이스다
+							: 그러니까 InetSocketAddress 의 객체를 arg 로 함 된단거다
+
+					: 연결 요청하는거라 IOException 을 던진다
+
+			(2) 소켓에서 원격지 정보 뽑아냄
+				InetAddresss getInetAddress( )
+					: 원격지 주소 정보 뽑아냄
+
+				int getPort( )
+					: 포트번호 뽑아냄
+
+				SocketAddress getRemoteSocektAddress()
+					: 원격지의 주소 + 포트번호를 뽑아냄
+
+			(3) 소켓에서 로컬 정보 뽑아냄
+				InetAddress getLocalAddress( )
+					: 로컬의 주소 정보 뽑아냄
+						: InetAddress 의 static 메서드인 getLocalAddrress( )와 같은 역할을 한다
+				int getLocalPort( )
+					: 로컬의 포트 번호 뽑아냄
+				SocketAddress getLocalSoketAddress( )
+					: 로컬의 주소정보+포트번호 뽑아냄
+						: Socket 들어간 표현이니 ip주소 + 포트번호
+
+			(4) 입출력스트림 생성 
+				InputStream getInputStream( ) thorws IOExcpetion
+					: 소켓의 원격지에 대한 입력 스트림 생성
+						: 원격지는 상대적인 것이기 때문에 client 의 socket 입장에선 server 에 대해 만들어지는 거고 serversocket 의 socket 입장에선 client 에 대해 만들어지는 거다
+				OutputStream getOutputStream( ) throws IOExcpetion
+					: 소켓의 원격지에 대한 출력 스트림 생성
+
+			(5) 송수신 버퍼
+				: 왠진 몰라도 SocketException 을 반환한다.
+				int getSendBufferSize( ) throws SocketExeption
+					: 송신 버퍼 사이즈 반환
+				void setSendBufferSize(int size) throws SocketException
+					: 송신 버퍼 사이즈 설정
+				int getReceiveBufferSize( ) throws SocketException
+					: 수신 버퍼 사이즈 반환
+				void setReceiveBufferSize( int size) throws SocketException
+					: 수신 버퍼 사이즈 설정
+
+--------------------------------------------------------
+ServerSocket
+	: 클ㄹ이언트로부터 연결 요청을 대기하는 곳
+	: 서버 , 클라이언트
+	: 서버에 만들어지는 서버 소켓은 하나가 아니라 여러개. 서버 소켓 각각마다 포트 번호가 하나씩 부여되어있음.(하나의 서버 소켓은 독립된 하나의 포트번호를 가진다)
+	:  클라이언트 측의 소켓은 원격 정보인 IP , Port 번호를 가지고 있는데 IP 는 서버의 IP 를 의미함( 서버 소켓의 IP 가 아님. 생각해보면 클라이언트 소켓도 소켓 자체에 ip 가 부여되는게 아니라 클라이언트 측의 ip 일껄 ?? ). 그리고 포트 번호는 서버 소켓의 포트번호를 의미함. 
+		: 그러니까 일단 IP 주소 가지고 해당 서버로 이동하고 , 여기서 어떤 포트 번호를 원격지의 포트 번호로 했느냐 따라서 해당 서버소켓 중 특정 서버 소켓과 연결되는 것이다
+		: 만약에 클라이언트 측에서 원격지 정보로 설정한 포트번호의 서버 소켓이 존재하지 않으면 연결 요청이 일어나지 않는다
+
+	: 바인딩 정보 ) 서버 소켓의 포트 번호 정보.
+		: 서버  소켓이  어느 포트 번호에 바인딩 되어있는가
+
+	: 생성자 (객체 생성 방법)
+		1. ServerSocket( )
+			: 당장은 바인딩 없이 객체 생성. 바인딩 되어있지 않은 서버소켓은 사용 불가하기 때문에 사용하기 이전에 바인딩하고서 써야됨.
+		2. ServerSocket( int Port )
+			: 바인딩 정보와 함께 객체 생성. 
+
+
+	: 주요 메서드
+		1. 바인딩 정보 제공
+			void bind(SocketAddress endpoint )
+				: 바인딩 정보가 없는 서버소켓(=기본 생성자로 생성된 객체)에 바인딩 정보를 제공
+				: arg 타입이 SocketAddress 니까 걍 InetSocketAddress 객체 집어넣음 된다는 거임
+
+
+		2. 바인딩 여부 확인
+			boolean isBound()
+				: 바인딩 여부 확인
+
+		3. 연결요청 리스닝 시간 관련
+			: 연결요청 리스닝 시간 == Socket으로부터의 연결 요청을 기다리는 시간 == accept( ) 가 유효한 시간 == accept( ) 가 블라킹 하는 시간 
+				: 디폴트는 0 이다 (무한대기)
+			: 종류
+				(1) void setSoTimeout(int timeout)
+					: 연결요청리스닝 시간을 ms 단위로 설정. (1000 == 1초) 
+					: timeout == 0 이면 무한 대기
+					: 참고로 So 는 Socket 에서 따온 것 같다
+				(2) int getSoTimeout()
+					: 연결요청리스닝 시간 불러오기
+
+		4. 연결요청 수락
+			Socket accept( )
+				: 연결 요청이 수락된 후 통신을 위한 Socket 객체 리턴
+				: 설정된 timeout 시간동안만 유효하다 (timeout 시간 지남 걍 다음코드로 넘어간다)
+					: 보통은 무한 대기 타게 하는 편이다
+				: 서버가 클라이언트 로부터 데이터를 받기 위해 대기타게 하는 것
+				: block 메서드이다
+					: 평소엔 block 상태이다가 특정 조건을 만족하면 반짝 작동한다
+					: 주구장창 대기타다보니까 보통 별도의 스레드에서 만들어놓는 편이다
+						: 메인 스레드에서 만들어 놓게 되면 평소엔 메인 스레드가 멈춰있는 상태일 거니까
+
+				: 이 메서드가 반환한 소켓 객체로 클라이언트(소켓)와 서버가 소통하게 된다.  
+
+
+	: 이미 사용중인 "TCP"포트 번호 알아내는 법
+		: ServerSocket 은 TCP 사용하는거지 UDP 포트를 사용하는게 아니라 UDP 포트 번호를 확인 할 수 있는 건 아니다 
+		: 포트 번호가 0~65535 인 것을 활용
+			for(int i=0 ; i<65536 ; i++){
+				try{
+					ServerSocket serverSocket = new ServerSocket( i );
+				}catch(IOException e){
+				System.err.println( i+ "th port is being used");
+				}
+			}
+
+		: 어쨌뜬 이렇게 해서 출력된 포트번호를 제외한 번호를 ServerSocket 객체의 포트 번호로 바인딩 함 되는거다
+
+bind vs connect
+	: connect >>기본생성자로 생성된 Socket 객체에게 "원격지 정보" 를 제공하기 위해 사용
+	: bind >> 기본 생성자로 생성된 ServerSocket 객체에게 "바인딩 정보"를 제공하기 위해 사용
+	
+
+
+-------------------------------------------------------------------------------------------------
+TCP 통신 예제1 - client 와 server 간의 text 교환
+	:  Server 스레드 먼저 실행 시킨 후 client 스레드 실행시켜야됨
+		: Server 스레드 의 ServerSocket 객체의 port 번호는 client 스레드의 Socket 객체의 원격지 port 번호와 같아야한다   
+		
+			
+
+
+		
+
+
+-----------------------------------------------------------------------
+
+콜백함수 callback
+	: 쉬운 정의) 함수의 arg 로 들어가는 함수
+	: 자신이 호출되었을때 (피호출자의 신분임에도) 다른 코드를 호출하는 코드
+		: caller 가 callee를 호출했을때 그 callee (호출자)가 caller (피호출자)를 호출하는 것.
+			: 그러니까 호출된 코드에서 자신 코드를 호출한 코드를 실행시키게 하는 것	
+
+	: 쓰는 이유
+		: 순차적으로 실행하고 싶을때(=원하는 시점에 호출되게 하고 싶을때) 씀 . 
+		: 비동기 처리시 유용하게 사용 가능 
+
+Blocking , non-blocking , sync , async
+
+
+blocking , non-blocking : 다른 주체가 작업할때 자신의 제어권(=특정코드를 실행할 권한)이 있는지 없는지로 구분
+
+	blocking
+		: A 메소드가 B 메소드를 호출하면 A메서드의 제어권은 B메서드에게 넘어가고, B 메서드가 종료되어야 다시 A메서드의 제어권을 A 메서드에게 넘긴다
+			: 그러니까 A 메서드는 B 메서드가 종료될때까지 멈추었다가, B메서드가 종료되면 다시 실행된다
+
+	non-blocking
+		: A 메소드가 B 메소드를 호출하면 A메서드의 제어권은 B메서드에게 넘어가긴하는데, 거의 바로 A메서드에게 돌려준다.
+			: B메서드를 호출한 이후에 B메서드가 종료되길 기다리지 않고 계속 실행한다
+
+Synchronous 동기 , Asynchronous 비동기
+	Synchronous
+		: A메서드가 B메서드를 후출하면 , B 메서드의 결과는 A 메서드가 처리한다
+	Asynchronous
+		: A메서드가 B메서드를 호출하면 , B메서드의 결과는 걍 B메서드가 처리한다
+			: 메서드 A 가 메서드 B를 호출할때 콜백 함수를 함께 전달해서, 메서드 B의 작업이 완료되면 함께보낸 콜백 함수를 실행한다. 함수 A는 함수B를 호출한 후로 함수 B의 작업 완려 여부에는 신경쓰지 않ㄴ는다.
+ 
+
