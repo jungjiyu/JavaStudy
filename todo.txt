@@ -20,3 +20,11 @@ https://www.youtube.com/watch?v=YQH18Jg-oGQ
 
 15. String 에서 char[] 관련한 메서드엔 왜 charset 옵션 없고 바이트 배열 관련해서만 설정할 수 있게 해논거임?
 
+16. 자바 소켓 프로그래밍 정리 >>
+  :additional 의 server.txt 보완 
+  :close() 의 시점 
+  :수업day13,14 정리 
+  :왜 Thread 의 생성자 부분에 람다식 쓰면 그게 runnable 구현 객체로 인정되는지
+  :이클립스에 하다만 day12_re 마저 해보기 & 보완 
+  : 유튜브 강의 보다만거 (text 전송 이후 부터)
+
