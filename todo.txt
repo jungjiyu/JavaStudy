@@ -15,8 +15,7 @@ https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462488097
 
 13. java.lang.Class 의 원리와 클래스 로더
 
-14. charsert 뭔지 파헤치기
-https://www.youtube.com/watch?v=YQH18Jg-oGQ
+
 
 15. String 에서 char[] 관련한 메서드엔 왜 charset 옵션 없고 바이트 배열 관련해서만 설정할 수 있게 해논거임?
 
