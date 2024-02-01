@@ -1,0 +1,608 @@
+
+
+
+---------------------------------------
+
+SYS : 오라클 db 관리자 super-user 계정
+SYSTEM : 백업 , 복구 , 데이터베이스 업그레이드를 제외한 모든 기능 수행 가능
+
+sql+ : 오라클 dbms 를 설치하면 자동으로 제공해주는 프로그램 . 명령어를 사용하여 교작작업가능
+	: 어플리케이션에 해당( 하드웨어 << 오라클 << 어플리케이션 << 사용자 에서 )
+	: cli 환경에서 사용 가능한 어플리케이션
+		: cli == command line interface ( <----> gui == graphic user interface)
+
+
+cmd 창에서 다음을 수행
+(1) sqlplus -v
+	: sqlplus 의 버전을 확인한다
+
+(2) sqlplus
+	: sqlplus 를 작동시킨다
+	: 사용자명 입력하라고 하면 sys / as sysdba 를 입력
+		: 최고 관리자 권한으로 로그인하는 거
+		: sys == SYS . 최고 관리자
+		: as sysdba == 옵션 
+	: 비밀번호는 1234 로 입력
+		: 우리가 설치할때 그렇게 설치했으니까
+	: 정상적으로 실행하면 앞이 SQL> 로 바뀜
+
+(3) create user C##JAVAUSER identified by java2024;
+	: 사용자 계정을 생성
+		: C## 뒤 == 아이디명 <<sql 에선 C##과 아이디는 한 몸이다
+		: identified by 뒤 == 비밀번호
+		: 세미콜론 입력
+			: 세미콜론 안붙임 입력 안됨 
+
+(4) grant connect, resource, dba to C##JAVAUSER;
+	: 권한 부여
+		: connet == 로그인
+		: resource == 데이터베이스 관리 가능한 권한
+		: dba == 최상위 권한
+(5) commit;
+	: 변경사항 저장
+		: 중간중간 계속 하는게 좋다
+(6) revoke connect, resource, dba from C##JAVAUSER;
+	: 권한 취소
+
+(7) drop user C##JAVAUSER:
+	: 사용자 계정 삭제
+
+(8)exit;
+	: 종료
+
+(9) C##아이디명
+	: 사용자명 입력 란에 이미 생성한 계정으로 로그인할때 사용
+
+(10) 
+create table itMember(
+id varchar2(10) primary key,
+pw varchar2(10),
+name varchar2(10) not null,
+age number(3),
+phone char(13)
+);
+	
+	: 테이블 생성 하기
+		: 5 개의 열
+			: id << 기본키
+			: pw
+			: name	
+				: 생략이 불가하다
+			: age 
+			: phone
+
+(11) select * from tab;
+	: 전체 테이블 조회
+		: tab == 테이블
+		: select == 조회
+(12) 
+insert into itMember(id, pw, name, age, phone) values('hong', '1234', '홍길동', 20, '010-1111-2222'); 
+insert into itMember(id, pw, name, age, phone) values('sung', '5678', '성춘향', 21, '010-1111-3333'); 
+insert into itMember(id, pw, name, age, phone) values('lee', '1111', '이몽룡', 22, '010-1111-5555'); 
+insert into itMember(id, pw, name, age, phone) values('jang', '2222', '장보고', 23, '010-1111-6666'); 
+
+
+	: 데이터 추가
+
+(13)select * from itMember;
+	: 데이터 전체 조회
+
+(14) select * from itmember where age=20;
+	: 나이가 20 세인 멤버 전체 조회
+
+(15) update itMember set phone = '010-1234-5678' where name='홍길동';
+	: 이름이 홍길동 인 데이터의 전화번호를 010-1234-5678 로 변경
+	
+(16) delete from itMember where id='lee';
+	: id 가 lee 인 데이터 삭제
+
+(17) rollback;
+	: 바로 이전 커밋 시점으로 돌아감<< 커밋을 많이 해두는게 좋다
+
+(18) drop table itMember
+	: itMember 테이블 삭제
+ -- -------------------------------------------------
+
+sql
+	: 관계형데이터베이스관리시스템(RDBMS) 에서 데이터를 관리하기 위해 사용되는 프로그래밍 언어
+	: 명령어 문장 단위는 ' ; '
+		: sql 자체를 실행할때는 빼고. 그러니까 SQL > 로 바뀌었을때 그렇단 얘기.
+	: 트랜잭션
+		: DBMS 에서의 하나의 작업 단위
+
+DML ) data manipulation language
+	: Select ) 테이블서 조건에 맞는 데이터 검색
+	: Insert ) 테이블서 새로운 데이터 삽입
+	: Delete ) 테이블서 조건에 맞는 데이터 삭제
+	: Update ) 테이블서 조건에 맞는 데이터의 내용을 변경
+
+DDL ) data definition language
+	: Create ) Schema, Domain , Table , Index 정의
+	: Alter ) 테이블 대한 정의 변경
+	: Drop ) Schema, Domain , Table , Index 삭제
+
+DCL ) data control language
+	: Grant ) 데이터 베이스 사용자에게 사용권을 부여
+	: Revoke ) 데이터 베이스 사용자에게 사용권 부여를 취소
+
+TCL ) Transaction control language<< 트랜잭션 : db 상태를 변환(=select , inssert , delete,upgrade)시키기 위해 수행하는 작업의 단위
+	: Commit ) 데이터베이스 조작 작업이 정상적으로 끝났다고 알려줌
+		: 데이터 변경 사항을 저장 
+	: Rollback ) 데이터베이스 조작 작업을 기존 상태로 복구
+	: SavePoint ) 데이터 베이스 조작 작업시 저장 지점을 만들어감
+--------------------------------------------------
+
+데이터 타입
+	: 문자 데이터 타입 ) 
+		: tip ) 앞에 N 붙어있음 유니코드고 , VAR 붙어있음 가변길이
+		1.  CHAR(N) : 고정길이문자
+			: N == 길이
+		2. VARCHAR2(N) : 가변길이문자 << 더 많이 사용
+			: 처음에 설정한 길이보다 남아돌면 조절을 알아서  해줌
+				: 저장공간 절약
+		3. NCHAR(N) : 고정길이 유니코드 문자
+		3. NVARCHAR2(N) : 가변길이 유니코드 문자
+
+	: 숫자 데이터 타입 ) 
+		1. number(p,s) 
+			: +-38 자리수의 숫자를 저장
+			: p == 소수점 앞의 자릿수 , S == 소수점 뒤의 자릿수
+			: ex)
+		 		number(3)
+					: 최대 3자리수까지 표현 가능한 ㅅㅅ자
+				number(2,2)
+				: 최대 2 자리 , 소수자리 포함( -99.99 ~ 99.99 )
+	: 날짜형 데이터 타입)
+		1. DATE: 시,분,초 까지 표현 가능
+		2. TIMESTAMP : 밀리초까지 표현 가능
+
+많이 쓰는 sql 명령어
+	select : 검색
+	where : 조건을 설정
+	star : 전체 지정
+	update : 수정
+	delete : 삭제
+	rollback : 되돌리기
+	commit: 저장하기
+
+---------------------------------
+
+테이블 생성 명령어
+
+create table [테이블명]
+( [컬럼명] [데이터타입] [기본값. 생략가능] [null 허용가능 여부 . 생략 가능] , ... ); 
+
+	: not null == 널값 허용 불가 == 생략 불가
+	: 찐으로 [ ] 를 쓰라는게 아니라 띄어쓰기 하란 의미임.
+	: 데이터 베이스는 형식이 엑셀과 비슷
+
+-----------------------------------------
+
+테이블에 값 삽입 명령어
+insert into 테이블명(column명1 , cloum명2 ..) values (data1 ,data2 ..);
+	: cloum 명 생략 가능 . 근데 그럴꺼면 숫서 반드시 사용해야
+
+데이터 전체 조회
+select * from 테이블;
+
+조건에 맞게 조회
+select 열 from 테이블 where 조건
+
+데이터 수정
+update 테이블 set 칼럼 = 변경할값 where 조건;
+
+데이터 삭제
+delete from 테이블 where 조건;
+
+테이블 자체 삭제
+drop table 테이블;
+
+=============================================================
+
+sqldeveloper : gui 환경
+설치 중 환경 설정 임포트 확인이 나오면 꼭 아니오 확인!
+
++ 눌러서 접속
+
+	name : DailyJava2
+	사용자이름 : C##JAVAUSER
+	비밀번호: java2024
+	포트 1521
+
+	>>다 했음 접속 클릭
+
+만든 거 접속 하는 법 >> 클릭후 비번 입력
+
+
+대문자 구분 없음
+
+ctrl+enter == '한줄'실행
+	: 한 줄은 ';' 를 의미. 엔터 기준 아니라 
+f5 == 여러줄 실행 
+
+============================================
+
+관계형 데이터 베이스 >> 테이블과 테이블 끼리 연결하는 것
+
+외래키 설정 
+	: 테이블 선언할때 걍 다른 테이블의 colum 명과 타입을 똑같이 해서 선언하고 references 키워드로 참조를 나타냄
+
+
+
+(1) 외래키 생성 << references 를 써서 다른 테이블의 column 을 참조한다는 뜻
+	: 이때 반드시 타입 일치해야됨
+create table student(
+studnetid number(6) primary key,
+name nvarchar2(7) not null,
+age number(3) not null,
+grade number(1) not null,
+departmentcode number (3) references department(departmentcode) // 외래키 설정 << 타입 맞춰야되는거주의
+);
+
+
+(2) 뭐 테이블에 갑 입력 << insert 사용
+insert into student values (202301 , '홍길동', 23 , 4 , 111); 등등
+
+
+(3)select * from student order by grade ASC;
+	: 오름차순으로조회(내가봤을떄 asc 뜻은 ascend 일듯)
+		: select * from 테이블명 order by 열 ASC;
+
+(4) select * from student order by grade DESC;
+	: 내림 차순 조회(내가 봤을때 desc 뜻은 descend 일 듯)
+		: select * from 테이블명 order by 열 DESC;
+
+(5) select name, departmentname, departmentnumber from student,department
+where student.departmentcode = department.departmentcode and name like '홍길동';
+
+	: 홍길동 학생의 학과에 전화하기
+		: 관계형 이용
+	: join
+		: 2 개의 테이블을 하나의 테이블 처럼 보여주는 것
+		: select 표시할열들 from 테이블들 where 조건문 ;
+			: 이때 조건문에서는 테이블명.column 으로 각 colum 에 접ㅂ근해야됨
+			: student.departmentcode = department.departmentcode의 의미는 두 테이블에 모두 존재하는 번호를 가진 열이어야된다는 것
+	: like ) = 와 같은 역할
+
+(6)select name,age+1 from student;
+	: 산술연산자 사용
+	: name 과 age 열을 조회하되 age 열에는 + 1 을 할 것
+		: 근데 조회만 그렇게 하는거지 실제로 값에 +1 되는게 아님		
+
+(7) 아니다 를 표현
+
+select * from student where age != 20;
+select * from student where age <> 20;
+select * from student where age ^= 20;
+select * from student where not age = 20;
+	: 20 세가 아닌 사람 출력하는 4 가지 방법
+
+(8)	논리연산자 사용
+select * from student where age = 23 and grade =1;
+select * from student where age = 23 or grade =1;
+select * from student where not age = 23;
+	: and  , or  , not 
+
+(9) 
+select name || age from student; 
+select name || '의 나이는' || age || '살입니다' from student;
+	: 연결연산자
+		: 하나의 column 으로 보여줌
+		: 문자열을 중간헤 추가할 수 있게 해줌
+
+(10)
+select * from student where grade between 2 and 3;
+select * from student where grade in (2,3,4);	
+select * from student where name like '홍%';
+select * from student where name like '홍_동';
+	: 기타연산자: 범위를 만들때 사용
+		between a and b == a<=값<=b
+		in ( , , ,) == 튜플 내부 값 에 해당한다 
+		like == '= ' 역할로 문자 패턴이 같은지 조사
+			:문자 패턴 비교
+				:  % == 와일드 카드.아무자리의 값이 아무거나 와도 됨.
+				: _ == 아무거나 한글자
+=========================================
+JDBC: 데이터 베이스 연결 및 작업을 ㅇ위한 자바 표준 인터페이스
+	: 이클립스로 데터 작업 할 수 있다
+	: 빙법
+		: 11 버전으로ㅗ,  모듈 자동 생성 안되게하여 프로젝트 생성
+
+		: sqldeveloper 설치할때 같이 깔렸던 모듈(ojdbc11.jar) import 해줘야됨
+
+			: 프로젝트 오른쪽 버튼 눌러서 properties 클릭
+				: java build path 클릭
+					: library 탭 클릭
+						: modulepath 클릭
+							: addexternaljars 클릭
+								: 모듈 택
+									: apply and close 택 >> 다 하면 패키지 익스플로러에 referenced libraries 생김
+
+							
+
+-----------------------------------------------
+
+
+// 테이블에 있는 모든 학생 조회하기
+		Connection conn = null; // 데이터 베이스 연결하는 객체
+		Statement statement = null; // db 데이터 접근해서 crud 작업을 하게 해준다
+		ResultSet rs = null; // 데이터 조회 결과를 가짐
+		
+		
+		// 초기화
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		// student 테이블에 있는 모든 핛생 조회하기
+		try {
+			String query = "SELECT * FROM STUDENT"; // 데이터 조회하는 쿼리문
+			
+			Class.forName(driver); // 드라이버 로드
+			conn = DriverManager.getConnection(url,dbId,dbPw); // db 연결
+			statement = conn.createStatement(); // sql 쿼리문을 실행하기 위한 객체 "준비"
+			rs = statement.executeQuery(query); // 만든 객체로 쿼리문을 동작 시키고 결과를 저장함
+			
+			
+			while(rs.next()) { // 열에 해당하는 데이터ㄹ를 꺼내 가져옴
+				int studentId = rs.getInt("STUDENTID");
+				String name = rs.getString("NAME");
+				int age = rs.getInt("AGE");
+				int grade = rs.getInt("GRADE");
+				int departmentcode = rs.getInt("DEPARTMENTCODE");
+				
+				System.out.println(name+" 학생의 학번: "+ studentId);
+				System.out.println(name+" 학생의 나이: "+ age);
+				System.out.println(name+" 학생의 성적: "+ grade);
+				System.out.println(name+" 학생의 학과 코드: "+ departmentcode);
+				System.out.println();
+	
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally { // 다 하면 연결을 끊어줌
+			
+			try {
+				if(statement != null) statement.close();
+				if(rs != null) rs.close();
+
+			}catch(Exception e) {e.printStackTrace();}
+		}
+		
+-----------------------------------------------
+// 데이터 insert 작업
+
+		Connection conn = null; // 데이터 베이스 연결하는 객체
+		Statement statement = null; // db 데이터 접근해서 crud 작업을 하게 해준다
+		
+		
+		// 초기화
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+	// 테이블에 데이터 출력
+		try {
+			String query = "INSERT INTO STUDENT VALUES (202412, '아이유' , 21 , 3 ,333)"; // 데이터 조회하는 쿼리문
+			
+			Class.forName(driver); // 드라이버 로드
+			conn = DriverManager.getConnection(url,dbId,dbPw); // db 연결
+			statement = conn.createStatement(); // sql 쿼리문을 실행하기 위한 객체 "준비"
+			int result = statement.executeUpdate(query); // 결과를 int 형으로 바음. 변경된 레코드 값을 반환
+			
+			if(result == 1 ) { // 1 개 insert 잘 됬으면 (true 를 의미하는 1 이 아님)
+				System.out.println(" INSERT 성공! ");
+			}
+			
+		
+			}catch(Exception e) {
+				System.out.println("insert 실패:");
+			e.printStackTrace();
+			
+		}finally { // 다 하면 연결을 끊어줌
+			
+			try {
+				if(statement != null) statement.close();
+				if(conn != null) conn.close();
+
+			}catch(Exception e) {e.printStackTrace();}
+		}
+
+
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+
+// 데이터 업데이트 하는 코드
+	//  java.sql.PreparedStatement; // 향상된 statement >> sqlinjection 을 방지한다
+ 
+package dbPractice2;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement; // 향상된 statement
+										// 해커가 중간에 데이터 갈취해서 위조하는 것 ) sqlinjcetion. 이걸(데이터의 변경. 즉 쿼리문 변경) 방지하려고 만든거임.
+
+// 업데이트 작업하기
+public class Main {
+	public static void main(String[] args) {
+		Connection conn = null; // 데이터 베이스 연결하는 객체
+		PreparedStatement statement = null; 
+		
+		
+		// 초기화
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+	// 테이블에 데이터 출력
+		try {
+			String query = "UPDATE STUDENT SET DEPARTMENTCODE =? WHERE NAME =?"; // 업뎃 쿼리문
+					// 물음표 자리에 데이터가 들어간다
+			
+			Class.forName(driver); // 드라이버 로드
+			conn = DriverManager.getConnection(url,dbId,dbPw); // db 연결
+			statement = conn.prepareStatement(query);
+			statement.setInt(1, 222); //첫번째 물음표에 값이 들어간다
+			statement.setString(2, "홍길동");// 두번째 물음표에 값이 들어간다
+			int result = statement.executeUpdate();
+			
+			if(result == 1 ) { // 1 개 update 잘 됬으면 (true 를 의미하는 1 이 아님)
+				System.out.println(" update 성공! ");
+			}
+			
+		
+			}catch(Exception e) {
+				System.out.println("update 실패:");
+			e.printStackTrace();
+			
+		}finally { // 다 하면 연결을 끊어줌
+			
+			try {
+				if(statement != null) statement.close();
+				if(conn != null) conn.close();
+
+			}catch(Exception e) {e.printStackTrace();}
+		}
+		
+		
+		
+		
+		
+	}
+}
+
+
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+//delete 하기
+
+
+package dbPractice;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+public class Main6 {
+	public static void main(String[] args) {
+		Connection conn = null; // 데이터 베이스 연결하는 객체
+		PreparedStatement statement = null; 
+		
+		
+		// 초기화
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		try {
+			String query = "DELETE FROM STUDENT WHERE STUDENTID = ?";
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url,dbId,dbPw); // db 연결
+			statement = conn.prepareStatement(query);
+			statement.setInt(1, 202412); // 아이유 삭제
+			int result = statement.executeUpdate();
+
+			if(result ==1) {
+				System.out.println("DELETE 성공");
+			}
+		}catch(Exception e) {
+			System.out.println("delete 실패:");
+		e.printStackTrace();
+		
+	}finally { // 다 하면 연결을 끊어줌
+		
+		try {
+			if(statement != null) statement.close();
+			if(conn != null) conn.close();
+
+		}catch(Exception e) {e.printStackTrace();}
+	}
+		
+		
+	}
+}
+
+----------------------------------------------------------------------
+
+// 메타데이터 확인하기
+	// 메타데이터 >> 데이터에 대한 데이터. 다른 데이터를 보충설명하는 데이터.
+
+package dbPractice;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+
+// 메타데이터 >> 데이터에 대한 데이터. 다른 데이터를 보충설명하는 데이터.
+
+public class Main8 {
+	public static void main(String[] args) {
+		Connection conn = null; // 데이터 베이스 연결하는 객체
+		PreparedStatement statement = null; 
+		ResultSet rs = null; // 데이터 조회 결과를 가짐
+		
+		
+		// 초기화
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		
+		
+		try {
+			String query = "SELECT * FROM STUDENT"; // 데이터 조회하는 쿼리문
+			
+			Class.forName(driver); // 드라이버 로드
+			conn = DriverManager.getConnection(url,dbId,dbPw); // db 연결
+			statement = conn.prepareStatement(query); // sql 쿼리문을 실행하기 위한 객체 "준비"
+			rs = statement.executeQuery(query); // 만든 객체로 쿼리문을 동작 시키고 결과를 저장함
+			
+			ResultSetMetaData metadata = rs.getMetaData(); // 인터페이스 레퍼런스 변수에 인터페이스 구현 객체 할당
+			int columnCount = metadata.getColumnCount(); // 정수값으로 열의 개수를 가져옴
+			
+			System.out.println("metadata result=======================");
+			for(int i = 1 ; i <=columnCount;i++) {
+				// 지정된 열에 대한 정보 출력
+				System.out.println("Column "+i+":");
+				System.out.println("Name: "+metadata.getColumnName(i));
+				System.out.println("Type: "+metadata.getColumnTypeName(i));
+				System.out.println("size: "+metadata.getColumnDisplaySize(i)); // 해당 열의 최대 데이터 사이즈. 
+				System.out.println("is Nullable: "+metadata.isNullable(i));
+				System.out.println();
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally { // 다 하면 연결을 끊어줌
+			
+			try {
+				if(statement != null) statement.close();
+				if(conn != null) conn.close();
+
+			}catch(Exception e) {e.printStackTrace();}
+		}
+		
+	
+	}
+
+}
+------------------------------------------
+
+입출력 << 외울 필욘 없지만 필요하단건 알아야
+
+람다식
+
+쓰레드
+
+스트림
+
+네트웍
+----------------------------------------------------------------
