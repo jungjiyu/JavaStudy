@@ -815,7 +815,7 @@ Charset 문자셋 << https://www.youtube.com/watch?v=YQH18Jg-oGQ&list=PLR9w0n2BH
 	: java.nio.charset.Charset 클래스에 정의되어있음
 		: nio == new input output
 
-	: 객체 생성 ) 생성자를 사용하지 않고 정적 메서드를 이용 << 근데 Charset 객체 생성하고 이를 활용하는 케이스를 딱히 본적없음 .대부분 String charsetName 을 이용하는 듯
+	: 객체 생성 ) 생성자를 사용하지 않고 정적 메서드를 이용 << 근데 Charset 객체 생성하여 활용하는 케이스를 딱히 본적없음 . 문자셋 지정이 필요한 부분에선 대부분 Charset charset 뿐 아니라 String charsetName 까지 지원하기 떄문에 "UTF-8" , "EUC-KR" 이런식으로 문자열의 형태로 많이 arg 로 대입한다.
 		sol 1. static Charset defaultCharset( )
 			: 현재 설정되어있는 디폴트 문자셋 리턴
 				: 최소 "파일" 단위까지 지정 "가능" . ( 근데 보통 프로젝트 단위로 설정 )
