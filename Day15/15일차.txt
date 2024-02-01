@@ -1,0 +1,356 @@
+- sqlplus 버전 확인
+sqlplus -v
+
+- sqlplus 실행
+sqlplus
+
+- sys관리자 계정으로 로그인
+사용자명 입력: sys / as sysdba
+비밀번호 입력: 1234
+
+SQL> Success
+
+사용자 계정 생성
+create user C##JAVAUSER identified by java2024;
+
+권한 부여
+grant connect, resource, dba to C##JAVAUSER;
+
+커밋
+commit;
+
+권한 취소
+revoke connect, resource, dba from C##JAVAUSER;
+
+사용자 삭제
+drop user C##JAVAUSER;
+
+다시 계정 생성 및 권한 부여
+create user C##JAVAUSER identified by java2024;
+grant connect, resource, dba to C##JAVAUSER;
+commit;
+
+- sqlplus 종료
+exit;
+
+
+- C##JAVAUSER 계정으로 로그인
+sqlplus
+사용자명 입력: C##JAVAUSER
+비밀번호 입력: java2024
+
+
+데이터 타입
+
+- 문자 데이터 타입
+CHAR(N): 고정 길이 문자
+VARCHAR2(N): 가변 길이 문자
+
+NCHAR(N): 고정 길이 유니코드 문자
+NVARCHAR2(N): 가변 길이 유니코드 문자
+
+- 숫자 데이터 타입
+number(p,s): +- 38자리수의 숫자를 저장
+number(3): 최대 3자리까지 표현이 가능한 숫자
+number(2,2): 최대 2자리, 소수이하 자리 포함(-99.99 ~ 99.99)
+
+- 날짜형 데이터 타입
+DATE: 날짜형식의 자료형으로 시, 분, 초까지 표현가능
+TIMESTAMP: 밀리초까지 표현가능
+
+- SQL 명령어
+select : 검색
+where : 조건
+* : 모든 것(전체)
+update: 수정
+delete: 삭제
+rollback : 되돌리기
+commit: 저장하기
+
+
+
+- 테이블 생성
+create table itMember(
+id varchar2(10) primary key,
+pw varchar2(10),
+name varchar2(10) not null,
+age number(3),
+phone char(13)
+);
+
+SQL> commit;
+
+- 테이블 조회
+select * from tab;
+
+
+- 데이터 추가
+insert into itMember(id, pw, name, age, phone) values('hong', '1234', '홍길동', 20, '010-1111-2222');
+
+insert into itMember(id, pw, name, age, phone) values('sung', '5678',
+'성춘향', 21, '010-1111-3333');
+
+insert into itMember(id, pw, name, age, phone) values('lee', '1111', '이순신', 22, '010-1111-5555');
+
+insert into itMember(id, pw, name, age, phone) values('jang', '2222', '장보고', 23, '010-1111-6666');
+
+commit;
+
+
+
+- 데이터 전체 조회 및 조건에 맞게 조회
+
+데이터 전체 조회
+select * from itMember;
+
+나이가 20살인 데이터 전체 조회
+select * from itMember where age = 20;
+
+
+- 데이터 수정
+id가 hong인 데이터의 전화번호를 010-1234-5678로 변경
+update itMember set phone='010-1234-5678' where id='hong';
+
+
+- 데이터 삭제
+id가 lee인 데이터 삭제
+delete from itMember where id='lee';
+
+
+- 롤백
+SQL> select * from itMember;
+SQL> rollback;
+SQL> select * from itMember;
+SQL> commit;
+
+
+- 테이블 삭제
+drop table itMember;
+select * from tab;
+
+
+sql Developer(GUI)
+
+1.
+https://www.oracle.com/database/sqldeveloper/technologies/download/
+
+2. 
+Windows 64-bit with JDK 11 included Download(465 MB) 클릭
+
+3. 라이센스 동의 및 로그인
+
+4. 다운로드 완료 후 압축 풀기
+
+5. sqldeveloper.exe 파일 실행 
+(설치 중 환경 설정 임포트 확인이 나오면 꼭 "아니오" 클릭!)
+
+
+--------------------------------------------------------------------
+테이블 생성
+
+create table department(
+departmentcode number(3) primary key,
+departmentname nvarchar2(10) not null,
+departmentnumber char(13)
+);
+
+commit;
+
+select * from tab;
+
+데이터 추가
+insert into department(departmentcode, departmentname, departmentnumber) values(111, '컴퓨터학과', '02-111-2222');
+insert into department(departmentcode, departmentname, departmentnumber) values(222, '요리학과', '02-3333-4444');
+insert into department values(333, '경제학과', '02-555-6666');
+insert into department values(444, '역사학과', '02-777-8888');
+
+
+commit;
+
+select * from department;
+
+
+테이블 생성(외래키 설정)
+create table student(
+studentid number(6) primary key,
+name nvarchar2(7) not null,
+age number(3) not null,
+grade number(1) not null,
+departmentcode number(3) references department(departmentcode)
+);
+
+
+commit;
+
+select * from tab;
+
+
+
+데이터 추가
+insert into student values(202301, '홍길동', 23, 4, 111);
+insert into student values(202302, '성춘향', 21, 2, 222);
+insert into student values(202303, '이순신', 23, 1, 333);
+insert into student values(202304, '이몽룡', 25, 3, 444);
+insert into student values(202305, '장보고', 20, 1, 111);
+insert into student values(202306, '임꺽정', 24, 3, 444);
+insert into student values(202307, '홍길순', 23, 4, 333);
+insert into student values(202308, '유재석', 22, 3, 222);
+insert into student values(202309, '노홍철', 20, 2, 111);
+insert into student values(202310, '박명수', 24, 4, 333);
+insert into student values(202311, '정준하', 23, 1, 222);
+
+commit;
+
+select * from student;
+
+
+
+
+데이터 조회
+
+select * from student;
+select * from department;
+
+select * from student order by grade ASC;
+select * from student order by grade DESC;
+
+select * from student order by grade ASC, age DESC;
+select * from student where name = '홍길동';
+
+
+조건에 맞게 조회(Join)
+select name, departmentName, departmentNumber from student, department
+where student.departmentCode = department.departmentCode and name like '홍길동';
+
+
+산술 연산자 사용하여 조회
+select name, age+1 from student;
+select name, age-1 from student;
+select name, age*2 from student;
+select name, age/2 from student;
+
+
+
+비교 연산자 사용하여 조회
+select * from student where age = 23;
+
+select * from student where age != 23;
+select * from student where age <> 23;
+select * from student where age ^= 23;
+
+select * from student where age > 23;
+select * from student where age < 23;
+select * from student where age >= 23;
+select * from student where age <= 23;
+
+
+
+논리 연산자 사용하여 조회
+select * from student where age = 23 and grade = 1;
+
+select * from student where age = 23 or grade = 1;
+
+select * from student where not age = 23;
+
+
+연결 연산자 사용하여 조회(컬럼, 문자)
+select name || age from student;
+
+select name || '의 나이는 ' || age || '살 입니다.' from student;
+
+
+기타 연산자 사용하여 조회
+select * from student where grade between 2 and 3;
+
+select * from student where grade in (2,3,4);
+
+select * from student where grade not in (2,3,4);
+
+
+
+문자 패턴 비교
+select * from student where name like '홍%';
+select * from student where name not like '홍%';
+
+select * from student where name like '홍_동';
+
+select studentid, name, age from student where name like '이%';
+
+
+1. 테이블 생성(commit)
+create table Quiz1 (
+id VARCHAR2(10),
+password number(10),
+name varchar2(10),
+age varchar2(10), 
+address varchar2(10)
+);
+
+2. 데이터 추가
+- 'apeach', 11111, '어피치', 21, '서울'
+- 'lion', 22222, '라이언', 22, '대전'
+- 'chunsik', 33333, '춘식이', 23, '대구'
+- 'neo', 44444, '네오', 24, '부산'
+- 'frodo', 55555, '프로도', 25, '광주'
+
+3. 명령어 입력
+1). 전제 데이터 조회
+2). 주소가 서울인 캐릭터 조회
+3). 주소가 서울이 아닌 캐릭터 조회
+4). 네오님의 나이를 27살로 수정
+5). 나이가 27이상인 캐릭터 조회 
+6). 나이가 21에서 25이하인 캐릭터 조회
+7). 프로도를 제거
+
+
+정답
+
+commit;
+
+create table Quiz1 (
+id VARCHAR2(10),
+password number(10),
+name varchar2(10),
+age varchar2(10), 
+address varchar2(10)
+);
+
+
+insert into Quiz1 values('apeach', 11111, '어피치', 21, '서울');
+insert into Quiz1 values('lion', 22222, '라이언', 22, '대전');
+insert into Quiz1 values('chunsik', 33333, '춘식이', 23, '대구');
+insert into Quiz1 values('neo', 44444, '네오', 24, '부산');
+insert into Quiz1 values('frodo', 55555, '프로도', 25, '광주');
+
+
+
+select * from Quiz1;
+
+select * from Quiz1 where address like '%서울%';
+
+select * from Quiz1 where address not like '%서울%';
+
+update Quiz1 set age = 27 where id = 'neo';
+
+select * from Quiz1 where age >= 27;
+
+select * from Quiz1 where age between 21 and 25;
+
+delete from Quiz1 where id = 'frodo';
+
+
+
+
+JDBC
+데이터 베이스 연결 및 작업을 하기 위한 자바 표준 인터페이스
+
+
+
+
+
+
+
+
+
+
+

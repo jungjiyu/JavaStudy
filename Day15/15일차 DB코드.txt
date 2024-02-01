@@ -1,0 +1,156 @@
+-------------------------------------------------------------------------------------------
+package Chapter8;
+
+public class EX01 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String driver = "oracle.jdbc.OracleDriver";
+		try {
+			Class.forName(driver);
+			System.out.println("클래스 로딩 성공!");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+
+-------------------------------------------------------------------------------------------
+package Chapter8;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+public class EX02 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Connection conn = null;
+		
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			System.out.println("Connection 성공!");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+}
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------
+package Chapter8;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class EX03 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		try {
+			String query = "SELECT * FROM STUDENT";
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(query);
+			
+			while(rs.next()) {
+				int studentID = rs.getInt("STUDENTID");
+				String name = rs.getString("NAME");
+				int age = rs.getInt("AGE");
+				int grade = rs.getInt("GRADE");
+				int departmentCode = rs.getInt("DEPARTMENTCODE");
+				
+				System.out.println(name + "학생의 학번 : " + studentID);
+				System.out.println(name + "학생의 나이 : " + age + "살");
+				System.out.println(name + "학생의 학년 : " + grade + "학년");
+				System.out.println(name + "학생의 학과 코드 : " + departmentCode + "번");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)stmt.close();
+				if(conn != null)conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+}
+
+-------------------------------------------------------------------------------------------
+package Chapter8;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+
+public class EX04 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Connection conn = null;
+		Statement stmt = null;
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		try {
+			String query = "INSERT INTO STUDENT VALUES(202412, '아이유', 21, 3, 333)";
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			stmt = conn.createStatement();
+			int result = stmt.executeUpdate(query);
+			if (result == 1) {
+				System.out.println("INSERT 성공!");
+			}
+		} catch (Exception e) {
+			System.out.println("INSERT 실패!");
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null) stmt.close();
+				if (conn != null) conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+}
+
+-------------------------------------------------------------------------------------------
+
