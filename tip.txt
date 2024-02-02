@@ -633,7 +633,10 @@ public boolean equals(Object o) {
 				ex ) Integer.toString(10); // static toString() 이용
 				     integerVal.toString(); // toString() 이용
 
-	: 문자열을 기본타입으로 >> 문자를 제외하곤 Wrapper 클래스에 정의된 static parse기본타입명(기본타입매개변수) 를 활용
-		: parse >> 기본적으로는 문장을 문법적으로 분석하다 란 뜻인데 프로그래밍에서는 주로 ( 기존과 다른 형식으로) 디코딩 한다는 의미로 쓰인다.
-		: Character 클래스의 경우에는 parseChar 이 없음
-		: ex ) String str = Integer.parseInt("200");
+	: 문자열을 기본타입으로
+		(1) 문자를 제외하곤 Wrapper 클래스에 정의된 static parse기본타입명(기본타입매개변수) 를 활용
+			: parse >> 기본적으로는 문장을 문법적으로 분석하다 란 뜻인데 프로그래밍에서는 주로 ( 기존과 다른 형식으로) 디코딩 한다는 의미로 쓰인다.
+			: Character 클래스의 경우에는 아예 문자열을 문자로 바꾸는 개념의 메서드가 없음
+			: ex ) String str = Integer.parseInt("200");
+
+		(2) 문자만 String 클래스의 charAt(0) 을 활용
