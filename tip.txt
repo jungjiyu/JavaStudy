@@ -616,7 +616,16 @@ public boolean equals(Object o) {
 
 52 ) 문자열 <----> 기본 타입
 	: 기본 타입을 문자열로 >> String 클래스에 정의된 static valueOf(Object obj ) 활용
-		: ex ) int num = String.valueOf(20);
+		: 주의 >> String 클래스 뿐 아니라 wrapper 클래스들에도 static valueOf(해당타입의 매개변수), static valueOf(String str) 이 있다 
+			: static valueOf() 메서드는 arg 를 자신이 선언되어있는 클래스의 값으로 변환해주는거라고 생각함된다.  
+				: tip>> 죄다 static 이므로 앞에 대상으로 쓰인 클래스명을 확인하면 어떤 값을 반환하는지 알기 쉽다
+					: ex) 
+						String.valueOf(10) >> String 클래스를 대상으로 쓰였으므로 String 객체를 반환한다
+						Integer.valueOf(10) >> Integer 클래스를 대상으로 쓰였으므로 Integer 객체를 반환한다
+				: 주의 ) 
+					1. String 클래스에 선언된 valueOf() 만 arg 타입이 Obj 여서 모든 타입의 값을 arg 로 받을 수 있다
+					2. Character 클래스엔 valueOf(String str) 이 오버로딩 되있지 않고 오직 valueOf(Char c) 만 있다
+
 	: 문자열을 기본타입으로 >> 문자를 제외하곤 Wrapper 클래스에 정의된 static parse기본타입명(기본타입매개변수) 를 활용
 		: parse >> 기본적으로는 문장을 문법적으로 분석하다 란 뜻인데 프로그래밍에서는 주로 ( 기존과 다른 형식으로) 디코딩 한다는 의미로 쓰인다.
 		: Character 클래스의 경우에는 parseChar 이 없음
