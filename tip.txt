@@ -611,4 +611,13 @@ public boolean equals(Object o) {
 	: 자바 소스 코드 내의 getBytes() , new String(byte[] bytes) 의 경우
 		>> default 는 소스코드가 속한 파일의 문자셋을 따름 
 		>> charset 이나 charsetaName으로 따로 지정하면 그 지정한 문자셋으로 인코딩 가능
-	: 
+	: 자바 프로그램 외부에서 만든 파일에서 불러오는 경운 어케되는진 모르겠음.
+
+
+52 ) 문자열 <----> 기본 타입
+	: 기본 타입을 문자열로 >> String 클래스에 정의된 static valueOf(Object obj ) 활용
+		: ex ) int num = String.valueOf(20);
+	: 문자열을 기본타입으로 >> 문자를 제외하곤 Wrapper 클래스에 정의된 static parse기본타입명(기본타입매개변수) 를 활용
+		: parse >> 기본적으로는 문장을 문법적으로 분석하다 란 뜻인데 프로그래밍에서는 주로 ( 기존과 다른 형식으로) 디코딩 한다는 의미로 쓰인다.
+		: Character 클래스의 경우에는 parseChar 이 없음
+		: ex ) String str = Integer.parseInt("200");
