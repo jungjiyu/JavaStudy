@@ -644,3 +644,26 @@ public boolean equals(Object o) {
 
 53) 생성자가 private 이거나 아예 없다고 하더라도 객체를 만들 수 없는건 아니다. 해당 클래스의 메서드를 이용해서 객체를 생성할 수 있게 만들어논 클래스도 있다
 	ex ) java.lang.Class 
+
+
+54) JVM , JRE , JDK 이란?
+	: JVM < JRE < JDK
+		: JDK
+			: java development kit .
+			: 자바 컴파일러 즉 JAVAC 를 포함한다
+			: .java 소스파일로 .class 바이트 코드 파일을 생성한다
+ 				: JRE 를 포함
+					: 개발자는 JDK 를 설치하여 프로그래밍을 한다( 모두 아우르니까)
+					: 사실 개발자가 아니라 실행만이 목적이라면 JDE 만 설치해도 된다. 굳이 소스 코드를 바이트 코드로 변환하는 과정이 필요없는거니까
+
+		: JRE
+			: 자바 런타임 환경 . Java Runtime Envioornment
+			: 자바 클래스 로더와 라이브러리를 포함하는 환경으로 , JVM 이 원활하게 작동할 수 있도록한다.
+				: 바이트코드를 필요한 라이브러리와 결합하여 JVM 에 넘긴다
+			: JVM 을 포함
+
+		: JVM 
+			: 자바 가상 머신 java virtual machine
+				: 자바 프로그램을 (운영체제에 관계없이) 실행시켜줌 && 프로그램의 메모리를 관리해줌
+			: Garbage Collection 을 포함한다
+				: 메모리를 관리하는 프로세스로 , 프로그램에서 사용하지 않은 메모리를 찾아 제거하여 효율적인 메모리 관리를 하게 해준다
