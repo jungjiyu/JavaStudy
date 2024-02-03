@@ -27,3 +27,5 @@ https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462488097
   :이클립스에 하다만 day12_re 마저 해보기 & 보완 
   : 유튜브 강의 보다만거 (text 전송 이후 부터)
 
+
+17. 제너릭이란
