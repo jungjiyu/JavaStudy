@@ -33,3 +33,7 @@ https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462488097
 
 18 .https://inpa.tistory.com/entry/GOF-%F0%9F%92%A0-%EC%8B%B1%EA%B8%80%ED%86%A4Singleton-%ED%8C%A8%ED%84%B4-%EA%BC%BC%EA%BC%BC%ED%95%98%EA%B2%8C-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90
 싱글톤 패턴 자세히 --뒷부분
+
+
+19. https://seokrae.gitbook.io/sr/book/effective/item_83
+  : 지연 초기화 자세히 마저 tip 에 적기
