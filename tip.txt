@@ -549,6 +549,10 @@ public boolean equals(Object o) {
 			: File file = new File("/home/./././Test.txt"); 일때
 				file.getAbsolutePath() 의 경우 file 객체를 생성할때 arg로 한 절대경로 그 자체인 /home/./././Test.txt 를 반환하지만
 				file.getCanonicalPath() 의 경우 찐(?) 절대경로인 /home/Test.txt 를 반환한다
+
+
+	7. primitive 
+		: 원시라는 뜻. primitive 타입은 기본 타입을 의미(<---> 레퍼런스 타입)
 42) 유명한 interface
 	1. Runnable
 		: run ( ) 메서드를 가지고 있고, 이 인터페이스의 구현 객체를 Thread 클래스 생성자의 arg  로 사용하여 Thread 객체를 만들 수 있다
