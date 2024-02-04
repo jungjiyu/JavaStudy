@@ -543,7 +543,12 @@ public boolean equals(Object o) {
 		: 대소문자 구분
 	5. offset
 		: 시작위치
-
+	6. canonical
+		: canonical 자체적인 의미는 원형, 기본이란 뜻으로, 자바에서는 절대 경로 뭐 이런것처럼 상대적인 것과 상반되는 개념으로 쓰인다
+		: absolute 보다도 더 절대적인 느낌.
+			: File file = new File("/home/./././Test.txt"); 일때
+				file.getAbsolutePath() 의 경우 file 객체를 생성할때 arg로 한 절대경로 그 자체인 /home/./././Test.txt 를 반환하지만
+				file.getCanonicalPath() 의 경우 찐(?) 절대경로인 /home/Test.txt 를 반환한다
 42) 유명한 interface
 	1. Runnable
 		: run ( ) 메서드를 가지고 있고, 이 인터페이스의 구현 객체를 Thread 클래스 생성자의 arg  로 사용하여 Thread 객체를 만들 수 있다
