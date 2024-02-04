@@ -37,3 +37,6 @@ https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462488097
 
 19. https://seokrae.gitbook.io/sr/book/effective/item_83
   : 지연 초기화 자세히 마저 tip 에 적기
+
+20. https://effectiveprogramming.tistory.com/entry/Holder-%ED%8C%A8%ED%84%B4
+  : holder 패턴이란?
