@@ -40,3 +40,7 @@ https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462488097
 
 20. https://effectiveprogramming.tistory.com/entry/Holder-%ED%8C%A8%ED%84%B4
   : holder 패턴이란?
+
+
+21. https://velog.io/@potato_song/Java-%EC%96%B4%EB%85%B8%ED%85%8C%EC%9D%B4%EC%85%98-%EC%BB%A4%EC%8A%A4%ED%85%80-%EC%96%B4%EB%85%B8%ED%85%8C%EC%9D%B4%EC%85%98-%EB%A7%8C%EB%93%A4%EA%B8%B0
+  : 어노테이션 만드는 법
