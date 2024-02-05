@@ -1,5 +1,3 @@
-T B continued
-
 
 기본적인 검색법:
 기본적인 페이지 해석법
@@ -16,54 +14,806 @@ T B continued
 		: implements 
 			: 어떤 인터페이스를 구현한 것인가
 	
-	: 
 java.lang 패키지
 	: 자바 프로그램의 가장 기본적인 클래스를 담고 있는 패키지 >> import 없이 사용 가능
+		: lang 이란게 이미 자바 language 자체적으로 포함하고 있단 의미인 것 같다 
 	: 다 외우란거 아니고 자바 API 도큐먼트에 잘 나와있음
 	: 주요 클래스
 		1. Object 
 			: 자바 클래스의 최상위 클래스
+				: 모든 클래스는 extends 키워드를 사용하지 않았더라도 java.lang.Object 클래스를 상속하게 된다
+					: 모든 클래스는 Object 클래스의 생성자와 메서드를 사용할 수 있다
+
 			: 구성요소
 				:필드-없음
 				:생성자-있음
 				:메서드-있음
 					: 대표적 메서드
 						1. public booelan equals(Object obj);	
-							: 기본적으로는 객체가 동등한지 여부를 판단 .
+							: 객체를 대상으로하여 호출되고 , 객체를 arg로 하여 두 객체가 동등한지 여부를 판단 .
 								: '  == ' 와 같은 효과
-							: 그런데 대부분의 하위 클래스들이 이를 오버라이딩 하여 객체적 동등여부가 아닌 논리적인 동등여부를 판단하게 해놨음
+								: int , char .. 같은 기본 타입의 변수는 적용 못하고 Ingerger , Character 이런 얘들을 대상으로 쓰인다
+
+							: 그런데 대부분의 자바에 정의되있는 Object 클래스의 하위 클래스들(String, Integer.... )이 이를 오버라이딩 하여 객체적 동등여부가 아닌 논리적인 동등여부를 판단하게 해놨음
 								: 다른 객체라도 가지고 있는 값이 같으면 true 반환
-								: 대표젹으로 String 클래스의 경우 문자열내용이 동일하면 true 리턴
-								: 우리도 직접 equals 메서드를 오버라이딩 할 수 있음.
-								 	: 주의해야 할 것은 매개변수 타입이 Object 이기 때문에 (오버라이딩은 매개변수종류까지 같아야되기 때문에 우리가 맘대로 변경 못함) 객체끼리 비교하기 전에 기준객체에 맞춰 강제형변환 과정을 거쳐야됨(Object 클래스가 부모 클래슨데 부모클래스에서 자식 클래스로 확장할때 강제 형변환 쓰니까)
- ; instanceof 쓰는거 추천
+								: 그러니까 객체의 동일여부를 판단하고 싶으면 == 를 쓰고, 내용상의 동일여부를 판단하고 싶으면 equals 를 쓰면 된다.
+								: 주의할 것은 우리가 직접 생성한 클래스의 경우 오버라이딩을 하지 않으면 eqauls( ) 는 객체의 동등성여부를 판단하게 된다는거다
+								 	: Object 클래스의 메서드를 오버라이딩한다면 주의해야 할 것은 매개변수 타입이 Object 이기 때문에 (오버라이딩은 매개변수종류까지 같아야되기 때문에 우리가 맘대로 변경 못함) 객체끼리 비교하기 전에 기준객체에 맞춰 강제형변환 과정을 거쳐야됨(Object 클래스가 부모 클래슨데 부모클래스 차원에선 자식 클래스에만 있는 멤버들을 활용 못하니까)
+ 										; instanceof 쓰는거 추천
 										
-			: 모든 클래스는 extends 키워드를 사용하지 않았더라도 java.lang.Object 클래스를 상속하게 된다
-				: 모든 클래스는 Object 클래스의 자식 혹은 자손 클래스이다
-					: 모든 클래스는 Object 클래스의 생성자와 메서드를 사용할 수 있다
+									: 만약 실제로 우리가 생성한 클래스 내부서 equals 를 오버라이딩 한다면 일차적으론 instanceof 로 같은 클래슨지 확인한후 클래스 내부의 필드별로 비교한다(메서드 구성은 다를게 없고 다를게 있다면 값을 담는 필드일거니까)
+										: 레퍼런스 타입의 필드일 경우 equals( ) 를 사용하여 비교하고(그 클래스들 내부에선 이미 내용동일성 여부 판단하게했으니, 물론 사용자 정의 클래스인 경우 또 equals 를 오버라이딩 직접 해놔야겠지만) , 일반타입의 필드인 경우 " == "를 통해 값의 동일성 여부를 판단함 된다 
+
+						2. public int hashCode( ) 
+							: 객체의 해시코드를 반환한다
+								: hashcode == 객체에 부여된 하나의 정수값
+									: 객체의 주소를 기준으로 부여되긴하는데 해시코드가 곧 주소인건 아니다
+									: 64비트 운영체제에서는 다른 객체라도 간혹 같은 hashCode 가 부여되기도 한다. (대부분 다 다르게 부여되긴 하지만)
+							:보통 equals( ) 와 hashCode( ) 는 세트로 오버라이딩하는 편이다. 
+								: 컬렉션프레임워크 HashSet, HashMap, HashTable 에서는 키에 대응하는 값을 찾는 과정에서 일차적으로 hashCode( )로 해시코드가 같은지 검사하고, 이차적으로 equals( )로 같은 객체인지 검사한다. 그래서 논리적 동일성을 따지려고 equals( ) 를 오버라이딩했어도 hashCode( ) 가 다르면 말짱도루묵 되는 경우가 생기게된다.
+								: object 클래스의 hashCode( ) 자체는 객체마다 (거의 - 64비트 운영체제의 경우 간혹 겹칠수있긴함) 물리적으로 다른 객체이면 다른 해시코드값을 반환하게 되있지만 자비에서 제공하는 대부분의 클래스의 경우 ( equals( ) 뿐아니라 )  hashCode( )를 오버라이딩하여 같은 내용의 객체인 경우 같은 해시코드값을 반환하게 되어있다 
+
+								: 직접 오버라이딩하면 hashCode( ) 의 반환값은 어떤 복잡한 공식을 통하여 반환하게 하는데ㅔ 솔직히 지금부터 그걸 알아야할ㅈ지 모르겠고 난 할게 많으므로 걍 일단 논리적으로 같은지 검사하게하고 && 만약에 논리적으로 같다면 (자바에서 제공하는 클래스의- 자바서 제공하는 클래스는 대부분 논리적으로 같으면 같은 해시코드값을 반환하게 오버라이딩되있으니까)특정 필드의 해시코드 혹은 (기본 타입의) 특정 필드의 값을 반환하게 하고, 나중에 (필드가 여러개인 경우 합리적으로 해시코드를 생성하는 방법을) 연구하자
+
+							: 참고로만약 오버라이딩하기 이전의 해시코드를 사용하고 싶다면 System.identyHashCode( 객체 ) 쓰면 된다. (java.lang 에 정의되어있는게 아니다)
+
+						3. public String toString( )
+							: 이것도 자바에서 제공되는 클래스들에 대부분 오버라이딩 되있음
+							: 객체의 문자 정보를 리턴
+								: 객체의 문자 정보 == 객체를 문자열로 표현한 값.
+
+								: ( Object 클래스에 정의되어있는 ) toString( )의 원형 메서드에서 문자정보 == " 타입.@16진수해시코드"
+									: 타입은 풀클래스명 , 즉 ( 누구를 상속받고 구현하고 그런거 말하는게 아니라 ) 걍 자기가속한패키지명.클래스명 말하는 거임  
+									:  hashCode( ) 써서 나오는 햇시코드는 decimal 형태이고 toString 했을때 나오는 해시코드는 16진수지만 같은 값이다
+								: 원형 toString( ) 에서 반환하는 내용은 상당히 쓸모없으므로 자바에 정의되있는 대부분의 클래스의 경우 대부분 의미있는 값을 반환하도록 오버라이딩한다.
+									: String, Interger.... 의 경우 저장하고 있는 값을 반환한다.
+										: 반환형이 문자열형이라서 문자열로 반환함을 주의
+							: 사용자 정의 클래스에서도 이를 오버라이딩하여 좀더 의미있는 값을 반환하게 함 좋다
+								: 문자열의 형태로 반환해야됨을 주의
+
+						4. public final Class<?> getClass( )
+							: 특정 객체의 타입이되는 클래스를 대상으로 Class 객체를 생성한다
+								: static 아닌거 주의(객체 대상으로 쓰는거임)
 
 		2. System
-			: 표준입력장치(키보드,모니터) 로부터 데이터를 입력,출력할 때 사용
-			: 자바 가상 기계를 종료할 떄 사용
-			: 가비지 컬렉터를 실행 요청할 때 사용
+			: 자바 프로그램에서 일반적으론 운영체제의 기능을 직접 이용하긴 어렵다. 그런데 System 클래스를 이용하면 운영체제의 일부기능(입출력 , 시간읽기 등)을 사용 가능ㅎ다
+				: 자바는 운영체제 바로 위에서 실행되는게 아니라 운영체제가 JVM 을 통해 간접적으로 실행시키는거라서
+					: 일반적인 프로그램의 경우 운영체제가 프로그램을 실행시키지만 자바의 경우 ".java 확장자의 소스코드>> [ 컴파일러 ] >> .class 확장자의 바이트코드 >> [ JVM ] >> 실행 " -으로 운영체제가 JVM 을 실행시켜 JVM 이 프로그램을 실행시키는 방식으로 동작한다
+						: 그래서 상대적으로 실행속도가 느리다 (일반적인 프로그램은 운영체제가 직방으로 실행시키는데 자바는 운영체제가 JVM 을 통해 실행시키니까)
+
+			: java.lang.System
+				: 객체 생성이 불가하기 때문에 다 정적멤버로만 구성되어있다 >> System.멤버명으로만 활용한다
+				: 생성자-없음? privit? 어쩄뜬 사용 불가
+				: 필드-있음(근데 all 정적 필드이고 인스턴스 필드는 없음 )
+					: 입출력관련
+						(1) public static InputStream in
+							: 키보드와 프로그램을 연결하는 스트림
+							: 바이트입력스트림 객체 >> read(  )사용 가능
+							: Scanner 객체 생성시 arg 로 들어가는 System.in 이 얘다
+
+						(2) public static PrintStream out
+							: 프로그램과 모니터를 연결하는 스트림
+							: PrintStream 객체 >> print ( ) 시리즈 사용 가능
+							: 자주쓰는 System.out.print( ) 에서 System.out 이 얘다
+
+				: 메서드-있음(근데 all 정적 네서드이고 인스턴스 메서드는 없음)
+					1.종료관련
+						(1) public static void exit( int status ) 
+							: 현재 프로세스(=프로그램 하나)를 강제 종료
+							: 매개변수는 "종료 상태값"임
+								: 정상종료일 경우 0 값을 줌
+								: 비정상종료일 경우 0이 아닌 값을 줌
+									: 0 아닌 값을 준다고 프로그램이 이상하ㅏ게 돌아거가나 콘솔상에 뭐 따로 출력되진 않음. 근데 뭐 운영체제 같ㅌ은데 들어가서 반환값을 확인해보면 0 아닌 다른 값을 반환헀음을 확인 가능
+
+					2.시간관련
+						: 사용방법 ) 시간측정하려는코드를 시작할때 한번 호출하고 시간측정하려는ㅋ코드가 다 종료됬을때 2번째로 호출하고 이 두 반환값의 차를 이용함
+						(1) public static long currentTimeMillis( )
+							: 컴퓨터로부터 시간을 읽어들여서 ms 단위의 long 값을 반환 
+								: 유닉스타임( 1970.01.01 기준으로부터 경과한 시간) 기준 경과한 시간을 반환하는거임
+				 			: s단위로 이용하려면 ) 반환값/1000
+ 
+						(2) public static long nanoTime( )
+							: 컴퓨터로부터 시간을 읽어들여서 nano second 단위의 long 값을 반환
+
+
+
 		3. Class
-			: 클래스를 메모리로 로딩할 때 사용
+			: Class 객체를 만들 수 있는 대상
+				1. 클래스
+					: 열거형 클래스, 레코드 클래스 포함
+					: 그 클래스 자체를 대상으로 할 수도 있고 , 그 클래스의 객체를 대상으로도 할 수 있따
+				2. 인터페이스		
+					: 어노테이션 포함
+						: 어노테이션을 대상으로할때 골뱅이 때고 생성해야된다(ex: @Override.class 가 아니라 Override.class 로 생성한다)
+
+				3. 원시 타입(명)
+					: int , byte , char...  그잡체
+						: 얘네들은 클래스가 아니기 때문에 원시타입변수를 대상으론 사용 못하고 딱 그 타입을 대상으로만 활용이 가능하다
+					: 얘네들을 대상으로 class 객체를 만들 순 있다는거지 얘네들이 클래스란 소리가 아니다
+				4. void 키워드
+				5. 배열
+					: 배열도 객체에 속하기 때문에 배열 타입 자체를 대상으로도 할 수 있고, 그 배열의 객체 자체를 대상으로도 할 수 있다
+			
+
+			: 클래스와 인터페이스의 메타 데이터를 관리하는 클래스
+				: 메타데이터 ) 클래스, 인터페이스의 부가적인 정보(클래스명 , 멤버정보(생성자,필드,메서드)  등 )
+				: 뿐만 아니라 Class 클래스로 상대경로를 통하여 절대경로도 구할 수 있다
+					: 그러니까 Class 객체가 대상으로하는 클래스와 같은 디렉터리에 위치한 파일을 파일명만 가지고 풀 경로(단순히 패키지명이 붙여져서 나오는게 아니라 어떤 드라이브에 있는지까지)를 알아낼 수 있다.
+					: 근데 src 파일 아니라 bin 파일 내에 있는 파일들에 대해 말하는 거임
+						: bin 파일 내에 .class 의 바이트 코드들이 위치하니까 그런 듯?
+
+					: 형식 ) 
+						String path = Class타입의객체명.getResource(파일명).getName( );
+							: getResource( )가 Class 클래스의 메서드인거지 , getName( )은 Class 의 메서든 아니다 
+			: jav.lang.Class<T>
+				: 그냥 Class 가 아니라 Class<T> 이다
+				: 생성자 - 있음. 근데 public 이 아녀서 직접 사용해서 객체를 생성하진 못하고 병도의 식으로 객체가 생성됨
+
+				: Class 의 객체 생성 방법
+					: 특정 클래스, 인터페이스의 메타 데이터를 알기 위해 생성되는 객체이므로 특정 클래스, 인터페이스르 대상으로 만들어진다.
+					: 해당 클래스의 객체가 생성되있지 않은 경ㅇ우
+						sol1 ) 클래스명.class 
+							: .class 는 출신이 어딘지 모르겠다
+						sol2 ) Class.forName( "클래스풀네임") 
+								: public static Class<T> forName( String classFullName ) throws ClassNotFoundException
+									: 해당 이름을 클래스명으로 하는 클래스의 메타데이터를 담은 Class 객체를 생성한다.
+								: 얘는 Class 클래스의 메서드중 하나이다
+
+
+					: 이미 해당 클래스의 객체가 생성되어있는 경우
+						sol1 ) 클래스의객체.getClass( )
+								: public Class<?> getClass( )
+									: Object 클래스에 정의되어있는 클래스이다
+
+					
+				: 필드 - 업ㅄ음
+				: 메서드 - 있음
+					: 객체 생성
+						(1) public static forName(String name ) throws ClassNotFoundException
+							: 정보를얻고싶은 대상의 풀네임을 arg 로 하여 Class 객체를 얻어낸다
+							: static 타입이라 Class.forName() 고정으로 쓴다
+						(2) public Package getPackage( )
+							: Class 객체가 대상으로하는 클래스의 Package 클래스 객체를 추출한다
+								: 인스턴스 메서드이기 떄문에 이미 만들어진 Class 객체를 대상으로 사용하는거 주의
+							
+					: 이름 관련
+						(1) punlic String getCanonicalName( )
+							: getName() 과 거의 유사하므로 걍 pass
+						(2) public String getName( ) 
+							: Class 객체의 대상의 풀네임을 받아온다
+								: Package 클래스에도 이 메서드가 따로 존재한다
+						(3) public String simpleName( )
+							: Class 객체의 대상으로 하는 클래스의 클래스명만 받아온다
+
+						(4) public String PackageName( )
+							: Class 객체의 패키지의 이름을 반환한다
+
+					: Class 객체가 뭘 대상으로 생성된건지 확인
+						1. 클래스 관련
+							(1) public boolean isEnum()
+								: 열거형을 대상으로 만들어진 class 객첸지 확인
+							(2) public boolean isMemberClass( )
+								: 멤버 클래스를 대상으로 만들어진 class 객첸지 확인
+									: 그러니까 내부 클래스를 대상으로 만들어진 class 객첸지 확인한다는거다
+										: 정적이냐 인스턴스냐는 중요치 않다
+									: 멤버로 클래스를 가지냐를 물어보는게 아니다
+										:outer 클래스를 대상으로 씀 걍 false 나오는거다
+							(3) public boolean isNestmateOf(Class<?> c)
+								: 대상으로 쓰인 Class 객체와 arg 로 대입한 Class 객체가 중첩관계인지 확인한다
+									: 어느 자리에 들어간 얘가 outer냐 inner냐는 중요하지 않다. 그냥 두 대상이 중첩 관계이기만 함 된다.
+ 
+							(4) public boolean isLocalClass( )
+								: 로컬클래스를 대상으로 만들어진 Class 객첸지 췤
+
+							(5) public boolean isAnonyMousClass( )
+								: 익명 클래스 객체를 대상으로 만들어진 Class 객첸지 췤
+
+						2. 인터페이스 관련
+							(1) public boolean isAnnotation()
+								: 어노테이션을 대상으로 하여 만들어진 Class 객체인지 확인
+							(2) public boolean isInterface( )
+								: 인터페이스를 대상으로 만들어진 class 객첸지 췍
+						3. 기타 관련
+							(1) public boolean isArray()
+								: 배열을 대상으로 하여 만들어진 Class 객체인지 확인
+
+							(2) public boolean is
+
+					
+					(5) URL getResource( String name )
+						: 해당 리소스의 
+
+
+			: 어쨌뜬 클래스를 메모리로 로딩할 때 사용한다는 거다
+			: jar 파일이란
+				: 자바에서 사용되는 아카이브( 여러 파일 , 디렉터리를 모아서 만든 파일 "하나" ).
+					: jar 파일은 .class 파일들 즉 컴파일된 파일들을 포함한다
+						: 프로세스 실행할때 클래스 경로에 jar 파일을 추가하면 그 jar 파일 내부에 정의된 클래스들, 코드를 모두 활용 가능 
+
+
+			: 자바의 클래스들이 언제 어디서 메모리에 올라가고 클래스 멤버들이 초기화되는가
+
+				: 단계
+					1. 로딩: 클래스 파일을 가져와서 JVM 의 메모리에 로드하는 과정
+							: 이때 각 바이트 코드들은 다음의 정보를 포함한다
+								(1) 부모 클래스 정보
+								(2) Class, Interface , Enum 과의 관련 여부
+								(3) 변수, 메서드 정보
+
+					2. 링크 : 클래스 파일을 사용하기 위해 검증하는 과정
+				
+					3. 초기화 : static 필드를 설정된 값으로 초기화
+
+				: 클래스 로딩 
+					: 클래스 로더가 .class 파일을 찾고 JVM의 메모리(메서드 영역)에 적재하는 것
+ 
+				: 클래스 로더의 종류
+					1. 부트스트랩클래스로더 Bootstrap Class Loader
+						: JVM 시작시 가장 먼저 실행되는 클래스 로더
+					 	: 자바 자체의 클래스 로더와 필요한 최소한의 클래스(클래스 로더의 부모클래스들 ]- java.lang.Object , Class )만 로드
+
+					2. 확장클래스로더 Extension Class Loader
+						: 부트스트랩클래스 로더의 자식 클래스 로더
+						: 확장 자바 클래스들( java.ext.dirs 환경변수에 설정된 디렉터리의 클래스 파일들 )을 로드함. 
+
+					3. 시스템 클래스 로더 System Class Loader
+						: 자바 프로그램 실행시 ClassPath 에 있는 클래스 파일,  jar 에 속한 클래스들을 로드함. 쉽게 말하자면 우리가 만든 .class 확장자 파일들을 로드함	
+							: classpath
+								: 클래스나 패키지를 찾을때 기준이 되는 경로로, ( 소스코드를 컴파일하여 만들어진 ) 바이트 코드까지의 경로를 의미
+
+				: 클래스 로더의 3가지 원칙
+					1. 위임 원칙 : 클래스 로더는 리소스를 찾기 위해 요청 받았을때 상위 클래스로더에게 책임을 위임한다
+						: 자신의 선에서 해결을 시도하고 책임을 위쪽으로 떠넘긴다는게 아니라 일단은 위쪽으로 넘긴다는것. (위쪽에서 해결 안되서 또 내려오면 그제서야 자신의 선에서 해결을 시도하고 자신의 선에서도 못끝내면 아래쪽으로 넘김)
+							: 그러니까 일단 가장 베이직한 클래스들 사이에서 먼저 조사한다.
+					2.  가시범위 원칙 : 하위 클래스 로더는 상위 클래스 로더가 로드한 클래스를 볼 수 있고 활용할 수 있지만 상위 클래스는 하위 클래스 로더가 로드한 클래스를 알 수 없다. 
+					3. 유일성의 원칙 : 하위클래스 로더가 상위 클래스 로더에게 로드한 클래스를 다시 로드하지 않는다.(그러니까 상위 클래스 로더에게 해당 클래스를 넘겨서 당장은 하위 클래스에 더이상 클래스가 존재하지 않다 하더라도 추가적으로 그 클래스를 로드 못한다) 그래서 고유하다
+		
+				: 클래스 로더의 동작방식
+					(1) 일단 메서드 영역 서치
+						1. JVM 의 메서드 영역에 클래스가 로드되어있는지 확인하고, 만일 없으면 시스템 클래스 로더에 클래스 로드를 요청
+							: 그러니까 해당 프로세스에서 만들어진 클래스들 중에 그 클래스가 있는지 확인
+
+					(2) (과정 (1) 이 실패한 경우)요청 위임
+						1. 시스템 클래스로더에게 클래스 로드를 "요청"
+						2. 시스템 클래스 로더는 확장 클래스 로더에게 요청을 위임
+						3. 확장 클래스 로더는 부트스트랩 클래스 로더에 요청을 위임
+
+					(3) (과정 (2) 를 모두 마쳤으면) 요청 수행
+						1. 부트스트랩 클래스 로더는  " 부트스트랩 Classpath" 즉 " JDK/JRE/LIB " 에 해당 클래스가 있는지 확인한다. 만약에 해당 클래스가 존재하지 않는 경우 확장 클래스 로더에게 요청을 넘긴다
+						2. 확장클래스로더는 "확장 Classpath" 즉 "JDK/JRE/LIB/EXT"에 해당 클래스가 있는지 확인한다. 만약에 해당 클래스가 존재하지 않는 경우 시스템 클래스 로더에게 요청을 넘긴다
+						3. 시스템 클래스 로더는 "시스템 classpath" 즉 "우리가 (알게모르게) 지정한 classpath 즉 우리가 만든 .class 확장자 가 들어있는 폴더"에 해당 클래스가 있는지 확인한다. 여기서 마저 클래스가 존재하지 않는 경우 ClassNotFoundException 이 발생한다
+
+				: 동적 클래스 로딩
+					: 런타임에 클래스를 로딩한다. 
+						: 그러니까 JVM 이 미리 모든 클래스에 대한 정보를 메서드 영역에 로딩을 해놓는건 아니란 소리이다
+
+			: 클래스 로더 class loader
+				: 클래스 로더는 런타임에 JVM의 메서드 영역에 동적으로 클래스들을 로드하는 역할을 한다. 
+					:자바는 동적 로드를 한다.( 컴파일 타임이 아닌 런타임에 클래스를 로드>>링크>>초기화 한다) 
+						: 그러니까 실행 이전에 클래스들을 모두 적재해놓는게 아니라 필요할때마다 일일이 메모리에 적재한다는거다
+
+
+						: 로드 종류)
+							1 . 로드 타임 동적 로딩 load time Dynamic loading
+								: 하나의 클래스를 로딩하는 과정에서 이와 관련된 다른 클래스들까지 같이 로딩하는 것. 
+								: (그러니까 직접 그 클래스를 로드하라고 프로그래머가 명시하진 않았지만) 그 클래스를 사용하기 위해 필수적으로 필요한 다른 클래스들까지 자동적으로 함께 로드 되는거
+
+							2. 런타입 동적 로딩 run time Dynamic loading
+								: (클래스를 로딩할때가 아닌) 코드를 실행하는 순간에 클래스를 로딩하는 것
+								: 그러니까 그 클래스 내부에서 프로그래머가 명시적으로 호출한 클래스.
+
+
+
+						: 로드 시점 ) 
+							: 주의 ) 단순 outer 클래스의 호출만으론 (static 타입이건 인스턴스 타입이건 상관없이) inner 클래스까지 호출되진 않는다. 클래스 답게 해당 inner 클래스의 객체가 생성되거나 그 inner 클래스 내부의 멤버를 생성해야 그 inner 클래스가 로드된다.
+
+							case1. 해당클래스의 객체를 직접 생성
+							case2. 해당 클래스의 static 멤버를 사용
+								: 예외 ) staitc final 상수 >> method area의 Constant Pool 에 (클래스와는 ) 따로 저장된다. 
+							case3. 인스턴스 inner 클래스의 객체 생성 시 
+								: 내부 인스턴스 클래스의 객체를 생성하기 위해선 outer 클래스의 객체 생성이 우선시 되어야하기 때문에 outer 클래스도 로드된다.
+						
+
+						: 왜 굳이 동적 ) 언제 어디서 활용될지 모르는 멤버들을 static 이라고 전부 메모리에 올리는건 좀 비효율적이기 때문.
+
+						: 로드내역 확인해보기
+							: 로드내역 확인하는 법
+								: 프롬프트 창에 다음을 입력)  java -verbose:class -classpath 해당클래스파일이있는bin폴더의경로 해당클래스의풀네임
+									: 예시) java -verbose:class -classpath c:/SelfStudyJava/chap11/bin/ classPractice.Main
+		
+									: 로드 시킨 클래스 파일을 생성한 소스파일의 내용
+package classPractice;
+
+public class Main {
+	public static void main(String[] args) {
+
+// 한번에 한줄만 남기고 죄다 주석 처리하고 실행한 후 해당 클래스 파일이 어떻게 내역 뜨나 확인해봄 된다		
+	Outer outer = new Outer(); // 단순히 outer class의 객체 생성  >>outer class 만 로드됨
+	System.out.println(Outer.StaticInner.smile); // static inner class 의 멤버 사용 >> static Inner class 만 로드 됨
+	Outer.StaticInner staticInner = new Outer.StaticInner(); // inner static class 의 객체 생성 >> inner static class 만 로드됨 
+	Outer.NonStaticInner nonStaticInner = new Outer().new NonStaticInner(); // inner class 의 객체 생성 >> inner class 뿐 아니라 outer class 까지 로드됨
+		
+	}
+}
+
+
+
+									: 알 수 있는 사실 
+										1. 내부 클래스가 static 이더라도 outer class 가 로드 되었다고 함께 로드되는게 아니고, 클래스 답게 직접 호출되거나 그 클래스 내부의 멤버를 사용해야 로드된다
+										2. 내부 인스턴스 클래스의 경우 outer class를 로드 시킨 후 내부 클래스를 로드시킨다.
+
+	
+				: 클래스가 로드되고 링크된 후 초기화가 일어나는데 거의 로드와 동시에 초기화 된다고 봐도 된다.
+
+				: 클래스 초기화 시점
+					: 클래스 초기화란  >> static 필드에 값을 할당하고 static 블럭을 실행시키는것
+						: static 블럭 
+							: static 메서드를 지칭하는게 아니라 실제로 걍 static{ ... } 의 꼴로, 해당 클래스가 로딩되고 static 필드가 준비된후 자동으로 실행되는 블럭이다. 
+							: 한 클래스 내부에 여러개가 올 수 있다.
+							: 주로 static 필드를 초기화 시키는 역할을 한다
+
+						: instance 블럭
+							: 생성자를 지칭하는게 아니라 걍 { .... }의 꼴로, 해당 클래스의 객체가 생성될떄 생성자의 실행 "이전"에 실행되는 코드들이 담긴 블럭이다.
+
+						: static 멤버라고 하지 않고 static 필드라고 콕 찝어 말한 것은 static 메서드는 딱히 필드처럼 값을 저장하는게 아니라 초기화한다고는 말하지 않음.. << 그런 static 블럭은 왜 초기화 된다고함 ㅋ
+					: 클래스의 초기화 순서
+						: 일단 로드 - 링크 된후 초기화가 일어난다
+						: static 필드와 static 빌드의 초기화 순서는 막상막하다(?). 코드상 먼저 선언된 순으로 초기화된다.
+
+					:클래스 초기화는 (일어난다면) 오직 한번만 수행
+						: 멀티 스레드 환경에서 여러개의 스레드가 동시에 클래스를 호출하더라도 클래스 초기화는 프로세스적으로 (일어난다면) 한번만 수행되기 때문에 ( 초기화 동작 자체는 ) 스레드 세이프하다.
+							: 스레드 세이프하다 == 멀티 스레드 프로그래밍에서 공유 자원에 여러 스레드가 동시에 접근해도 프로그램 실행에 문제가 되지 않는다.
+							: 그러니까 다른 스레드에서 해당 클래스를 호출했다고 또다시 static 필드값이 모두 초기화 값으로 다시 세팅된다는게 아니다
+
+
+						: 한번만 초기화 되는 특성 떄문에 스레드가 여러개여도 싱글톤 패턴이 구현 가능한 것이다(한 프로세스에 해당 클래스의 객체가 오직 하나만 존재하게 함)
+				
+			
+
+
+
+
+					
+
+
+		
+
+		
+
 		4. String
-			: 문자열 관련 여러가지 처리할때 사용
-		5. Wrapper	
-			: 종류
-				: Byte
-				: Short
-				: Character
-				: Integer
-				: Float
+			: 문자열 관련 여러가지 처리할때 사	용
+			: final 클래스이기 때문에 String 클래스를 부모클래스로 삼을 순 없다
+			: java.lang.String
+				: tip 
+					1. char[ ] 관련 멤버에선 죄다 charset 관련 옵션이 없고 byte  [ ] 에만 있다
+						: 내생각에는 char 의 경우 한 문자를 (UTF-16으로)  저장하도록 자바 프로그램 내부적으로 결정되어있기 때문에 따로 지정 못하게 한거고,  byte[ ] 의 경우 인코딩 방식이 내부적으로 결정되있지 않아따로 인코딩 방식을 지정할 수 잇게 만들어둔 것. (어떤 인코딩 방식을 택하느냐 따라 문자열이 다르게 분할됨)
+					2. charset 관련 옵션 중 그냥 Charset charset 은 괜찮은데 String charsetName 즉 문자열로 charset 을 지정하는 경우 throws UnsupportedEncidingException 이 발생한다 
+
+					3. 기존 문자열 객체를 수정하는건 불가한 것 같고 기존 문자열 객체 내용을 수정한 것을 내용으로하는 새로운 문자열 객체 생성은 가능하다(문자열 수정과 관련한 메서드의 반환 값은 String )
+
+				: 생성자
+					: 자바에선 생성자를 명시하지않고 String 객체를 생성할 수도 있고 생성자를 명시해서 String 객체를 생성할 수도 있다
+						: 자바에선 일반적인 문자열(String 클래스의 생성자를 직접 사용해서 만들어진게 아닌 걍 문자열들)이 자동적으로 String 객체가 된다
+							: 같은 내용의 일반적인 문자열이 이미 존재하면 또 문자열 객체가 새로 생성되진 않고 이미 존재하던 문자열 객체를 가리키게 된다.
+						: 유명한 생성자
+							: c언어에서처럼 배열명이 곧 문자열 변수인건 아니지만 String 클래스의 생성자의 arg 로 하여 손쉽게 String 객체를 생성 가능하다. 
+								: 주의
+									1. 배열에서 채워지지 않은 부분은 다 null, 즉 출력했을땐 '□' 로 나오니까(아무리 끝에 '\0'을 추가해도 소용 없다) 되도록이면 배열 레퍼런스 변수 선언할때 중괄호 이용해서 사이즈가 자동으로 의미있는 값으로 잡히게 하자(new char[사이즈] , new byte[사이즈] 이런식으로 사이즈 먼저 잡고 나중에 인덱스 단위로 대입하지 말고)
+										: 채워지지 않은 부분이 '□' 으로 출력되는 부분에서 알 수 있듯이 문자열의 사이즈는 '□' 를 포함한 사이즈인거다
+										: 참고로 c언어는 쓰레기 값을 NULL, '\0' 으로 구분할 수 있게 만들었기 때문에 문자열로써 출력했을때 예쁘게 나오는거고 , 사이즈는 자바에서와 마찬가지로 줄어들지 않고 그대로다.
+									2. 자바에서 줄바꿈은 CR+LF 이기 때문에 배열을 통하여 줄바꿈을 구현하고자한다면 2칸을 소비해야한다( '\r','\n' )
+
+							(1) String( 바이트혹은문자배열 )
+								: 배열을 arg 로 하여 String 객체를 생성하면 원소들을 쫘라락 합친 것을 내용으로 하는 문자욜 객체를 만든다
+
+							(2) public String( 바이트배열 , String charsetName) thorws UnsupportedEncodingException 
+								: 배열 전체의 원소를 쫘라락 이어붙여서 지정한 charsetName 형식으로 디코딩한다. 그러니까 바이트 배열의 요소들을 charset 을 기준으로 조합하여 메모리 상에 저장한다.
+									: 개중요!!!!! )  문자열을 분할해서 만든 byte[ ] 배열을 다시 조합하여 문자열을 만들땐 "반드시" 분할할때 쓰였던 charset 을 기준으로 조합해야된다.
+										: new String(byte[ ] bytes , Charset charset ) 에서 charset 이 getBytes(Charset charset) 할때 쓰인 charset 과 동일해야한다.
+									
+
+							(3) public String( 바이트혹은문자배열 , int offset , int length )
+								: 배열의 offset인덱스번째부터 length 개의 원소를 이어붙ㅌ여서 문자여를 만든다
+					
+							(4) public String( 바이트배열, int offset , int length , String charsetName )
+								: 배열의 offset 인덱스번째부터 length개의 원소를 charsetName 의 형식으로 디코딩한다
+
+				: 필드
+				: 메서드
+
+					: 문자관련
+						(1) public char charAt(int index)
+							: 문자열의 특정 인덱스에 위치한 문자를 반환한다
+							: 주의할 것은 XXXX.parseXXXX(String str) 는 String 클래스의 메서드가 아니라 각 Wrapper 클래스에 있는 메서드란 거다(메서드를 호출시키는 대상이 String 클래스도 아니고 String 객체도 아니니까)
+
+						(2) public char[] toCharArray( )
+							: 문자열로 문자 배열을 뽑아낸다
+							: 따로 오버로딩 되있지 않다
+
+						(3) public void getChars(int srcBegin , int srcEnd , char [ ] dst, int dstBegin)
+							: 문자열 객체로부터 시작 위치 , 끝 위치를 정하여 특정 문자 배열로 복사를 함
+								: 주의) int srcLength 라 아니라 srcEnd 이다. 딱 인덱스 적으로만 접근하는거다
+								: dstEnd 가 따로 없는건 srcEnd -srcBegin 으로 유추할 수 있기 때문인 것 같다.
+							: 안헷갈리게주의 ) getBytes 는 바이트 배열을 반환하지만 getChars 는 문자 배열을 반환하는게 아니고, arg 로 받게 했음 . 그리고 getBytes 에서는 이렇게 디테일하게 인덱스를 (아예) 못잡음
+							: getChars 는 이거 하나 달랑 있다 (오버로딩 안되있다)
+
+						
+
+					: 바이트 관련
+						(1) public byte [ ] getBytes( Charset charset )
+							:  문자열 객체를 사용하여 byte 배열 객체를 뽑아냄
+								: public byte [ ] getBytes( ) 도 오버로딩 되있기 때문에 charset 를 지정하지 않을 수 있고, 이경우  디폴트 charset 로 정해진다
+									: 확인해보니까 내 os 경우 UTF-8이다
+									: 이전에는 getChars 처럼 디테일한 인덱스 설정이 가능했는데 이제 지원하지 않는다(@Deprecated)
+
+								: 만약 디폴트 charSet 을 택하지 않고 다른 charSet 을 쓴 경우 추후 이 바이트 배열로 문자열 객체를 생성하기 위해서는 단순히 String(byte[ ] bytes) 쓰지 않고 String(byte[ ] bytes, String charsetName) 으로 charset을 명시하고 써야 효과가 있다. (charsetName 명시 안하고 String(byte[ ] bytes ) 로만 하면 여기서도 마찬가지로 defaault charset 적용된다 )
+							
+							: Charset 을 지정하는 이유는 어떤 Charset 을 사용하느냐 따라서 글자를 어떻게 분해할지가 달라지기 때문
+								: UTF-8 은 한글문자 하나를 3개로 쪼갬(=한글문자 하나를 3바이트로 저장) . 근데 MS949 같은 경우는 한글문자 하나를 2개로 쪼갠다 (=한글문자 하나를 2바이트로 저장)
+								
+								: 문자열을 어떤 charset 을 기준으로 분할할지 선택하는건 자유다
+
+								: 개중요!!!!! )  문자열을 분할해서 만든 byte[ ] 배열을 다시 조합하여 문자열을 만들땐 "반드시" 분할할때 쓰였던 charset 을 기준으로 조합해야된다.
+									: new String(byte[ ] bytes , Charset charset ) 에서 charset 이 getBytes(Charset charset) 할때 쓰인 charset 과 동일해야한다.
+							
+
+							:  네트워크로 문자열을 전송하거나 문자열을 암호화 할때 문자열을바이트 배열로 꽤나 많이 변환함
+
+					: 걍 문자열 관련
+						(1) public boolean equals(Object obj)
+							: Object 클래스의 메서드를 오버라이딩한것
+								: 그래서 매변이 String str 이 아니라 Object obj 인거 참고
+							: 객체로써의 동일성이 아닌 내용상의 동일성을 따진다
+
+							: 참고로 대소문자의 구분없이 내용상의 동일성을 따지고 싶으면 public boolean equalsIgnoreCase(String str)을 사용하면된다
+								: Object 클래스의 메서드를 오버라이딩한것이 아니기 때문에 매변 타입은 String 인거다
+
+						(2) public int length( )
+							: 문자 개수 반환
+							: 배열에서도 length가 있긴한데 그건 필드고, 이건 메서드임 주의
+
+						(3) public int isEmpty( )
+							: length( )==0 이면 true 반환
+							: 아예 null 인 상태에서 쓰면 에러남( 객체를 참조조차 안하고 있는거라 )
+
+						(4) indexOf
+							1. int indexOf( String str)
+								: 매개값으로 주어진 문자열이 시작되는 인덱스를 리턴
+									:ex) 
+										String s = "I hate you";
+										System.out.println(s.indexOf("hate")); //2 나온다
+	
+								: 만약 주어진 문자열이 없을 경우 -1 을 리턴
+
+							2. public int indexOf( int ch)
+								: 매개값으로 주어진 '문자'가 시작되는 인덱스를 리턴
+								: 매개변수 타입이 int 형이지만 실제로 숫자를 넣는게 아니라 문자를 넣는거임 주의(물론 해당 문자를 유니코드로 표현해서 대입하는건 결과 잘 나옴)
+
+
+						(5) 치환 관련
+							: 기존 문자열은 변하지 않고 변경사항을 반영한 새로운 문자열 객체가 만들어지는거임 주의
+							: arg 으로 넣은 수정되어야할 대상(문자든 문자열이든)들과 같은 내용인 부분들 모두에 적용이 되는거지, 가장 앞부분에만 적용되는게 아니다
+			
+							: 단어들간의 공백을 "모두"  삭제해야할때 유용하게 쓸 수 있다
+								: 만약 문자열의 젤 앞, 젤 뒷 공백만 제거하는 경우는 trim( ) 을쓰는게 훨 낫다
+							1. replace
+								: 첫 arg 로 넣은 대상을 "모두" 두번째 arg 로 넣은 값으로 바꾼다
+								(1) public String replace(char oldChar , char newChar)
+									: 특정 문자를 다른 문자로 바꾼 것을 내용으로 하는 문자열 객체를 반환
+									
+								(2) public String replace(CharSequence oldString , CharSequence newString)
+									: 특정 부분을 다른 부분으로 바꾼 것을 내용으로 하는 문자열 객체를 반환
+									: CharSequence 라고해서 겁먹을 필요 없고 그냥 문자열 쓰면 되는건데 정규표현식은 못쓰는거다
+							2.  public String replaceAll(String regex, String replacement)
+								: regex == 정규표현식으로, 정규표현식이 사용 가능하단 장점이 있다
+								: replace 보단 활용범위가 넓지만 연산 속도가 다소 느린편임으로 찐으로 정규표현식 쓸때만 이 메서드 쓰고 , 평소에 문자열 단위로 치환할땐 걍 replace 써라
+
+							3. public String replaceFirst
+								: 문자열에서 첫번째 arg와 같은 값은 부분 중에 젤 처음으로 나온 얘만 두번째 arg 로 넣은 값으로 바꾼다.
+
+						(6) subString(어쩌구)
+								: 인덱스 지정해 문자열을 추출	
+									: trim() 은 앞 뒤 공백을 자르고 문자열을 그대로 주는거고 subString 은 특정 부분을 추출하는 거임 주의
+								: 실제로 존재하는 개념임
+									: substring == 부분(문자)열
+								1. public String subString(int startIndex ,int endIndex )
+									: 시작인덱스와 끝 인덱스 모두 설정하여 문자열을 추출
+										: 주의해야할 것은 개수가 아니라 끝인덱스인거고 끝 인덱스는 포함되지 않는다(끝 인덱스 바로 앞 인덱스까지 저장한다. " a<= 값<b  " 느낌이다)
+										: 
+								2. public String subString(int startIndex)
+									: 시작인덱스만 설정하고 그로부터 끝까지 문자열을 추출
+
+
+
+
+						(7) 알파벳 대소문자 변경
+							: 원본이 바뀐게 아니라 변경사항이 적용된 새로운 객체가 생성되는 거임 주의
+							public String toLowerCase( )
+								: 문자열 전체를 소문자로 변환
+
+							public String toUpperCase( )
+								: 문자열 전체를 대문자로 변환
+
+							public equalsIngnoreCase( )
+								: 대소문자 구별 안하고 순수히 내용상의 동일성만 판단한다
+
+
+
+						(8) public String trim( )
+							: 앞뒤 공백 생략
+								: 단어 중간중간의 공백을 모두 삭제하고 싶은 경우 replace 를 사용해야된다.
+
+
+						(9) public static String valueOf(Object obj)
+							:기본 타입의 값을 문자열로 변경
+								: 문자열을 기본 타입의 값으로 바꾸는건 String 클래스에 정의되있는게 아니라 각 자료형에 대응하는 Wrapper클래스에 static 타입으로 "parse기본타입자료형명( )" 꼴의 메서드로 정의되어있거 주의
+								: valueOf() 메서드는 String 클래스 뿐 아니라 Wrapper 클래스들에도 있음을 주의
+							: static 타입임으로 String.valueOf(값) 의 형태로 쓰는거다
+							: 매개변수가 Object 타입이기 때문에 심지어 char 값도 문자열로 바꿀 수 있다 !
+						
+
+		5. Wrapper 클래스
+			: wrap == 포장. 그러니까 기본 타입의 값을 클래스로써 포장하기 위한 클래스란거임.
+				: 그러니까 포장객체는 기본 타입 값을 가지는 객체가 필요한 경우 사용한다(기본 타입은 클래스가 아니니까)
+			: 근데 주의해야할 것은 Wrapper 이란 클래스가 java.lang.Wrapper 로 실제로 있는건 아니고 ㅓjava.lang.Integer , java.lang.Charcter 같은 클래스를 아우르는 개념 같은거다
+
+			: 포장객체의 내부값은 외부에서 바꿀 수 없다. 바꾸고 싶으면 걍 새로 만들어야된다.
+
+			: 종류 (tip : 줄임말이었던 char 과 int 제외하곤 걍 앞글자가 대문자로 바뀐것 빼곤 바뀐게 없음)
+				: Byte, Short, Character, Integer, Float, Double, Boolean, Long
+
+			: 박싱과 언박싱
+				: Boxing 박싱>> 기본타입에 대응하는 객체로 만드는 과정
+					: 자동박싱
+							: wrapper 클래스의 레퍼런스 변수에 해당 클래스에 대응하는 기본 타입값을 할당하면 자동으로 박싱이 일어난다( 기본 타입값을 직접 생성자나 valueOf() 을 사용해서 박싱하지 않아도 )
+					: 직접 박싱하는 방법 <<  자동 박싱이 있는데 많이 쓰겠냐 ㅋ . 그래도 arg 가 String 인 건 그래도 간간히 쓸 듯.
+						(1) 각 Wrapper 클래스에 정의된 static valueOf() 메서드 활용
+							: String 클래스의 valueOf() 처럼 arg 타임이 Object 인건 아니라 모든 자료형의 값을 arg 로 할 수 있는건 아님을 주의
+
+							1. 값을 그대로 arg 로 함
+								: ex ) Integer intObj = Integer.valueOf(10);
+							2. 그 값을 나타내는 문자열을 arg 로함
+								: 주의 ) Character 클래스에는 이 메서드가 오버로딩 되있지 않음
+								: ex) Integre intObj = Integer.valueOf("10");
+
+						(2) 각 Wrapper 클래스의 생성자 << 죄다 deprecated 됬다. 현재는 못쓴다.
+							1. 값을 그대로 arg로 함
+							2. 그 값을 나타내는 문자열을 arg 로 함
+						
+
+				: Unboxing 언박싱 >> 포장객체에서 기본 타입의 값을 얻어내는 과정
+					: 자동 언박싱
+						: wrapper 클래스의 객체를 기본 타입의 변수에 할당하면 자동으로 언박싱이 일어난다(  "기본타입Value( )" 를 사용하지 않아도 )
+
+					: 직접 언박싱 하는 법<< 솔직히 자동 언박싱이 있는데 많이 쓰겠냐 ㅋ. 이건 진짜 안쓸 듯
+						: 각 wrapper 클래스에 정의된 " 기본타입Value( ) " 메서드를 이용
+							: arg 없고 , 레퍼런스 타입이므로 해당 값을 담은 wrapper 클래스의 객체를 대상으로 사용하면 된다.		
+							: 이건 딱히 문자열과 관련된게 아니니까 Character 객체를 대상으로도 쓸 수 있다
+
+
+
+			: Wrapper 클래스의 유용한 메서드
+				: 공통
+					(1) 문자열에서 기본타입값 뽑아내기
+						1. static parse기본타입명( 기본타입값을나타내는문자열 )
+							: Character 클래스엔 없다.
+								: Character 클래스엔 이와 비슷한 것도 없다( 문자를 문자열화)
+								:이같은 기능을 char 상에서도 구현을 원하면 String 클래스의 charAt(0)을 이용
+							: 반환형이 wrapper 클래스가 아니라 찐 기본타입값이다
+
+						2. stiatic valueOf( 기본타입값을 나타내는 문자열)
+							: Character클래스는 제외		
+							: 반환형은 wrapper 클래스임 
+
+					(2) 기본 타입 값에서 문자열 뽑아내기
+						1. toString << Character 클래스를 포함하여 모든 wrapper 클래스에 정의되어있음
+							(1) static toString( 값)
+								ex) Integer.toString(10); 
+							(2) toString( )
+								: ex) intVal.toString( ) ;
+					
+						2. 이건 Wrapper 클래스의 메서드가 아니긴 한데 String 클래스의 valueOf( )
+				:  Integer		
+					: 참고로 대부분 각 메서드엔 static 버전 뿐 아니라 인스턴스 버전도 같이 동반하는데 굳이 객체 만들기 귀찮으니 static 버전만 정리함.
+					(1) 정수를 2,8,16 진수를 "문자열"로 표기
+ 						1. static String toBinaryString( int  i)
+							: 2 진수 표기
+						2. stataic String toOctalString(int i)
+							: 8진수 표기
+						3. static String toHexString(int i)
+							: 16진수 표기
+
+					(2) 값 비교 <<다른 정수형들엔 없는데 아마 연산자 쓰면 다들 int 로 승격되는것때문에 그런 것 같다
+						1. static int compare(int a, int b)
+							: a 가 더 큰지 같은지 더 작은지 비교 결과를 1,0,-1로 표현
+								: a>b 면 1 , a==b면 0 , a<b 면 -1 을 반환
+									: ex ) Integer.compare(100,500) == -1
+
+						: 참고로 static max , static min 도 있긴 한데 그건 걍 Math 클래스꺼 쓰자.
+
+
 				: Double
-				: Boolean
-				: Long
-			: 기본타입의 데이터를 갖는 객체를 만들때 사용
-			: 문자열을 기본타입으로 변환할 때 사용
-			: 입력값 검사에 사용
+					: 참고로 대부분 각 메서드엔 static 버전 뿐 아니라 인스턴스 버전도 같이 동반하는데 굳이 객체 만들기 귀찮으니 static 버전만 정리함.
+					(1) 값 비교 
+						1. static int compare(double a, double b)
+							: a>b 면1 , a==b면 0 , a<b면-1
+
+
+					(2) 유한 무한 NaN
+						1. static boolean isFinite(double d)
+							: 유한이여야만 true 리턴 (NAN 혹은 무한이면 false 리턴)
+
+						2. static boolean isInfinite(double d)
+							: 무한이여야만 true 리턴 (NaN혹은 유한이면 flase 리턴)
+								: ex) n / 0 == 무한
+						3. static boolean isNaN(double d)
+							: NaN 이여야만 true 리턴
+								: NaN == Not a Number . 함부로 알 수 없는 값 또는 존재하지 않는 값
+									ex) 0 / 0 == NaN , n%0 == NaN 
 
 		6. Math
-			: 수학관련 내용 처리
+			:수학 처리 관련
+				: 기능마다 대부분 정수(int)와 실수(double) 타입 쌍으로 존재하는편
+				: 대부분 param 타입과 반환 타입이 같은 편
+					: 예외) long round(double a)
+			: 멤버는 죄다 정적 멤버밖에 없고, 생성자는 아예 없음 << 죄다 Math.어쩌구 꼴로 사용
+				: 필드
+					1. public static final double PI
+						: 파이 값
+					2. public static final double E
+						: 자연로그값
 
+				: 메서드
+					1. 절대값 처리
+						(1) public static int abs(int a)
+						(2) public static double abs(double a)
+
+					2. 올림값 
+						: double 타입 밖에 없음( 하긴 정수는 소수점 올림할 필요가 없을거니까)
+						: 더 커지는 방향으로 소수점 뒷자리 값을 처리
+							: 음수 소수의 경우 소수점 걍 날리고, 양수 소수의 경우 소숫점을 날리되 소수점 ㅇ앞부분에 + 1 해줌
+							: "반"올림이 아님!
+						(1)  public static double ceil(double a)
+						
+					3. 버림값 
+						: 마찬가지로 double 타입밖에 없음
+						: 더 작아지는 방향으로 소수 뒷자리값을 처리
+							: 음수 소수의 경우 소수점 날리되 소수점 앞부분에 -1 해주고, 양수 소수의 경우 소수점 뒤 걍 날림
+						: 반내림 그런게 아님
+						(1) public static double floor(double a)
+
+					4. 전통적인 반올림값 << 비추
+						: 특이하게 param은 double 타입이고 반환타입은 long 타입임
+						: 왜그런진 몰라도 음수 소수의 경우 반올림(?) 이 적용이 안되고 걍 소숫점 뒷자리만 날라간다
+						: 기본적으론 소숫점 첫째자리에서 반올림해서 정수값을 리턴한다.
+						: 소수 n번쨰값을 기준으로 반올림한 것을 구하는 법
+							: 그러니까 최종적으로는 n-1번째 소숫자리까지 남긴 값을 구하는게 목표인거다
+							: 내부의 arg 에 * (10**n) 하고 외부서 다시 /(10.0**n) 으로 복구한다.
+								: 그러니까 해당 n번째 자릿수를 일단 소수점 첫쨰자리로 올려놓고 이후 그 n번째 자릿수를 기준으로 반올림을 적용시킨 후 round( )값을 적용시키고 다시 올린만큼 나눠준다
+								: 쉽게 생각해라. 소수점 뒤 가장 첫번쨰로 나오는 숫자가 소수점 첫번쨰 숫자이기 때문에 n번쨰의 조작을 원하면 *(10**n) , /(10**n) 을 하는거다
+							: round 의 반환값이 정수타입이기 떄문에 복구하기 위해 divide 할떄 소수값으로 나눠야된다.
+							
+						(1) public static long round( double a )
+						
+
+
+					5. 똑똑한 반올림값 << 개추
+						: arg 값과 가까운 정수를 실수버전으로 표현
+						: round( )보다도 더 나은 것 같다. 음수값도 제대로 반올림된다.
+						: 소수 n번쨰값을 기준으로 반올림한 것을 구하는 법 
+							: round( )쓸떄의 방법과 같다. 더 편리한게 있다면 rint 반환값은 실수이기 떄문에 굳이 또 실수로 나눌 필욘 없다
+						: ex) 
+							Math.rint(10.9) >> 11.0
+							Math.rint(99.2) >> 99.0
+						(1) public static double rint(double a)
+
+					6. 최대값
+						: 두 수중 더 큰 값을 반환
+						(1) public static int max(int a, int b);
+						(2) public static double max(double a, double b);
+							
+
+					7. 최소값
+						: 두 수중 더 작은 값을 반환
+						(1) public static int min(int a, int b)
+						(2) public static double min(double a, double b)
+
+					8. 랜덤값
+						: 이거 실수형밖에 없음
+						: 0<= <1 의 실수 난수 발생
+						: 랜덤한 정수값 뽑기 ) (int)(Math.random( ) * 가능한숫자개수)+ 시작숫자
+							: 왜>> 
+								: 가능한갯수곱하는거>> 일단 random( )은 0~ 0.9XX... 까지 뽑아낼 수 있는데 이렇게 되면 random( )* n 하면 0~n-1.xxx... 까지 가능해지기 때문에 최종적으론 n 개 가능해짐
+								: 시작숫자더하는거>> 0부터 시작하니까
+								: 형변환>>반환형이 실수니까 정수형으로 형변환 해줘야됨
+
+						(1) public static double random( )
+
+					9. 제곱값
+						: 이거 실수형밖에 없음
+						(1) public static double pow( double a, double b )
+ 						
+
+
+java.util 패키지
+	: 프로그램에서 자주 사용되는 자료구조
+	: 날짜 제공 API
+	1. 날짜 정보 관련 클래스
+		(1) java.util.Date
+			: 객체가 생성된 시점의 날짜와 시간 정보( 요일 달 날짜 시간 년도)를 저장하는 클래스	
+			: Calendar 클래스가 나오고 나선 Date 클래스의 대부분의 메서드가 deprecated 되었긴 해도 쓸데가 있다고 한다
+			: 시간도 나타낼 수 있긴하지만 보통 날짜 정보를 get하기 위해 사용. 
+				: Date 클래스 중 시간 뽑는 메서드는 다 deprecated 되어있어서 요일 날짜 뭐 이런 요소들을 따로 뽑아서 저장하는 기능은 (옛날엔 있었지만) 없어도도 print 는 잘됨
+
+			: 생성
+				Date( )
+					: 현재 시점의 날짜와 시간정보를 담은 객체 생성
+
+			: 객체 자체만 print 해도 이쁘게 잘 나오긴 하는데 (Mon Feb 05 12:53:50 KST 2024
+ 이런 꼴로 나옴) 더 예쁘게 하기 위해 java.text.SimpleDateFormat 와 함께 쓰이는 편 
+				생성자
+					1. SimpleDateFormat(String pattern)
+						: 형식 문자열을 arg 로 하고 이를 바탕으로 객체 생성
+							: 자주 쓰는 Letter
+								(1) 년도 표기
+									: y >> yyyy == 네자리수 년도 표기
+										: 상식적인 년도 표현
+										: y 뿐 아니라 Y 도 존재하긴 하는데 걔는 우리가 쓰는 year 를 의미하는게 아니라 weekyear 이라고 다른거고 오류가 날 수 있다	
+
+								(2) 월표기
+									: M >>MM == 숫자 두자리 월표기	
+										: m 은 월이 아니라 분을 나타내는 표현임을 주의
+								(3) 요일표기
+									1. 숫자로 몇번째 주인지
+										: W >> W
+											: 한달 중 몇번쨰 주인지 (일반적인 주 ) 표현
+										: w 
+											: 일년중 몇번째 주인지 표현
+									2. 문자열로 무슨 요일인지 
+										: E >> E == 몇 요일인지만 표기
+
+									3. 숫자로 무슨 요일인지
+										: u >> u
+											: 1 = 월 , 2 = 화 , ... 7 = 일
+								(4) 일표기
+									: d >> d
+										: 한달  중 몇일인지 표현
+									: D 
+										: 일년중 몇일인지 표현
+								(5) 오전 오후 표기
+									: a >> a
+								(6) 시 표기
+									: k >>kk
+										: 1~24 시 표현
+									: h >> hh
+										: 1~12 시 표현
+								(7) 분 표기
+									: m >> mm
+										
+								(8) 초 표기
+									: s >> ss
+									
+									
+
+				메서드
+					1. public String format(Date date)
+						: Date 객체의 정보를 simpledateformat 객체의 형식을 지켜 대입한 생성한 문자열을 반환
+						
+				
+		(2) java.util.Calander			 
+			 : 객체 생성 시점의 운영체제의 날짜와 시간을 얻을때 사용	
+				: 연도, 월, 일 , 요일 ,오전오후, 시간 을 print 뿐아니라 값으로써 get 도 가능
+			: 객체 생성 방법
+				:추상 클래스다 >> new 연산자를 통한 인스턴스 생성이 불가하다
+					: 추상클래스지 인터페이스가 아니니까 생성자가 존재 불가한건 아닌데 protected 타입이라 생성자가 있지만 못쓰는거다
+				:그럼 how 생성 >> 정적 메서드로 생성
+					(1) public static Calendar getInstance( ) 
+						: 디폴트 timezone, 디폴트 locale 을 사용하여 객체 생성
+					(2) pulblic static Calendar getInstance(Locale locae)
+						: locale 은 직접 설정하되 timezone 은 디폴트꺼씀
+					(3) public static Calendar getInstance(Timezone tz)
+						: timezone 은 직접 설정하되 locale 은 디폴트꺼씀
+					(4) public static Calenar getInstance( Timezone tz, Locale locale )		
+						: 둘다 직접 설정'
+			: 필드
+				: tb continued
