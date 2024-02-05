@@ -553,13 +553,17 @@ public boolean equals(Object o) {
 
 	7. primitive 
 		: 원시라는 뜻. primitive 타입은 기본 타입을 의미(<---> 레퍼런스 타입)
+
+	8. singlealone pattern
+		: single alone . 그러니까 즉 독립적으로 쓰인 경우를 뜻함
+
 42) 유명한 interface
 	1. Runnable
 		: run ( ) 메서드를 가지고 있고, 이 인터페이스의 구현 객체를 Thread 클래스 생성자의 arg  로 사용하여 Thread 객체를 만들 수 있다
 	2. Serializable
 		: 입출력스트림 통해서 보낼 수 있는 객체
 
-
+	3. 어노테이션
 43 ) 자바 api 사전에서 선언부에 있는 "thorws 어떤예외 " >> try catch(어떤예외) 내부서 호출해야된다.(예외가 발생하든 안발생하든 뭊조건 그 예외를 반환하게 되있어서 그렇다) 하지만 선언부에 없고 밑에 설명부분에 throws 어떤예외2 로 되있는 건 따로 try catch(어떤예외2) 처리 안하고 써도 된다.
 
 
