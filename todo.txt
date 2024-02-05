@@ -2,8 +2,6 @@
 2. 하이딩과 오버라이딩의 개념 차이
 3. 추상클래스와 인터페이스의 차이
 4. 410쪽, 435 쪽 스레드
-5. 예외처리 단원 통쨰로
-6. java api document 둘러보기
 8. outputstream 닫으려고 finally 썼을때 에러 나는 이유
 9. 배열 깊은 복사 , 얕은 복사
 10. 왜 복사때는 ㅂ바이트 스트림 써도 안깨지는데 직접 출력하면 깨지는지
@@ -40,6 +38,8 @@ https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=462488097
 
 20. https://effectiveprogramming.tistory.com/entry/Holder-%ED%8C%A8%ED%84%B4
   : holder 패턴이란?
+
+21 . Calendar 클래스 마저 살펴보기 && String 클래스 마저 살펴보기
 
 
 21. https://velog.io/@potato_song/Java-%EC%96%B4%EB%85%B8%ED%85%8C%EC%9D%B4%EC%85%98-%EC%BB%A4%EC%8A%A4%ED%85%80-%EC%96%B4%EB%85%B8%ED%85%8C%EC%9D%B4%EC%85%98-%EB%A7%8C%EB%93%A4%EA%B8%B0
