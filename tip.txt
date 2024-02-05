@@ -557,6 +557,10 @@ public boolean equals(Object o) {
 	8. singlealone pattern
 		: single alone . 그러니까 즉 독립적으로 쓰인 경우를 뜻함
 
+	9. locale 로케일
+		: 국가 따른 설정 총칭. 
+			: 언어 시간 화폐등을 어케 표시할 지 정의한 매개변수의 모음
+
 42) 유명한 interface
 	1. Runnable
 		: run ( ) 메서드를 가지고 있고, 이 인터페이스의 구현 객체를 Thread 클래스 생성자의 arg  로 사용하여 Thread 객체를 만들 수 있다
