@@ -1,0 +1,182 @@
+양진석 강사
+b-b0317@naver.com
+
+수업자료: https://naver.me/x7rbqGim
+비밀번호: kg1234
+
+ 
+
+CGI Common Gateway Interface
+	: 웹 프로그래밍 동작 원리 중 "하나"
+	: 클라이언트 request 마다 웹서버에서 "외부" 프로그램을 호출하여 그 외부 프로그램이 request를 처리하고 그 결과를 웹 서버에 반환하고, 웹 서버가 받은 결과를 클라이언트에게 respond하는 방식
+		: 외부 프로그램을 실행하는 것이기 때문에 매 요청마다 프로세스를 생성하고 종료해야하므로 오버헤드가 크고 느리다는 단점이 있다
+		: 그러니까 짜장면 집에서 짜장면을 주문했는데 주인장이 직접 요리해서 내는게 아니라 또 주인장이 다른 집에 전화해서 음식 받고 전달해주는 격
+
+
+WAS Web Application Server == webserver + web container
+	: 웹 서버와 어플리케이션 사이서 동작
+	: 클라이언트가 web server 에 request을 보내면 web server 는 request 를 WAS 에게 전달하고, WAS는 request 를 처리하기 위해 필요한 기능 들을 수행한다. WAS는 처리가 완료되었으면 처리 결과를 web server에게 반환하고 웹 서버는 그 결과를 Client 에게 respond 로 보낸다
+		: 그러니까 짜장면 집에서 짜장면 주문하면 주인장이 직접 요리해서 손님한테줌
+	: WAS 내부에서 프로세스를 관리하기 때문에 성능이 용이하고 확장성이 좋다
+
+웹 어플리케이션 장점
+	: 사용자- 별도의 설치 없이 프로그램 사용 가능
+	: 개발자 - 사용자용 프로그램을 별도로 제작 않고 HTML을 이용하여 사용자 UI를 구축하기떄문에 비용감소
+
+
+
+
+
+
+web.xml 이란
+	: <web-app> 태그로 시작하고 종료하는 문서.
+	: web application의 동작과 관련된 다양한 환경정보를 태그 기반으로 설정하는 파일
+		: 그러니까 서버의 설정 파일.
+		: web.xml에 작성되는 내용
+			1. ServletContext 의 초기 파라미터 
+				: Session 의 유효 기간 설정
+			2. Servlet/JSP 대한 정의
+				: Servlet
+
+Java Resources 의 src\main\java
+	: 자바 소스 파일의 위치
+
+src\main\webapp
+	: 웹 컨텐트 파일의 위치
+	: 여기 아래에 html 파일 만드는 거임
+	src\webapp\web-inf\web.xml
+		: 서버 설정 파일
+	
+C##JAVAUSER ,  java2024
+
+---------------------------------------------------
+cmd 창에서
+
+(1) sqlplus
+	: sqlplus 실행
+(2) create user C##사용자명 identified by 비밀번호;
+	: 사용자생성
+(3) grant connect, resource, dba to C##사용자명
+	: 권한부여
+
+(4)
+
+====================================================
+
+Servlet서블릿
+	: 서버에서 웹 페이지등을 동적으로 생성하거나 데이터 처리를 수행하기 위해 "자바" 로 작성된 프로그램. 자바 코드 안에 HTML 태그가 삽입되어있고 확장자는 .java
+	: 클라이언트 요청을 처리하고 그 결과를 다시 클라이언트에게 전송하는 구현규칙을 지킨 자바클래스
+	: HTML , 멀티 Thread 를 이용한다
+
+	: 작동 순서
+		: 클라이언트에서 요청이 들어옴>> 서버에서는 서블릿 컨테이너 생성>> 서블릿컨테이너는 HttpServeltRequest , HttpServletResponse 객체를 생성>>  HttpServeltRequest는 requset 를 분석해서 어떤 서블릿에 대한 요청인지를 찾아 그 서블릿 클래스가 메모리에 존재하지 않는다면(== 그러니까 해당 클래스가 불린적이 없으면) 서블릿 객체를 하나 생성하고 스레드에게 해당 작업을 위임 >> 해당 서블릿에서 request 대한 동적 페이지를 생성한 후 HttpServletResponse 객체로 respond를 함 >> respond가 끝나면 HttpServeltRequest , HttpServletResponse 객체를 소멸 시킴
+
+	: 자바 기반이기 때문에 서버 내의 JVM의 멀티스레드 기능을 활용하여 request 를 스레드로 보낸다 . 새로운 요청이 들어왔을 떄는 다른 thread를 생성해서 request 를 처리한다. thread 를 이용해서 요청을 처리하기 때문에 서버 부하가 적게 발생하여 빠르고 효율ㅈㄱ
+
+
+	: 서블릿 파일 만드는 법
+		: 일단 .java 로 소스 파일이기 때문에 src/main/java 아래에 만든다
+		: 서블릿파일(걍 클래스 파일로 만들어도 되긴 되는데 일일이 쓰기 귀찮아서  그런거)을 만든다
+		: URL mapping >> 웹이니까 url 로 요청이 들어오면 서블릿을 실행시켜주겠단 것
+			: 디폴트론 클래스 이름으로 잡힘
+	: 상속 관ㄱㅖ
+		: 서블릿 클래스는 HttpServlet 클래스를 상속받는다
+		: Servlet 인터페이스 <-- GenericServlet 추상클래스<--- HttpServlet 
+
+	: @ == 어노테이션 
+		: 메타 데이터를 의미함.
+		: 프로그램 실행 관점에서 보면 프로그램이 처리할 메인 데이터가 아니라 실행과정에서 데이터를 어케 처리할건지 알려주는 서브 데이터. 재사용이 가능하다
+
+	: URL 매핑은 어노테이션을 사용하거나 web.xml 에 작성하는 방식이 있다.
+
+
+servlet mapping
+	: 특정 servlet 을 실행할때  해당하는 url 패턴.
+		: url 패턴 >> contextpath 뒤에 나오는 얘
+		: 그러니까 결국 클래스로 이어질 경로를 의미한다
+		
+	: '/' + 어쩌구 == URL 패턴
+		: 그러니까 슬래쉬로 시작한다
+
+	: how << sol1 과 sol2 를 동시에 사용할 순 없다
+		sol1 >> 어노테이션
+		sol2 >> web.xml
+
+		
+<sevlet>
+	<servlet-name>임의의이름</servlet-name>               // 여기서 설정한 서블릿 이름은 이후 해당 서블릿을 참조할 때 사용함
+	<servlet-class>등록할클래스의패키지를포함하여풀네임</servlet-class>
+<servlet>
+<servlet-mapping>
+	<servlet-name>임의의이름<servlet-name>
+	<url-pattern>표시할URL패턴</url-pattern>
+</servlet-mapping>
+
+
+
+
+
+contextpath란
+	: 서블릿컨테이너 즉 Tomcat 에서 ㅇ웹 상의 "어플리케이션"을 구분하기 위해 사용하는 Path.
+		: 그러니까 프로젝트가 여러개고 톰캣은 하나니까 실행할때 프로젝트를 구분하기 위해 Path 를 설정하는거
+		: 그러니까 결국 프로젝트 명을 의미한다
+	: URL의 일부이다 << 포트번호 다음 한토막이다
+		:  http://localhost:8282/Day2/Hello 에서 Day2
+
+	: URL == 도메인:포트번호/contextpath/url매핑
+
+
+
+form 태그
+	: action 속성
+		: 데이터를 전송할 server 쪽 url 작성
+		: /contextpath/urlpattern 을 대입
+			: 결국 /프로젝트명/url패턴명
+	: method 속성 << 걍 메서드이름 할당하는 것. 할당된 부분서 실행된다.
+		: 근데 축약형( get ) 쓴다
+		(1) get 방식
+		(2) post 바식
+
+HTTP 패킷
+	: 클라이언트가 서버로 request 했을때 보내는 데이터
+	: 구조
+		: 헤더
+			: 클라이언트 정보를 담는다. (HTTP 메서드 방식중 뭘 썼는지, 브라우저 정보 뭔지, 접속할 URL 뭔지... )
+		: 바디
+			: 그냥 냅둠 비어있다. 근데 원하면 특정 데이터를 담아서 보낼 수 있다. 여기서 get post 호출 가능하다
+
+
+GET & POST 방식 << 클라이언트의 request 방식(그러니까 어떻게 클라이언트의 정보를 가져오는지)
+	: html 내 form 태그의 method 속성을 사용하여 요청하는 방식으로 사용한다
+
+	GET 방식 
+		: URL 에 데이터를 붙여 전송한다 >> HTTP 패킷의 헤더 부분에 포함되어 클라이언트의 정보가 전송된다.
+			: 클라이언트의 데이터를 URL 뒤에 '?'뒤에 쿼리스트링의 형태로 붙여서 전달한다
+				: 쿼리스트링 ) 키와 값의 쌍. 파라미터. & 로 구분된.
+	
+		: URL 길이제한 있다보니 맘껏 못쓴다
+		: 데이터 요청에만 사용되고 수정이 불가하다
+
+	POST 방식
+		: URL 뒤에 붙여서 전송 안하고 패킷의 BODY 에 데이터를 넣어서 보낸다
+		: 데이터의 전송양에 길이 제한이 없고 대용량 데이터를 보내는데 적합하다
+		: URL 에 데이터가 노출 되지 않아 get 방식보단 안전하다
+	
+
+servlet parameter
+	form 태그의 submit 버튼을 클릭해서 데이터를 서버로 전송하면 해당 Servlet 에서는 HttpServletRequest 객체를 이용해서 Parameter 값을 얻을 수 있다
+
+name 은 가져오는 값에 이름을 붙여주는 속성이다
+
+ctrl+f11 >> 실행
+
+실행시키는건 클래스가 아니라 html 페이지다
+
+Parameter 한글 처리
+	>> tomcat 서버의 기본 문자 처리 방식은 IOS-8859-1 방식이다. 따라서 코드 짤때 별도로 한글 인코딩을 하지 앟으면 한글ㅇ;; 깨져보이는 현상이 나타난다
+		: how
+			Get 방식 요청일 경우>> server.xml 의 <connector> 태그에 URIEncoding 속성 추가하고 utf-8값 부여
+			post 방식의 요청일 경우 >> 서블랫 클래스 부분에 reponse.setCharacterEncoding , request.setCharacterEncoding 쓰고 arg 를 UTF-8 로 함
+
+
+사실 get 방식의 경우 직접 url 을 조작해서 전송해도 잘 들어간다.
