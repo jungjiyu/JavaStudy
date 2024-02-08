@@ -101,15 +101,16 @@ servlet mapping
 	: how << sol1 과 sol2 를 동시에 사용할 순 없다
 		sol1 >> 어노테이션
 		sol2 >> web.xml
-
-		
-<sevlet>
-	<servlet-name>임의의이름</servlet-name>               // 여기서 설정한 서블릿 이름은 이후 해당 서블릿을 참조할 때 사용함
-	<servlet-class>등록할클래스의패키지를포함하여풀네임</servlet-class>
+			: web-app 태그 내부에 아래와 같이 적는다	
+				: 설명) 일단 특정 클래스를 특정 servlet 에 할당하고, 특정 클래스를 할당받은 특정클래스에 url 패턴을 맵핑한다. 고로, servlet-name 이 같은 그룹끼리 맵핑이되는거다 
 <servlet>
+	<servlet-name>임의의이름</servlet-name>             
+	<servlet-class>URL패턴맵핑할클래스의풀네임</servlet-class>
+<servlet>
+
 <servlet-mapping>
 	<servlet-name>임의의이름<servlet-name>
-	<url-pattern>표시할URL패턴</url-pattern>
+	<url-pattern>URL패턴</url-pattern>
 </servlet-mapping>
 
 
