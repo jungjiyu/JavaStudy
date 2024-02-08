@@ -1,0 +1,97 @@
+양진석 강사
+b-b0317@naver.com
+
+수업자료: https://naver.me/x7rbqGim
+비밀번호: kg1234
+
+	
+C##JAVAUSER ,  java2024
+
+
+URL 매핑은 어노테이션을 사용하거나 web.xml 에 작성하는 방식이 있다.
+
+HttpServeltRequest , HttpServletResponse
+
+HTTP 패킷
+	: 클라이언트가 서버로 request 했을때 보내는 데이터
+	
+	GET 방식 : URL 에 데이터를 붙여 전송한다 >> HTTP 패킷의 헤더 부분에 포함되어 클라이언트의 정보가 전송된다.
+
+	POST 방식: URL 뒤에 붙여서 전송 안하고 패킷의 BODY 에 데이터를 넣어서 보낸다
+
+
+Parameter 한글 처리
+	>> tomcat 서버의 기본 문자 처리 방식은 IOS-8859-1 방식이다. 따라서 코드 짤때 별도로 한글 인코딩을 하지 앟으면 한글ㅇ;; 깨져보이는 현상이 나타난다
+	post 방식의 요청일 경우 >> 서블랫 클래스 부분에 reponse.setCharacterEncoding , request.setCharacterEncoding 쓰고 arg 를 UTF-8 로 함
+
+---------------------------------------------------
+====================================================
+
+Servlet parameter
+	:  form 태그의 submit  버튼을 클릭>> 클라이언트의 데이터가 서버로 전송>> Servlet 에서 HttpServletRequest 객체를 이용하여 Parameter 값을 활용
+	: Parameter 를 얻을 수 있는 메서드<< 만약에 없는 name 을 arg 로 하면 null 값이 나온다
+		1. String getParameter(name)
+			: 해당 이름의 값을 get
+		2. String[ ] getPatameterValues(name)
+			: 체크 박스처럼 한 이름으로 여러개의 값이 넘어올때사용
+		3. Enumeration getParameterNames( )
+			: 요청에 의해 넘어오는 모든 파리미터 이름의 목록을 받음
+			: Enumeration >> 반복자 객체. iteraotr 의 이전 버전
+				: 타입 >> Enumeratoin<요소 타입>
+				: 메서드<<딱 2개 있다 
+					1. hasMoreElements>> 더 읽어올거 있음 true 반환
+					2. nextElement >> 일거온다
+	Enumeration<String> enumeration = request.getParameterNames();
+		while(enumeration.hasMoreElements()) { 
+			String[] values = request.getParameterValues(enumeration.nextElement());//직방으로 읽어온 name 을 arg 로 할 수 있다
+			System.out.println(Arrays.toString(values));
+		}
+
+-------------------------------------------------------------------
+
+
+----------------------------------------------------
+
+초기화 파라미터
+	: 특정 servlet 이 생성될때 초기에 필요한 데이터들.
+	: 파라미터를 초기화하는 방법
+		1. web.xml 에 기술을 한다
+			: 이때 특정 서블릿의 초기갑ㅄ만 설정하는 것이므로 servlet 태그 내부에다 적어야된다.
+				: 그러니까 풀클래스명과 서블릿명 맵핑하는 부분서 말이다 (url매핑하기 잊전 블록에)
+
+ <servlet>
+  	<servlet-name>practiceServlet</servlet-name>
+  	<servlet-class>recieveText.RecieveText</servlet-class>
+    <init-param>
+  	<param-name>coffee</param-name>
+  	<param-value>starbucks</param-value>
+  </init-param>
+  </servlet>
+
+		2. Servlet 파일에 어노테이션으로 기술한다
+		3. 애초에 Servlet 파일을 생성할떄 Initalization parameters 에다 써넣는다
+	: 초기화한 파라미터에 접근하는 방법) Servlet 파일에서 ServletConfig 객체로 접근한다
+	ServletConfig config = super.getServletConfig(); // 서블릿이 초기화 되는 동안 참조해야할 정보를 가지고 있다가 전달해주는 역할
+	String id =config.getInitParameter("id");
+	String pw =config.getInitParameter("pw");
+-------------------------------------------------------------------
+
+
+데이터 공유
+	: 특정 데이터를 여러 Servlet 에서 공유해야할 ㄱ경우 web.xml 에 데이터를 기술하고 Servlet 에서는 ServletContext 객체로 접근하여 데이터를 얻을 수 있따'
+		: 특정 서블릿만ㄴ 사용 가능하게 하는게 아님으로 <servlet> 안에다 쓰는게 아니라 밖에다 (그래도 web-app 내부엔 있어야된다) 써야된다
+
+  <context-param>
+  	<param-name>host</param-name>
+  	<param-value>jiyu</param-value>
+  </context-param>
+
+하고 서블릿 클래스에서 getServletContext( )를 통하여 ServletContext 객체를 얻고 그 객체의 클래스에 정의된 getInitParameter() 를 이용해서 저장된 값을 뽑아낸다
+
+String broadName= getServletContext().getInitParameter("host");
+	    System.out.println("전역 파라미터 초기값은:"+broadName);
+	    
+
+
+---------------------------------------
+web.xml 안보일때 >> 프로젝트 오른쪽 마우스- java EE tools >> generate deployment .. 클릭함 web.xml 생성됨
