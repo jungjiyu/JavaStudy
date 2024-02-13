@@ -102,18 +102,16 @@ servlet mapping
 		sol1 >> 어노테이션
 		sol2 >> web.xml
 			: web-app 태그 내부에 아래와 같이 적는다	
-				: 설명) 일단 특정 클래스를 특정 servlet 에 할당하고, 특정 클래스를 할당받은 특정클래스에 url 패턴을 맵핑한다. 고로, servlet-name 이 같은 그룹끼리 맵핑이되는거다 
-<servlet>
-	<servlet-name>임의의이름</servlet-name>             
-	<servlet-class>URL패턴맵핑할클래스의풀네임</servlet-class>
-<servlet>
-
-<servlet-mapping>
-	<servlet-name>임의의이름<servlet-name>
-	<url-pattern>URL패턴</url-pattern>
-</servlet-mapping>
-
-
+				: 설명) 일단 특정 서블릿에 대한 참조를 생성하고, 생성한 서블릿 참조를 이용하여 해당 서블릿에 url패턴을 맵핑한다.
+  <servlet> <!-- 특정 서블릿에 대한 참조 생성 -->
+  	<servlet-name>studentFormServlet</servlet-name>
+  	<servlet-class>com.java.servlet3.StudentForm</servlet-class>
+  </servlet>
+  
+  <servlet-mapping> <!-- 서블릿 참조를 사용하여 특정 서블릿에  url 매핑 -->
+  	<servlet-name>studentFormServlet</servlet-name>
+  	<url-pattern>/Student</url-pattern>
+  </servlet-mapping>
 
 
 
