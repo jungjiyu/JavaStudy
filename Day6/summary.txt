@@ -1,0 +1,98 @@
+쿠키
+	: 웹 브라우져는 일반적으로 response 이후 관계를 끝낸다
+	: 서버와 클라이언트의 관계 유지 위해 씀
+		: 서버와의 연결이 끊긴 이후에도 어떤 정보를 지속적으로 유지하기 위한 수단이 쿠키이다.
+
+	: 과정
+		: 쿠키생성 >> 속성 설정 >> response 객체에 쿠키 탑재
+		
+	: 쿠키 관련 메서드
+		(1) cookie.setMaxAge(60*60); // 1시간
+			: 초 단위로 유효시간 설정
+			 쿠키는 보통 유효시간을 정해주지 않으면 웹 브라우져를 닫음과 동시에 쿠키가 삭제된다
+				: 이 쿠키를 세션쿠키라고 한다
+			: 그러나 유효시간을 설정해놓으면 유효시간동안 쿠키가 존재하게되고
+			: 웹 브라우져를 닫아도 유효시간이 남아있으면 쿠키는 삭제디지 않고 남아있게 된다
+			: 로그인 같은건 쿠키로 사용하지 않음. 너무 위험하기 때문. 현재는 세션 객체를 쓴다.
+			: 그럼 쿠키는 언제 사용될까? >> 팝업창 같은거 아래에서 24시간 보지 않기 이런거
+
+		(2) cookie.setValue("newCookieValue"); 
+			: 쿠키값 변경
+		(3) response.addCookie(cookie); 
+			: response 객체의 add cookie 로 쿠키객체를 웹 브라우져에 파일로 저장
+			: 웹 브라우져 차원에서 아예 쿠키를 차단이 가능하고, 삭제도 가능하다
+		(4) Cookie[] cookies= request.getCookies();
+			쿠키 객체를 배ㅕㄹ로 얻음
+
+		(5) String getName()
+			:쿠키이름 가져옴
+			:반환타입문자욜임
+
+		(6) getValue()
+			: 쿠키에 설정된 값을 가져옴
+			: 얘도 반환타입문자욜일듯
+		Cookie[] cookies= request.getCookies();
+		for(int i=0;i<cookies.length;i++){
+			String str = cookies[i].getName();
+		
+		if(str.equals("cookieName")){
+		}
+			out.print("쿠키이름:"+cookies[i].getName()+"<br>");
+			out.print("쿠키값:"+cookies[i].getValue()+"<br>");
+
+		}
+
+			
+
+	: 쿠키는 내장 객체가 아니라 직접 생성해줘여됨
+		Cookie cookie = new Cookie("cookieName","cookieValue");
+
+	: 원하는 쿠키만 딱 얻을 수 있는 방법은 없고 모든 쿠키를 배열의 형태로 얻을 수 있음
+		: request 객체로
+
+	: 쿠키의 삭제는 
+		:웹 브라우져에 직접적으로 접근해서 삭제하는 기능은 없음
+		: how
+			1. 쿠키 객체들을 일단 얻어와야됨
+			2. 쿠키 객체 수정
+			3. 수정한 쿠키 객체를 다시 브라우져에 저장
+				: 수정된 쿠키 객체를 브라우져에 저장해야 쿠키의 변경 사항이 반영된다
+Cookie[] cookies= request.getCookies();
+for(int i = 0 ; i <cookies.length;i++){
+	String str = cookies[i].getName();
+	if(str.equals("cookieName")){
+		cookies[i].setMaxAge(0);//유효시간을 0으로 설정
+		response.addCookie(cookies[i]);//변경된 쿠키 객체를 웹 브라우져에 저장
+	}
+}
+---------------------------------------------------------------------------------------
+
+실습
+	cookieSet >> 쿠키를 만드는 파일
+	cookieDelete >> 쿠키를 삭제하는 파일
+	cookieGet >> 직접적으로 쓰이진 않고 coolieSet , cookieDelete 에서 남아있는 값 확인하는 용도로 쓰임
+	cookieTest> 현재 있는 모든 쿠키를 출력
+	Cookie[] cookies = request.getCookies();
+	if(cookies!=null){
+		for(int i = 0 ; i<cookies.length;i++){
+			out.print("쿠키이름:"+cookies[i].getName()+"<br>");
+			out.print("쿠키값:"+cookies[i].getValue()+"<br>");
+		}
+	}
+	
+
+---------------------------------------------------------------------------------------
+JsessionID
+	: 서버에서 자동으로 만들어주는 쿠키
+---------------------------------------------------------------------------------------
+f12 >> 개발자 모드
+	: ㄱ 중 어플리케이션-스토리지-쿠키즈
+---------------------------------------------------------------------------------------
+
+팝업 실습
+	: 자바 스크립트 사용
+	<script> <%-- 자바스트립트의 object 급. 최상위. --%>
+		window.open("popup.jsp",'pop',"width=350, height=550"); <%-- 새창으로 팝업을 만들떄 사용되는 함수 --%>
+		// 내부에서 주석 사용 가능능
+		// 새 창으로 팝업 만들때사용하는 함수
+	</script>
