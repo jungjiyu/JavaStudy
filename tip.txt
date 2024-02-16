@@ -24,6 +24,19 @@
 	: URL == 도메인:포트번호/contextpath/url매핑
   : URI == URL 에서 도메인 이런거 뺴고 contextpath 이후 부분부터의 경로
 
+5. 경로 비교
+1.  URL
+  System.out.println("URL : " + request.getRequestURL());	---->  /http://localhost/JSP/member/list.do :  전체주소
+
+2. URI
+  System.out.println("URI : " + request.getRequestURI());	  ----> /JSP/member/list.do  :  프로젝트에서부터 현재 페이지를 부른 servlet주소까지
+
+3. ContextPath
+  System.out.println("contextPath : " + request.getContextPath());	---->  /JSP  :   프로젝트명
+
+4. ServletPath
+  System.out.println("servletPath : " + request.getServletPath());	 ----> /member/list.do  : servlet 주소
+
 
 
 
