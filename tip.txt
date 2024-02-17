@@ -98,3 +98,8 @@
 10. f12 >> 개발자모드
 	: application - cookie >> 생성된 쿠키 확인 및 삭제 가능
 	: network - HTTP 메세지 확인 가능
+
+
+11.
+	: 추상 클래스라고 죄다 상속 전용인건 아니다. 그냥 new 연산자를 이용한 객체 생성을 막고 메서드( getInstance( ) )를 이용한 객체 생성을 위해 그렇게 만든걸 수 있다
+		: ex >> Calendar 추상클래스의 객체를 생성하기 위해서 Calendar 클래스의 자식 클래스를 만들고 그걸로 객체 생성하는게 아니라 바로 Calendar.getInstance 로 만든다.
