@@ -50,21 +50,23 @@ JSP Java Server Page
 
 
 		5.<%@ %>
-			: 지시자 태그) 현재 JSP 페이지의 기본설정을 하는 역할 
+			: 지시자 태그) jsp 페이지가 실행될 때 필요한 정보를 jsp 컨테이너에게 알려주는 역할<< 그러니까 jsp 를 servlet 으로 변환하는 시점에 처리된다 
 				: 주요 역할
 					1. servlet 파일에서의 response 겍체에 대한 설정 역할. (request 객체는 따로 스크립틀릿 내부서 해주는 편이다)
 					2. 페이지에 외부 리소스를 불러옴
-
-			: jsp 를 servlet 으로 변환할 때 처리된다.
+			: https://abn-abn.tistory.com/81
 			: 지시자태그 의 종류 << 지시자태그 카테고리 아래 여러 태그가 존재한다
-				1. page태그 : 해당 페이지의 속성을 지정
+				1. page태그 : 현재 jsp 페이지의 속성과 response 객체에 대한 기본 설정을 설정한다
+				
 					속성
 						(1) import
 							: 근데 보통 import 속성을 직접 타이핑하진 않고 ctrl+shfit+o 로 자동 타이핑 시키는 편이다
 
-						(2) language << 스크립틀릿 안에 어떠한 언어로 작성할 지 명시한다 (대부분 java)
-						(3) contentType << Servelt 에서의 response.setContentType( ) 의 역할
-						(4) pageEncoding << Servlet 에서의 response.setCharacterEncoding( ) 의 역할
+						(2) language << 스크립틀릿 안에 어떠한 언어로 작성할 지 명시한다 
+						(3) contentType << 클라이언트에게 어떤 형태로 출력할 것인지 설정한다
+							:Servelt 에서의 response.setContentType( ) 의 역할
+						(4) pageEncoding << JSP 페이지 자체의 인코딩 방식을 지정한다
+							: Servlet 에서의 response.setCharacterEncoding( ) 의 역할
 
 
 				2. include태그 : 별도의 페이지를 현재 페이지에 삽입
