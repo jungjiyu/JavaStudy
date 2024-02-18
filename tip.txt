@@ -155,32 +155,67 @@
 		: 멀티 스레드 >> 한 프로세스를 여러 스레드로 구성하여 각 스레드 별로 태스크를 처리하도록 함
 		: 멀티 프로세스 보다 훨 자주 씀
 
+18. 빌드와 컴파일
+	: 컴파일은 빌드의 일부분으로, 바이트 코드로 바꾸는 과정
+	: 빌드는 컴파일 하고 링크까지 하는 과정을 통틀어 의미
+		: 링크 >> 컴파일된 각 파일에서 필요로 하는 요소들을 찾아 연결해주는 것
+
+19. 원시코드 == 소스코드 , 목적코드 == 바이트코드
+
+20. http 프로토콜
+	: stateless >> 연결 종료 이후 클라이언트의 정보를 유지하지 않는다
+	: connectionless >> 클라이언트가 server 로부터 response 받으면 server 와의 연결을 끊는다 
+
 18. servlet --> jsp
+	: 참고
+		1. https://codevang.tistory.com/193
+		2.. https://skyfox83.tistory.com/142
+		3. https://velog.io/@effirin/Servlet%EA%B3%BC-JSP%EC%97%90-%EB%8C%80%ED%95%B4
+
 	: 동적처리의 역사 ) CGI --> servlet --> jsp
 	: 최근 경향 ) jsp 와 servlet 을 섞어 쓴다
 	: CGI )
 		: 사용자의 요청을 받고, 웹 서버에서 다른 프로그램을 불러내고, 그 처리 결과를 클라이언트에게 보내주는 인터페이스
+			: 그러니까 동적인 처리를 할 수 있게 해줬다
 		: 단점 ) 멀티 프로세스 방식이여서 서버 부하가 큼
-			: 대인 >> 멀티 스레드 기반의 Servlet 등장
+		: 대안 >> 멀티 스레드 기반의 Servlet 등장
 
-	: servlet ) 
+	: servlet )  
 		: java 언어 기반이고, java 코드 내부에 html 태그를 삽입하는 구조
-		: server + let 
-		: 단점 << 그렇다고 사용안하는거임. 개똥도 쓸데가 있다
-			: java 언어 기반이라 html 삽입하기 번거로움
-			: 코드가 수정되면 다시 일일이 컴파일하고 배포해야됨
+		: server + applet 
+		: 단점 )
+			: java 언어 기반이지, html 기반이 아니라 화면 인터페이스 구현하는데 코드가 너무 길게 쓰임
+			: 코드가 수정되면 다시 일일이 빌드해야됨
+		: 대안 >> 언어는 html을 기본으로하고, 빌드 과정은 자동처리한  Servlet 을 기반으로 f람 jsp
 
 		: 클라이언트의 request을 받고, 분석하여 처리하고, 처리한 결과를 클라이언트에게 response하는 Controller 층을 담당
-		: 동작과정
-			1. 
-
+		: 서블릿 라이프 사이클
+			1. 쿨라이언트가 (DNS 로 부터 받았건 직접 입력했건) URL 을 입력
+			2. HTTP request 가 Servlet contatiner 로 전송됨
+				: HTTP request >> Http 프로토콜을 따르는 request
+			3. request를 전송받은 Servlet container 는 HttpServletRequest, HttpServeltResponse 객체를 생성한다
+			4. web.xml 을 기반으로 사용자가 요청한 URL 이 어느 Servlet에 대한 요청인지 찾는다.(=맵핑할 서블릿 찾는다)
+			5. 해당 Servlet 의 인스턴스 존재 유무를 확인한다
+			6. 해당 Servlet이 메모리에 로딩되어있지 않으면 (= 해당 Servlet 의 인스턴스가 존재하지 않으면) init() 메서드를 호출하여 인스턴스를 생성한다
+				: 만약에 이미 로딩되어있다면 또 인스턴스를 생성하진 않고 바로 service( ) 를 호출시킨다
+				: init( ) 
+					: 서블릿 초기화 작업 수행 시 자동으로 호출되는 메서드
+					: 생성자랑 별개로 존재하는 거임
+			7. Servlet Container에 thread 를 생성한다
+			8. service( ) 메서드를 실행한다
+			9. 클라이언트가 택한방식 (get, post) 에 따라 doGet 혹은 doPost 를 호출한다 
+	
 	: jsp ) 
 		: html 코드 기반이고, 자바 코드가 삽입되는 구조
 		: Java Server Page
 		: 장점
 			: html 언어 바로 사용 가능하고, 다양한 태그를 활용하여 자바 코드도 쉽게 삽입 가능
 			: 코드를 수정하면 알아서 컴파일해줄껄?
-		:  
+		: Servlet 을 기반으로 한다
+			: JSP 가 Servlet 으로 변환되어 실행되는 과정
+				(1) jsp 실행이 요청됨
+				(2) jsp 가 서블릿컨테이너에서 서블릿 소스코드로 변환됨
+				(3) 서블릿 소스코드는 자동으로 컴파일 된 후 실행되어 결과를 html 형태로 클라이언트에게 돌려줌
 
 		:사용자에게 결과를 보여주는 View 층을 담당 
 			: html 코드 사용이 편리해서 그렇다
