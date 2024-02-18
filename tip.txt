@@ -166,6 +166,10 @@
 	: stateless >> 연결 종료 이후 클라이언트의 정보를 유지하지 않는다
 	: connectionless >> 클라이언트가 server 로부터 response 받으면 server 와의 연결을 끊는다 
 
+21. controller 
+	: 조율자의 역할을 하는 무언가
+		: 웹 개발에서는 요청을 받고 응답을 내뱉는 역할을 하는 객체 정도
+
 18. servlet --> jsp
 	: 참고
 		1. https://codevang.tistory.com/193
