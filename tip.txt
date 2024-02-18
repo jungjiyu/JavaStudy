@@ -237,17 +237,32 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 			3. request를 전송받은 Servlet container 는 HttpServletRequest, HttpServeltResponse 객체를 생성한다
 			4. web.xml 을 기반으로 사용자가 요청한 URL 이 어느 Servlet에 대한 요청인지 찾는다.(=맵핑할 서블릿 찾는다)
 			5. 해당 Servlet 의 인스턴스 존재 유무를 확인한다
-				case1 )  해당 Servlet이 메모리에 로딩되어있으면 >> 그냥 넘어간다
+				case1 )  해당 Servlet이 메모리에 로딩되어있으면 >> 바로 다음 단계로 넘어간다
 				case2 )  해당 Servlet이 메모리에 로딩되어있지 않은경우(= 해당 Servlet 의 인스턴스가 존재하지 않으면)
 					1. 해당 Servlet 클래스의 생성자를 실행해서 그 Servlet 클래스의 인스턴스를 생성한다
+
 					2. servlet container가 설정정보(web.xml 혹은 WebServlet 어노테이션)를 바탕으로 ServletConfig 객체를 생성한다
 						: init(ServletConfig config) 의 arg 가 필요하기 때문
-					3. servlet container가, 앞서 생성한 Servlet 의 인스턴스를 대상으로 ServletConfig 객체를 arg 로 하여 init() 메서드를 실행한다
+
+					3. servlet container가, 앞서 생성한 Servlet 의 인스턴스를 대상으로 ServletConfig 객체를 arg 로 하여 init() 메서드를 호출한다
 						: 그러니까 서블릿인스턴스.init(서블릿콘피그인스턴스); 한다는거임
-					4.
-						case1 ) servlet 클래스에서 init(ServletCongfig config) 를 오버라이딩한 경우
-							: 오버라이딩한 init(config) 가 호출된다
-						case2 )
+
+					4. 다음의 init( ) 메서드가 실행된다
+						: 참고 자료 
+							1. https://www.asknsay.com/difference-between-init-and-init-servletconfig.html
+							2. https://codevang.tistory.com/193
+					 	case1 ) servlet 클래스에서 init(ServletCongfig config) 만 오버라이딩한 경우 << 비추되는 방식
+							: 오버라이딩한 init(config) 가 호출된 후 super.init(config) 가 호출되어 실행된다
+								: servlet클래스내서 오버라이딩 한 init(config)는 부가적인 기능하는거고 사실상 핵심적인 내용, 즉 ServletConfig 객체를 메모리에 올리는건 super.init(config) 가 하는거라서 오버라이딩할때 필수적으로 super.init(config) 를 쓰지 않으면 좆되게 된다.
+ 
+						case2 ) servlet 클래스에서 init( ) 만 오버라이딩한 경우 << 개추
+							: 해당 Servlet 클래스 내에 init(ServletConfig config) 가 오버라이딩 되있지 않으므로 GenericServlet 클래스 내의 init 이 실행되게 된다. 그리고 GenericServlet 클래스 내의 init() 은 마지막에 항상 init( ) 을 호출하게 되있으므로 해당 Servlet 클래스 내에서 오버라이딩 한 init( ) 의 내용이 실행되게 된다
+								: 그러니까 Generic의 init( config ) 실행할때 Servlet 클래스 내의 init( ) 실행 이 되는거다 
+
+						case3 ) init(ServletCongfig config) 이건 init() 이건 둘다 오버라이딩 안한 경우
+							: 걍 GenericServlet 의 init(ServletConfig config) 만 실행된다.
+
+
 
 init() 메서드를 호출하여 인스턴스를 생성한다
 				: init(ServletConfig config), init()
