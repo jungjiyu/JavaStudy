@@ -186,8 +186,19 @@ interface ServletConfig
 	: 개별 서블릿을 생성할때 servlet container 에 의해 호출되어 생성되고 (init( ) 의 arg 로 넣어야되서), 그 서블릿의 소멸과 함께 소멸됨.
 		: 우리가 직접 servlet 파일에서 호출하여 객체 생성하는 용도로 사용하진 않는다.
 
-abstract class GenericServlet
-	: ServletConfig 를 구현한 것. (=implements 한 것)
+abstract class GenericServlet implements ServletConfig 
+	: 제너릭을 정의한다
+	: 대표 메서드
+		(1) public void init(ServletConfig config)
+			: ServletConfig 객체를 servlet conatiner 에 반영시키는 역할을 한다
+			: 이게 실행이 안되면 나중에 ServletConfig 객체를 얻을 수 가 없어서 좆된다
+			: 내부적으로 코드 마지막 부분에서 init( ) 을 호출하고 있다
+			: 직접적으로 오버라이딩 하는건 비추이다
+				: 만약에 오버라이딩 할꺼면 super.init(config) 를 해줘야되는데 이거 쓰는거 까먹으면 좆되서 그렇다
+
+		(2) public void init( )
+			: GenericServlet 의 init( ) 자체는 담고 있는 내용이 없고 오버라이딩 당하는 용도로 쓰인다
+				: init(ServletConfig config) 의 실행을 보장하고, init(ServletConfig config) 의 실행이후 실행하고 싶은 내용을 적기에 안성 맞춤이다
 
 
 abstract class HttpServlet
