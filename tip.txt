@@ -1,3 +1,10 @@
+0.
+WAS == web server + web container
+web container == JSP container + Servlet container +...
+	Jsp container >> 웹 컨테이너에서 jsp 파일 실행시키는 부분
+	servlet container >> 웹 컨테이너에서 servelt 파일 실행시키는 부분
+
+
 1. jsp html 뭐 그런거에서의 prameter는 주로 다른 페이지로 이동과 동시에 전달되는 데이터를 가리키는 용어로 사용한다  (자바나 c언어서 처럼 매서드 선언부에서 선언된 변수들을 가리키기보다는... 얘네들은 걍 argument 라고 부르자) 
 
 
@@ -267,7 +274,7 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 
 		: 클라이언트의 request을 받고, 분석하여 처리하고, 처리한 결과를 클라이언트에게 response하는 Controller 층을 담당
 		: 서블릿 라이프 사이클
-			1. 쿨라이언트가 (DNS 로 부터 받았건 직접 입력했건) URL 을 입력
+			1. 웹서버로부터 
 			2. HTTP request 가 Servlet contatiner 로 전송됨
 				: HTTP request >> Http 프로토콜을 따르는 request
 			3. request를 전송받은 Servlet container 는 HttpServletRequest, HttpServeltResponse 객체를 생성한다
@@ -337,7 +344,7 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 			: 코드를 수정하면 알아서 컴파일해줄껄?
 		: Servlet 을 기반으로 한다
 			: JSP 가 Servlet 으로 변환되어 실행되는 과정
-				(1) 
+				(1) 웹
 				(2) jsp 가 서블릿컨테이너에서 서블릿 소스코드로 변환됨
 				(3) 서블릿 소스코드는 자동으로 컴파일 된 후 실행되어 결과를 html 형태로 클라이언트에게 돌려줌
 
