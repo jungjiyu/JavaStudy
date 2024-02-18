@@ -175,6 +175,7 @@
 	: ex) GenericServlet 의 init( )
 
 23. servlet 의 여러 클래스들
+
 interface ServletConfig
 	: Config = Configration 
 	: 개별 서블릿이 실행하기 위해 필요한 설정 정보를 제공
@@ -183,8 +184,8 @@ interface ServletConfig
 			(2) web.xml
 		: 설정정보의 내용 ) 초기 파라미터 (init-param), ServletContext 객체의 주소값 등
 
-	: 개별 서블릿을 생성할때 servlet container 에 의해 호출되어 생성되고 (init( ) 의 arg 로 넣어야되서), 그 서블릿의 소멸과 함께 소멸됨.
-		: 우리가 직접 servlet 파일에서 호출하여 객체 생성하는 용도로 사용하진 않는다.
+	: 개별 서블릿을 생성할때 servlet container 에 의해 호출되어 "익명"객체로(인터페이스니까) 생성되고 (init( ) 의 arg 로 넣어야되서), 그 서블릿의 소멸과 함께 소멸됨.
+		: 우리가 직접 servlet 파일에서 호출하여 객체 생성하진 않고, servlet container 가 생성해 둔 servletconfig 객체를 활용하는 거다. 
 
 abstract class GenericServlet implements ServletConfig 
 	: 제너릭을 정의한다
@@ -205,6 +206,10 @@ abstract class GenericServlet implements ServletConfig
 			: 접근제한자가 "public"이고,  매개변수가 "Servlet"Config , "Servlet"Response 임 을 주목
 				: 자식 클래스인 HTTPServlet 에서는 이를 한번 오버라이딩 할 뿐 아니라 오버로딩까지 하고 있다
 					: https://www.inflearn.com/questions/758877/service-%EC%98%A4%EB%B2%84%EB%9D%BC%EC%9D%B4%EB%93%9C-%ED%95%A0%EB%95%8C-protected
+
+
+		(4) public void destroy( )
+			: 해당 servlet 객체에 대한 자원을 servlet container 에서 해제한다
   
 
 
@@ -309,9 +314,17 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 						...
 						super.service();
 					}
+				: 자원이 해제되기 전까지 request 가 올때마다 실행된다.
 
 			7. doGet 혹은 doPost 는 동적 페이지를 생성하고, resposne을 보낸다
-			8. response가 끝나면 distroy() 메서드를 사용하여 HttpServletRequset 와 HttpServletResponse 두 객체를 소멸 시킨다.
+			8. response가 끝나면 destroy() 메서드를 사용하여 HttpServletRequset 와 HttpServletResponse 두 객체를 소멸 시킨다.
+				: 자원해제시 1회 실행된다.
+				: 오버라이딩 할꺼면 지켜야하는 형식)
+					@Override
+					protected void destroy( ){
+					...
+					super.destroy();
+					}
 
 			
 
@@ -324,7 +337,7 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 			: 코드를 수정하면 알아서 컴파일해줄껄?
 		: Servlet 을 기반으로 한다
 			: JSP 가 Servlet 으로 변환되어 실행되는 과정
-				(1) jsp 실행이 요청됨
+				(1) 
 				(2) jsp 가 서블릿컨테이너에서 서블릿 소스코드로 변환됨
 				(3) 서블릿 소스코드는 자동으로 컴파일 된 후 실행되어 결과를 html 형태로 클라이언트에게 돌려줌
 
