@@ -200,10 +200,20 @@ abstract class GenericServlet implements ServletConfig
 			: GenericServlet 의 init( ) 자체는 담고 있는 내용이 없고 오버라이딩 당하는 용도로 쓰인다
 				: init(ServletConfig config) 의 실행을 보장하고, init(ServletConfig config) 의 실행이후 실행하고 싶은 내용을 적기에 안성 맞춤이다
 
+		(3) public "abstract" void  service(ServletRequest req, ServletResponse res) throws ServletException, IOException
+			: abstract 타입이기 때문에 service 메서드를 호출하면 GenricServlet 의 servic 메서드가 호출되는게 아니라 GenericServlet 의 자식클래스인 HttpServlet 에서 오버라이딩한 service 메서드가 실행되게 된다
+			: 접근제한자가 "public"이고,  매개변수가 "Servlet"Config , "Servlet"Response 임 을 주목
+				: 자식 클래스인 HTTPServlet 에서는 이를 한번 오버라이딩 할 뿐 아니라 오버로딩까지 하고 있다
+					: https://www.inflearn.com/questions/758877/service-%EC%98%A4%EB%B2%84%EB%9D%BC%EC%9D%B4%EB%93%9C-%ED%95%A0%EB%95%8C-protected
+  
 
-abstract class HttpServlet
+
+abstract class HttpServlet extends GenericServlet
 	: 서블릿 클래스 만들때 기본적으로 부모가 되는 클래스
 	: GenericServlet을 부모 클래스로함
+	: 대표 메서드
+		(1) public void service
+
 
 [ ServletContext ]
 : web application의 전역에서 공유(사용)할 수 있는 객체이다.
@@ -249,52 +259,40 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 			4. web.xml 을 기반으로 사용자가 요청한 URL 이 어느 Servlet에 대한 요청인지 찾는다.(=맵핑할 서블릿 찾는다)
 			5. 해당 Servlet 의 인스턴스 존재 유무를 확인한다
 				case1 )  해당 Servlet이 메모리에 로딩되어있으면 >> 바로 다음 단계로 넘어간다
-				case2 )  해당 Servlet이 메모리에 로딩되어있지 않은경우(= 해당 Servlet 의 인스턴스가 존재하지 않으면)
+				case2 )  해당 Servlet이 메모리에 로딩되어있지 않은경우(= 해당 Servlet 의 인스턴스가 존재하지 않으면) Servlet 인스턴스를 생성한다
 					1. 해당 Servlet 클래스의 생성자를 실행해서 그 Servlet 클래스의 인스턴스를 생성한다
 
 					2. servlet container가 설정정보(web.xml 혹은 WebServlet 어노테이션)를 바탕으로 ServletConfig 객체를 생성한다
 						: init(ServletConfig config) 의 arg 가 필요하기 때문
 
-					3. servlet container가, 앞서 생성한 Servlet 의 인스턴스를 대상으로 ServletConfig 객체를 arg 로 하여 init() 메서드를 호출한다
+					3. 'servlet container"가 앞서 생성한 Servlet 의 인스턴스를 대상으로 ServletConfig 객체를 arg 로 하여 init(ServletConfig config) 메서드를 호출한다
 						: 그러니까 서블릿인스턴스.init(서블릿콘피그인스턴스); 한다는거임
 
 					4. 다음의 init( ) 메서드가 실행된다
 						: 참고 자료 
 							1. https://www.asknsay.com/difference-between-init-and-init-servletconfig.html
 							2. https://codevang.tistory.com/193
+						: 일단 init(ServletConfig config) 이건 init( ) 이건 GernericServlet 에 정의된 메서드이다
+
 					 	case1 ) servlet 클래스에서 init(ServletCongfig config) 만 오버라이딩한 경우 << 비추되는 방식
 							: 오버라이딩한 init(config) 가 호출된 후 super.init(config) 가 호출되어 실행된다
 								: servlet클래스내서 오버라이딩 한 init(config)는 부가적인 기능하는거고 사실상 핵심적인 내용, 즉 ServletConfig 객체를 메모리에 올리는건 super.init(config) 가 하는거라서 오버라이딩할때 필수적으로 super.init(config) 를 쓰지 않으면 좆되게 된다.
  
 						case2 ) servlet 클래스에서 init( ) 만 오버라이딩한 경우 << 개추
 							: 해당 Servlet 클래스 내에 init(ServletConfig config) 가 오버라이딩 되있지 않으므로 GenericServlet 클래스 내의 init 이 실행되게 된다. 그리고 GenericServlet 클래스 내의 init() 은 마지막에 항상 init( ) 을 호출하게 되있으므로 해당 Servlet 클래스 내에서 오버라이딩 한 init( ) 의 내용이 실행되게 된다
-								: 그러니까 Generic의 init( config ) 실행할때 Servlet 클래스 내의 init( ) 실행 이 되는거다 
+								: 그러니까 init( ) 자체는 init(ServletConfig config) 실행될때 같이 실행할 내용 적는거임
+
+							: 오버라이딩 할꺼면 지켜야하는 형식 )
+								@Override
+								public void init() throws ServletException{
+									...
+								}
 
 						case3 ) init(ServletCongfig config) 이건 init() 이건 둘다 오버라이딩 안한 경우
 							: 걍 GenericServlet 의 init(ServletConfig config) 만 실행된다.
 
-
-
-init() 메서드를 호출하여 인스턴스를 생성한다
-				: init(ServletConfig config), init()
-					:public viod init(ServeltConfig config) throws ServletException 
-						: 서블릿 초기화 작업 수행 시 "servlet container에 의해" 자동 호출되는 메서드로, arg 로 받는 Servlet config 객체를 저장하여 설정 정보를 저장한다.
-						: 우리가 직접 호출하진 않는다
-
-					: public void init( ) throws ServletException 		
-
-					: 과정
-						(1) 톰캣의 servlet container 가 web.xml 파일의 내영을 불러와 ServletConfig 객체를 생성한다
-						(2) servletConfig 객체를 init(ServletConfig config ) 의 arg 로 하여 실행시킨다.
-
-							
-
-					: Servlet인 클래스가 상속받는 HttpServlet 의 부모 클래스인 GenericServlet 에 정의되어있는 메서드이다
-						: https://docs.oracle.com/javaee%2F7%2Fapi%2F%2F/javax/servlet/GenericServlet.html#method.summary
-	
-						: 그러니까 servlet 객체 생성시 초기화 작업()을 수행해주는 역할을 한다
-
-			7. Servlet Container에 thread 를 생성한다
+			6. service( ) 메서드를 실행한다
+				: 
 			8. service( ) 메서드를 실행한다
 			9. 클라이언트가 택한방식 (get, post) 에 따라 doGet 혹은 doPost 를 호출한다 
 	
