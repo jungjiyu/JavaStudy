@@ -170,6 +170,43 @@
 	: 조율자의 역할을 하는 무언가
 		: 웹 개발에서는 요청을 받고 응답을 내뱉는 역할을 하는 객체 정도
 
+22. convenienece method
+	: 편의메서드. 말 그대로 편의를 위한 메서드로, 필수는 아니나 있으면 편한 메서드
+	: ex) GenericServlet 의 init( )
+
+23. servlet 의 여러 클래스들
+interface ServletConfig
+	: Config = Configration 
+	: 개별 서블릿이 실행하기 위해 필요한 설정 정보를 제공
+		: 설정정보의 형태
+			(1) WebServlet
+			(2) web.xml
+		: 설정정보의 내용 ) 초기 파라미터 (init-param), ServletContext 객체의 주소값 등
+
+	: 개별 서블릿을 생성할때 servlet container 에 의해 호출되어 생성되고 (init( ) 의 arg 로 넣어야되서), 그 서블릿의 소멸과 함께 소멸됨.
+		: 우리가 직접 servlet 파일에서 호출하여 객체 생성하는 용도로 사용하진 않는다.
+
+abstract class GenericServlet
+	: ServletConfig 를 구현한 것. (=implements 한 것)
+
+
+abstract class HttpServlet
+	: 서블릿 클래스 만들때 기본적으로 부모가 되는 클래스
+	: GenericServlet을 부모 클래스로함
+
+[ ServletContext ]
+: web application의 전역에서 공유(사용)할 수 있는 객체이다.
+
+→ 웹 어플리케이션 내 모든 Servlet과 JSP가 공유할 수 있는 정보이다.→ 웹 어플리케이션 시작 시에 생성되고, 종료시에 소멸된다.
+
+→ 단, ServletConfig안에 ServletContext의 주소값이 있기 때문에,
+
+ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
+
+
+
+
+
 18. servlet --> jsp
 	: 참고
 		1. https://codevang.tistory.com/193
@@ -200,11 +237,34 @@
 			3. request를 전송받은 Servlet container 는 HttpServletRequest, HttpServeltResponse 객체를 생성한다
 			4. web.xml 을 기반으로 사용자가 요청한 URL 이 어느 Servlet에 대한 요청인지 찾는다.(=맵핑할 서블릿 찾는다)
 			5. 해당 Servlet 의 인스턴스 존재 유무를 확인한다
-			6. 해당 Servlet이 메모리에 로딩되어있지 않으면 (= 해당 Servlet 의 인스턴스가 존재하지 않으면) init() 메서드를 호출하여 인스턴스를 생성한다
-				: 만약에 이미 로딩되어있다면 또 인스턴스를 생성하진 않고 바로 service( ) 를 호출시킨다
-				: init( ) 
-					: 서블릿 초기화 작업 수행 시 자동으로 호출되는 메서드
-					: 생성자랑 별개로 존재하는 거임
+				case1 )  해당 Servlet이 메모리에 로딩되어있으면 >> 그냥 넘어간다
+				case2 )  해당 Servlet이 메모리에 로딩되어있지 않은경우(= 해당 Servlet 의 인스턴스가 존재하지 않으면)
+					1. 해당 Servlet 클래스의 생성자를 실행해서 그 Servlet 클래스의 인스턴스를 생성한다
+					2. servlet container가 설정정보(web.xml 혹은 WebServlet 어노테이션)를 바탕으로 ServletConfig 객체를 생성한다
+						: init(ServletConfig config) 의 arg 가 필요하기 때문
+					3. servlet container가, 앞서 생성한 Servlet 의 인스턴스를 대상으로 ServletConfig 객체를 arg 로 하여 init() 메서드를 실행한다
+						: 그러니까 서블릿인스턴스.init(서블릿콘피그인스턴스); 한다는거임
+					4.
+
+init() 메서드를 호출하여 인스턴스를 생성한다
+				: init(ServletConfig config), init()
+					:public viod init(ServeltConfig config) throws ServletException 
+						: 서블릿 초기화 작업 수행 시 "servlet container에 의해" 자동 호출되는 메서드로, arg 로 받는 Servlet config 객체를 저장하여 설정 정보를 저장한다.
+						: 우리가 직접 호출하진 않는다
+
+					: public void init( ) throws ServletException 		
+
+					: 과정
+						(1) 톰캣의 servlet container 가 web.xml 파일의 내영을 불러와 ServletConfig 객체를 생성한다
+						(2) servletConfig 객체를 init(ServletConfig config ) 의 arg 로 하여 실행시킨다.
+
+							
+
+					: Servlet인 클래스가 상속받는 HttpServlet 의 부모 클래스인 GenericServlet 에 정의되어있는 메서드이다
+						: https://docs.oracle.com/javaee%2F7%2Fapi%2F%2F/javax/servlet/GenericServlet.html#method.summary
+	
+						: 그러니까 servlet 객체 생성시 초기화 작업()을 수행해주는 역할을 한다
+
 			7. Servlet Container에 thread 를 생성한다
 			8. service( ) 메서드를 실행한다
 			9. 클라이언트가 택한방식 (get, post) 에 따라 doGet 혹은 doPost 를 호출한다 
