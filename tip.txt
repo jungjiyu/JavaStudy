@@ -274,12 +274,14 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 
 		: 클라이언트의 request을 받고, 분석하여 처리하고, 처리한 결과를 클라이언트에게 response하는 Controller 층을 담당
 		: 서블릿 라이프 사이클
-			1. 웹서버로부터 
-			2. HTTP request 가 Servlet contatiner 로 전송됨
+			1. 웹 서버로부터 HTTP request 가 Servlet contatiner 로 전송됨(== servlet 클래스 파일의  request 를 받음)
 				: HTTP request >> Http 프로토콜을 따르는 request
-			3. request를 전송받은 Servlet container 는 HttpServletRequest, HttpServeltResponse 객체를 생성한다
-			4. web.xml 을 기반으로 사용자가 요청한 URL 이 어느 Servlet에 대한 요청인지 찾는다.(=맵핑할 서블릿 찾는다)
-			5. 해당 Servlet 의 인스턴스 존재 유무를 확인한다
+			2. request를 전송받은 Servlet container 는 HttpServletRequest, HttpServeltResponse 객체를 생성한다
+				: servlet 객체가 이미 있나 없냐 상관 없이 HttpServletRequest , HttpServletresponse 객체는 request 마다 새로 생성되는거다
+					: HttpServletRequest 는 request 내용을 담은 객체인데, 항상 request 내용이 같은 것도 아니니까 새로 생성시키는거ㅓ고 , Servlet 객체는 있으면 또 생성 안하는건 기존 request 내역 및 처리를 보유하고 잇기 때문이다.(물론 response 내역은 포함 안한다- response 하면 종료되니까) 
+
+			3. web.xml 을 기반으로 사용자가 요청한 URL 이 어느 Servlet에 대한 요청인지 찾는다.(=맵핑할 서블릿 찾는다)
+			4. 해당 Servlet 의 인스턴스 존재 유무를 확인한다
 				case1 )  해당 Servlet이 메모리에 로딩되어있으면 >> 바로 다음 단계로 넘어간다
 				case2 )  해당 Servlet이 메모리에 로딩되어있지 않은경우(= 해당 Servlet 의 인스턴스가 존재하지 않으면) Servlet 인스턴스를 생성한다
 					1. 해당 Servlet 클래스의 생성자를 실행해서 그 Servlet 클래스의 인스턴스를 생성한다
@@ -313,7 +315,7 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 						case3 ) init(ServletCongfig config) 이건 init() 이건 둘다 오버라이딩 안한 경우
 							: 걍 GenericServlet 의 init(ServletConfig config) 만 실행된다.
 
-			6. HttpServlet에 정의된 service(HttpServletRequest , HttpServletResponse ) 메서드를 호출해서 클라이언트에게 받은 Request 를 doPost 혹은 doGet 을 호출한다
+			5. HttpServlet에 정의된 service(HttpServletRequest , HttpServletResponse ) 메서드를 호출해서 클라이언트에게 받은 Request 를 doPost 혹은 doGet 을 호출한다
 				: HttpServlet에 정의된  service(ServletRequest, ServletRespone) 호출하는거 아니다
 				: 오버라이딩 할꺼면 지켜야하는 형식 )
 					@Override
@@ -323,8 +325,8 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 					}
 				: 자원이 해제되기 전까지 request 가 올때마다 실행된다.
 
-			7. doGet 혹은 doPost 는 동적 페이지를 생성하고, resposne을 보낸다
-			8. response가 끝나면 destroy() 메서드를 사용하여 HttpServletRequset 와 HttpServletResponse 두 객체를 소멸 시킨다.
+			6. doGet 혹은 doPost 는 동적 페이지를 생성하고, resposne을 보낸다
+			7. response가 끝나면 destroy() 메서드를 사용하여 HttpServletRequset 와 HttpServletResponse 두 객체를 소멸 시킨다.
 				: 자원해제시 1회 실행된다.
 				: 오버라이딩 할꺼면 지켜야하는 형식)
 					@Override
@@ -343,7 +345,10 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 			: html 언어 바로 사용 가능하고, 다양한 태그를 활용하여 자바 코드도 쉽게 삽입 가능
 			: 코드를 수정하면 알아서 컴파일해줄껄?
 		: Servlet 을 기반으로 한다
-			: JSP 가 Servlet 으로 변환되어 실행되는 과정
+		: jsp 파일이 실행되는 과정
+			: jsp 컨테이너는 jsp 파일을 서블릿 소스로 변환하는 과정까지만 담당하고, 변환된 서블릿의 수행은 서블릿 컨테이너로 넘어가서 실행한다
+			1. 웹 서버로부터 HTTPrequest 중에서도 jsp 파일을 요청하는 request 를 JSP컨테이너가 받음 
+			2. 기존에 request 되었던 jsp 파일이닞
 				(1) 웹
 				(2) jsp 가 서블릿컨테이너에서 서블릿 소스코드로 변환됨
 				(3) 서블릿 소스코드는 자동으로 컴파일 된 후 실행되어 결과를 html 형태로 클라이언트에게 돌려줌
