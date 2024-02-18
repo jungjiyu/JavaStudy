@@ -245,6 +245,9 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 					3. servlet container가, 앞서 생성한 Servlet 의 인스턴스를 대상으로 ServletConfig 객체를 arg 로 하여 init() 메서드를 실행한다
 						: 그러니까 서블릿인스턴스.init(서블릿콘피그인스턴스); 한다는거임
 					4.
+						case1 ) servlet 클래스에서 init(ServletCongfig config) 를 오버라이딩한 경우
+							: 오버라이딩한 init(config) 가 호출된다
+						case2 )
 
 init() 메서드를 호출하여 인스턴스를 생성한다
 				: init(ServletConfig config), init()
