@@ -25,14 +25,37 @@ JDBC
 	: 흐름
 		: java application >> 하나의 JDBC API >> 하나의 JDBC Driver manager  >> 각 DBMS 만의 JDBC Driver 
 			:DBMS 의 종류에 상관 없이 java application 을 실행할 수 있는 이우는 각 DBMS 를 위한 JDBC driver 가 존재하기 때문.
-	
+				: JDBC Driver >> 각 DBMS 의 데이터 베이스에 접근할 수 있게 해줌
+
+
 
 	: JDBC 연결 순서
-		0. DBMS 의 "드라이버"가 있는 파일을 애플리케이션에 투입해서 로드할 수 있게 준비해두기 ( ojdbc.jar )
-		1. JDBC 드라이버를 "로드"
-			: Class.forName("드라이버");
+		-1. DBMS 의 "드라이버"가 있는 파일을 애플리케이션에 투입해서 호출당할수있게 준비해두기 ( ojdbc.jar )
+
+		0. 오타 우려 있는거 미리 선언하기 << 오타우려있는거 , try 문 밖에서 선언해놔야할 것
+		<%!	Connection conn; 
+			PreparedStatement pstmt; 
+			ResultSet rs; 
+
+			String driver="oracle.jdbc.OracleDriver";
+			String dbURL = "jdbc:oracle:thin:@localhost:1521:xe"; 
+			String dbID="C##JAVAUSER";
+			String dbPW="java2024";
+			String query= "SELECT * from YayTest";  %>
+
+
+
+		1. JDBC 드라이버( 클래스 )를 "로드"
+			: Class.forName("풀패키지명");
 				: 오타날 수 있으니 String driver="oracle.jdbc.OracleDriver"; 로 미리 적어놓고 driver 를 arg 로한다
-				: Class 클래스의 정적 메서드인 forName 메서드 >> 풀패키지명 쓰면 해당하는 클래스를 메모리로 로딩해줌
+				: Class 클래스의 정적 메서드인 forName 메서드 	
+					: 풀패키지명 쓰면 해당하는 클래스 혹은 인터페이스를 메모리로 동적 로딩해줌
+				
+				: Driver 클래스의 경우 내부 쌩 static 블럭(= 초기화 시점에서 실행되는 블럭)에서 자기자신의 객체를 DriverManager 에 등록하게 되어있기 때문에( DriverManager.registerDriver( new Driver( ) ) ; ), forName 을 사용하여 Driver 클래스를 메모리에 로딩할때 자동적으로 해당 드라이버가 등록된다.
+
+				:https://sshplendid.github.io/blog/dev/java/2020/02/09/java-class-forname/
+
+			: throws ClassNotFoundException 이 발생한다
 
 		2. DriverManager 를 통하여 connection 객체 생성
 			: Connection conn = DriverManager.getConnection(url , dbID,dbPW );
@@ -41,7 +64,13 @@ JDBC
 				: URL , ID , PW 는 오타의 소지가 있으므로 미리 만들어둔다
 					String url = "jdbc:oracle:thin:@localhost:1521:xe"; // 오라클의 기본 주소. 
 					String dbID="C##JAVAUSER";
-					String dbPW="java2024";	
+					String dbPW="java2024";
+
+			: DriverManager 는 등록된 드라이버를 자동으로 인식하고, 해당 드라이버의 db 와의 연결을 성사시킨다
+
+			: throws SQLException 이 발생한다	
+
+
 
 		3. connection 객체를 통하여 Statement 객체를 생성(정확히는  PreparedStatement 객체이긴 함)
 			: PreparedStatement pstmt = conn.prepareStatement(쿼리문);
@@ -49,25 +78,63 @@ JDBC
 				: PreparedStatement 객체 >> 생성당시 arg 로 투입된 sql 쿼리문을 저장하고 있으며, 이를 실행 가능한 객체
 					:<interface> Preparedstatement 
 						:  sql 문장을 실행, 결과를 반환하는 기능을 캡슐화한 인터페이스
-						: Statement 를 상속 받은 것이다 << 그래도 PreparedStatement 와 사용법이 살짝살짝 다르다
+							: 캡슐화 >> 외부서 함부로 접근 못하게 private 처리 해놓은것(+ 물론 메서드를 통한 접근은 가능해야됨)
+
+
+						: 주요 메서드
+							(0) setXXXX(int index , XXXXX value)
+								: 객체 생성 당시에 arg 로 집어넣은 쿼리문에 값이 들어가는 자리에 물음표를 대신 적은 경우 setXXXX 를 통하여 그 물음표에 값을 집어넣을 수 있다
+								: XXXX 는 넣을 자바상에존재하는( NVARCHAR2 같은거 아니라) value 의 타입이다 
+									: ex) setInt(int index, int value),  setString(int index , String value)
+								: 주의)
+									1.  index 는 "1" 부터 시작한다
+									2.  preparedstatement 객체를 대상으로 쓰이는 instancr 
+
+							(1) ResultSet executeQuery( )
+								: 결과값을 반환을 목적으로하는 sql 쿼리문을 실행할 경우 사용
+								: select 문
+
+							(2) int executeUpdate( )
+								: (딱히 결과를 반환하지 목적으로 사용하지 않고) 내용 수정을 목적으로 하는 하는 sql 쿼리문을 실행할 경우 사용
+								: insert, update , delete 문
+
+
+
+						: Statement 를 상속 받은 것이다 
+							: PreparedStatement 와 Statement 의 차이
+								(1) 객체 생성 방법
+									: Statement 객체는 쿼리에 대한 정보 없이(=별다른 arg 없이) connection 객체의 createStatement( ) 메서드를 통하여 생성되고, PreparedStatement 객체는 생성 당시 쿼리를 arg 로 하여 connnection 객체의 prepare"d"Statement(String sql)  메서드를 통하여 생성이 된다
+
+								(2) 쿼리문 실행 방법
+									: 생성 당시에 쿼리에 대한 정보를 주지 않아 Statement 객체는 excuteXXX 메서드를 실행하기 위해서는 arg 로 qurey 문을 그떄마다 넣어줘야하기 떄문에 보안에 취약하지만, PreparedStatement 객체는 이미 쿼리문이 내장되어있어 활용할떄마다 쿼리문을 넣을 필요가 없어 보안에 강하다
+										: 주의 ) PreparedStatement 의 excuteQuery( ) , excuteUpdate( ) 는 Statement 의 excuteQuery(String sql), excuteUpdate(String sql) 을 오버라이딩 한 것이 아니다. (매개변수 불일치)
+											:  오버라이딩 >> 메서드 명이 같고, """ 매개변수의 타입 개수 순서 일치해야하고""" , 리턴타입 일치해야하고, 접근제한자는 부모클래스 보다 약해야됨
+
+								(3) 추가기능
+									:  쿼리문에 값이 들어갈 자리를 '?' 로 해놓고 나중에 setString(index, value) 를 이용하여 ㅋ쿼리문을 쉽게 변경할 수 있다
+										: 물론 Preparedstatemet 객체를 생성 한 "후" 에 그 객체를 대상으로 할 수 있는거다
+								
+
+
+
 
 							: <interface> Statement
-								: 주요 메서드 >> sql 문을 실행시킴
-									(1)   executeQuery()
+								: 주요 메서드 << PreparedStatement 객체에선 이 메서드 안쓰고 다른거 쓰는거 주의(arg 로 쿼리 안넣은다)
+									(1) ResultSet executeQuery(String sql)
 										: 결과값을 반환하는 sql 쿼리문을 실행할 경우 사용
 										: select 문 같은
-									(2) executeUpdate( )
+									(2) int executeUpdate(String sql )
 										: (딱히 결과를 반환하지 목적으로 사용하지 않고) 내용 수정을 목적으로 하는 하는 sql 쿼리문을 실행할 경우 사용
 										: insert, update , delete 같은
 
-					: 사용 ex) 객체.excuteQuery(쿼리문)
 
 		4. PreparedStatement 객체를 통하여 sql 쿼리문을 실행한 결과를 ResultSet 객체로 받음
-			: ResultSet rs = pstmt.executeQuery() 혹은 pstmt.excuteUpdate( ) 
-				: ResultSet >> PreparedStatement 의 쿼리문 실행 결과 반환 타입
+			: ResultSet rs = pstmt.executeQuery() 혹은 int n =  pstmt.excuteUpdate( ) 	
+				: excuteUpdate( ) 만 하는 경우 따로 ResultSet 객체를 필요로 하지 않는다
 
 
-		5. ResultSet 객체에서 결과를 꺼내서 활용하기	
+		5. ResultSet 객체에서 결과를 꺼내서 활용하기
+			: 만약에 앞서서 excuteUpdate( ) 만 실행해서 rs 를 만들지 않은 경우 pass	
 			: while(rs.next()){
 	
 				String id = rs.getString("ID"); 
@@ -85,12 +152,15 @@ JDBC
 
 		6. 연결 해제
 			: 가장 최근에 사용했던 것부터 거꾸로 올라가면서 "finally 문 내부에서" 해제한다
-			try{
-				if (rs != null) rs.close();
-		 		if (pstmt != null) pstmt.close();
-		 		if (conn != null) conn.close();
-			}catch(Exception e){}
-				
+				: 따라서 Connection conn , PreparedStatement pstmt, ResultSet rs 를 try 문 내부에서 선언하고 할당하기보다는 try 문 밖에서 미리 선언해놓기를 추천
+			:
+			finally{
+				try{
+					if (rs != null) rs.close();
+		 			if (pstmt != null) pstmt.close();
+			 		if (conn != null) conn.close();
+				}catch(Exception e){}
+			}
 
 			
 
