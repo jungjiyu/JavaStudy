@@ -1,144 +1,158 @@
-자바 빈이란 
-	: 자바빈 규약을 만족하는 java 기반의 클래스로,  jsp 에서 DTO 클래스의 객체를 가져오기 위한 기법이다.
-		: servlet 처럼 java 기반이 아니니까 그냥은 객체를 쓸 수 없어서 필요한거다.
-		: DTO Data Transfer Object
-			: 데이터를 전달하는 객체
-
-	:  jsp 의 액션 태그를 사용하여 객체 생성과 설정, 사용이 가능하다 . 
-	: 자바빈이 되기 위해 만족해야하는 조건들 (=자바빈 규약)
-// 자바빈 규약
-		// 1. 빈이 패키지화 되있어야한다 << default package 가 아닌. 직접 만든 패키지
-		// 2. 기본 생성자를 반드시 가지고 ㅇ있어야한다 << getter setter 로 필드값을 할당할 목적으로 만들어졌으므로, 기본ㄴ 생성자를 가지고 있어야함
-		// 3. 멤버 ㄴ변수의 접근자는 private 으로 선언한다
-		// 4. 멤버 변수에 접근하기 위한 publid 접근자인 getter , setter 메서드를 만들어 놓아야한다
-			// 이클립스 기능을 사용하여 getter setter 만들기
-			//alt+shift+s 하고 generate getters and setters 하고 select all
-
-
-: 사용법
-1. 속성과 기능이 있는 빈 클래스(데이터 클래스)를 Java Resources 에 만든다 
-	: jsp , servlet 같은 것처럼 eclips 에서 따로 자바빈 전용 템플릿을 제공하진 않아 따로 다 만들어야됨
-	
-	
-
-2. jsp 페이지를 만들어서 액션태그를 이용하여 데이터 클래스를 사용한다.(빈의 내부 데이터를 처리한다.)
-	: webapp 내부에 jsp 파일 만든다
-	
-
-
-빈 관련 액션태그
-	: 
-	: 지시자명 >> useBean : 특정 Bean 클래스의 객체를 생성할 때 사용한다
-		형식 : <jsp:useBean id="원하는객체명" class = "쓰고자하는Bean클래스의풀클래스명" scope="유효벙위4가지중하나" /> 
-		ex ) <jsp:useBean id="student" class = "com.jsp.student.Student" scope="page" /> 
-
-		: 속성
-			1. id  << 자바 객체 이름 명시
-			2. class << 
-			3. scope << 유효 범위 지정
-				(1) page << 생성된 페이지에서만 사용이 가능
-					: 디폴트값
-				(1) requset << request 요청을 받고 처리를 완료할 때까지 유지됨.
-				(1) session << 클라이언트당 하나씩
-				(1) application << 서버 종료 전까진 유지
-
-	:  지시자명 >> setProperty : 데이터 값을 설정 할 때 사용한다. << 객체의 초기 값 설정 할때 자주 사용
-		형식:  <jsp:setProperty name="자바빈객체명" property = "클래스내부의필드명" value="집어넣고자하는값" /> 
-		ex) <jsp:setProperty name="student" property = "studentID" value="202401" /> 
-
-		: 속성 
-			1. name
-				: 빈 이름 . id
-			2. property 
-				: 필드명
-			3. value
-				: 값
-
-	:  지시자명 >> getProperty : 데이터 값을 설정 할 때 사용한다.
-		형식 : <jsp:getProperty name="자바빈객체명" property = "필드명" /> 
-		ex) <jsp:getProperty name="member" property = "id" /> 
-
-		: 속성
-			1. name
-				: 빈 이름 . id
-			2. property 
-				: 필드명
-		: 이거 자체로 값이 나오는거다
-
-
-	: setProperty , getProperty 액션 태그 << 속성에 바로 접근해서 값을 넣고 빼는게 아니라(private 이라서 애초에 직접 접근 불가) getter , setter 메서드 (publlic 이라 가능)로 얻어온 것이다.
-
-
--------------------------------------------------------------------------------------------------------------------------------
-
-CREATE TABLE KGMEMBER (
-ID VARCHAR2(50) PRIMARY KEY,
-PW VARCHAR2(50) NOT NULL,
-NAME NVARCHAR2(50) NOT NULL,
-EMAIL VARCHAR2(100),
-ADDRESS NVARCHAR2(100),
-REGDATE TIMESTAMP DEFAULT SYSTIMESTAMP
+create table YayTest(
+    nameXX NVARCHAR2(100) PRIMARY KEY,
+    ageXX NUMBER(3),
+    emailXX NVARCHAR2(50)
     );
-    
-    INSERT INTO KGMEMBER(ID, PW, NAME, EMAIL, ADDRESS) VALUES('hong','1234','홍길동','hong@naver.com','서울');
-    INSERT INTO KGMEMBER(ID, PW, NAME, EMAIL, ADDRESS) VALUES('sung','1111','성춘향','sung@naver.com','대전');
-    INSERT INTO KGMEMBER(ID, PW, NAME, EMAIL, ADDRESS) VALUES('eeee','2222','이몽룡','eeee@naver.com','전라도');
 
 
-commit;   
+
+select * from yayTest
+
+UPDATE 테이블명 SET  컬럼1 = 변경할 값, 컬럼2 = 변경할 값 WHERE 조건;
+insert into YayTest values ('김김김', 17 , 'naver@naver.com' );
+delete from YayTest where ageXX <=20;
+
+레코드 == 한 줄
+--------------------------------------------------------------------------------------------------------------
+ Connection 클래스의 객체 >> DB 와 연결성을 가지게 해주는 객체
+PreparedStatement 객체 >> 생성당시 arg 로 투입된 sql 쿼리문을 저장하고 있으며, 이를 실행 가능한 객체
+ ResultSet >> PreparedStatement 의 쿼리문 실행 결과를 담은 객체
 
 
-JDBC
-	: Java DataBase Connectivity
-	: 데이터베이스에 연결해서 CRUD create read update delete  를 효율적으로 할 수 있는 메서드 제공
-	: 자바는 DBMS( Oracle, MySQL , MongoDB 등) 의 종류에 상관없이 하나의 JDBC API 를 이용해서 데이터 베이스 작업을 처리한다
-	: 과정
-		1. sqldeveloper 를 연다
-			jdbc-lib-ojdbc11.jar 파일 복사
-				: 여기에 오라클 드라이버 있다
+단계 : 
+		0. DBMS 의 "드라이버"가 있는 파일을 애플리케이션에 투입해서 로드할 수 있게 준비해두기 ( ojdbc.jar )
+		1. JDBC 드라이버를 "로드"
+			: Class.forName("드라이버");
 
-		2. dynamic project - webapp -webinf-lib 아래에 복붙
-			: 라이브러리 올려주기 가능
+
+		2. DriverManager 를 통하여 connection 객체 생성
+			: Connection conn = DriverManager.getConnection(url , dbID,dbPW );
+
+		3. connection 객체를 통하여 Statement 객체를 생성(정확히는  PreparedStatement 객체이긴 함)
+			: PreparedStatement pstmt = conn.prepareStatement(쿼리문);
+			
+		4. PreparedStatement 객체를 통하여 sql 쿼리문을 실행한 결과를 ResultSet 객체로 받음
+			: ResultSet rs = pstmt.executeQuery() 혹은 pstmt.excuteUpdate( ) 
+
+
+		5. ResultSet 객체에서 결과를 꺼내서 활용하기	
+			: while(rs.next()){
+	
+				String id = rs.getString("ID"); 
+				String pw = rs.getString("PW"); 
+				String name = rs.getString("NAME"); 
+			}
+
 			
 
-		3.. webapp 내부에 jsp 파일 만든다
+		6. 연결 해제
+			: 가장 최근에 사용했던 것부터 거꾸로 올라가면서 "finally 문 내부에서" 해제한다
+				: 이를 위해선 try 문에서 rs, pstmt, conn 을 선언하는게 아니라 try 문 밖에서 미리 해둬야 finally 문에서도 접근이 가능
+			try{
+				if (rs != null) rs.close();
+		 		if (pstmt != null) pstmt.close();
+		 		if (conn != null) conn.close();
+			}catch(Exception e){}
+				
 
-	: jdbc 연결 순서 외우자 (7페이지)
-		(1) JDBC 드라이버 로딩<< 메모리에 올림
-		(2) 데이터 베이스 연결  << 연결성 가지는 connection 객체를 얻음
-		(3) Statment 생성 << sql 문을 처리하는 객체를 생성
-		(4) SQL 문 전송 
-		(5) 결과 받기 (ResultSet)
-		(6) 연결해제 << close()
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	: jsp 
+자바빈 >> jsp 에서 java 기반의 클래스 객체를 쉽게 사용하기 위함
+	<jsp:useBean id="bean1" class="bean.BeanEx" scope="page"/>
+	<jsp:setProperty name="bean1" property="age" value="25"/>
+	<p><jsp:getProperty name="bean1" property="age"/></p>
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+
+
+
+int excuteUpdate( ) 메소드
+	: DML(Data Manipulation Language 데이터 조작어)인 INSERT와 UPDATE, DELETE 문인 경우에는 관련된(추가, 변경, 삭제) 레코드의 수를 반환한다.
+		: insert 는 어차피 1 만 반환하고, update 와 delete 는 때에 따라 다르다
+
+
+PreparedStatement 객체
+	: SQL문에서 변수(데이터)가 들어갈 자리는 ' ? ' 로 표시한 후 setter 메소드를 사용하여 ? 로 표시한 곳에 데이터를 넣어준다.
+
+	: 굳이 Statement 냅두고 PreparedStatement 쓰는 이유 >> 쿼리문에 일단 ? 써놓고 Setter 계열의 메서드인 setString( ) 을 활용하여 ? 에 바로 값 대입할 수 있어서
+		: setString(인덱스, 값); 
+			: 주의 ) 인덱스는 1부터 시작한다
+			: 해당 인덱스에 해당하는 물음표에 해당 값을 넣는다
+
+		: 예시
+			: String query= "INSERT INTO KGMEMBER VALUES (?,?,?,?,?) ";
+			:	 
+pstmt.setString(1,id);		
+pstmt.setString(2,pw);		
+pstmt.setString(3,name);
+pstmt.setString(4,email);
+pstmt.setString(5,address);
+				
+
+
+DAO TAO >> 둘다 java 기반의 클래스로 만들어서 사용한다	
+	: db와 관련한 경우 java 기반의 코드가 많고, 화면 과의 교류가 적어 html 기반 보다는 java 기반이 더 좋다
+
+DAO
+	: Data Access Object
+	: 데이터베이스의 data 에 접근하기 위한 객체
+		: form 으로 입력된 내용을 자바빈을 통하여 받아서 저장한다
+
+DTO
+	: Data Transfer Object
+	: 계층간 데이터 교환을 위한 자바빈즈
+		:
+	
+
+
 		
-	: statemetnt 객체<< <interface> Statement
-		: executeQuery()  >> SQL 문 실행 후 여러 개의 결과값이 생기는 경우 사용EX) SELECT
-			excuteQuery( )  >> 데이터베이스 검색 전용 메서드인 SELECT 문을 실행 시킬 때 사용하며 결과값을 ResultSet 타입으로 반환한다
 
-		: executeUpdate() >> SQL 문 실행 후 테이블의 내용만 변경되는 경우 사용 EX) UPDATE, DELETE
+// 싱글톤패턴구현
+	private static memberDAO instance = new memberDAO(); // private static  +자기자신 타입의 레퍼런스 변수 선언후 넣어둠
+	private memberDAO() {
+	}
+    public static memberDAO getInstance() {// 반환할 수 있는 객체
+        return instance;
+    }
 
-
-
-
-
-
-
-SELECT 문을 수행하고 반환된 값(=REsultsset 객체)을 레코드 셋이라고 부르며 레코드 셋은 여러행으로 구성되어 있다.
-여러 행을 한꺼번에 처리할 수는 없고 한 개의 행 단위로 처리할 수 있다.
-	: 레코드 == 한 줄
-
-	: ResultSet의 메서드 
-		: next() >> 현재 행에서 한행 다음으로이동
-			: 다음 행이 있으면 true 를 반환하고 커서를 이동시킴
-			: 다음 행이 없으면 false 를 반환
-
-		: getter 꼴 메소드 (getString, getInt 등) >> 각 행에서 원하는 컬럼 값을 접근해서 얻으려면 getter 메소드를 사용 (컬럼 이름으로 값을 얻을 수 있다.)
+		: DTO >> 자바빈 규약 지켜 생성
+			: 각 column 의 타입을 짘켜 변수 생성
+			: Timestamp 타입 같은 경우 java.sql.Timestamp 따로 import 필요
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+<style>
+	{
+		text-align:center;
+		margin: 0 auto;
+	}
+
+</style>
 
 
--------------------------------------------------------------------------------------------------------------------------------
-<어쩌구> </어쩌구> ==  <어쩌구/>
 
+ 자바 스크립트로 함수 만들기 ;
+		<script type="text/javascript">
+			function joinFormCheck(){
+				var id = document.joinForm.id.value; 
+				}
+		</script>
+
+	;  함수 >> function 이란 키워드로 시작
+	:  변수의 타입 >> var
+	: document 객체 << 현제 웹페이지를 나타내는 객체
+		: documemt.웹페이지서사용하고자하는값의NAME값.values
+			: document 를 대상으로 html 태그의 name 값을 사용하여 그 태그로 접근하고 그 태그의 values 속성을 사용한다.
+		: var id = document.joinForm.id.value; 의 경우 현재 문서의
+
+ 자바 스크립트로 함수 만든 함수를 html 코드 상에서 호출하기  << onclick 이벤트 속성에 할당한다
+	<input type="button" onclick="joinFormCheck()" value="회원가임"> 
+
+자바스크립트에선에선 이름으로 접근한다
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+
+
+SELECT ID,PW from KGMEMBER; 도 가능하다
