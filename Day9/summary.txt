@@ -1,12 +1,6 @@
-create table YayTest(
-    nameXX NVARCHAR2(100) PRIMARY KEY,
-    ageXX NUMBER(3),
-    emailXX NVARCHAR2(50)
-    );
+핵심 sql 문 정리
 
-
-
-select * from yayTest
+ select * from yayTest
 
 UPDATE 테이블명 SET  컬럼1 = 변경할 값, 컬럼2 = 변경할 값 WHERE 조건;
 insert into YayTest values ('김김김', 17 , 'naver@naver.com' );
@@ -14,142 +8,259 @@ delete from YayTest where ageXX <=20;
 
 레코드 == 한 줄
 --------------------------------------------------------------------------------------------------------------
- Connection 클래스의 객체 >> DB 와 연결성을 가지게 해주는 객체
-PreparedStatement 객체 >> 생성당시 arg 로 투입된 sql 쿼리문을 저장하고 있으며, 이를 실행 가능한 객체
- ResultSet >> PreparedStatement 의 쿼리문 실행 결과를 담은 객체
 
-
-단계 : 
-		0. DBMS 의 "드라이버"가 있는 파일을 애플리케이션에 투입해서 로드할 수 있게 준비해두기 ( ojdbc.jar )
-		1. JDBC 드라이버를 "로드"
-			: Class.forName("드라이버");
-
-
-		2. DriverManager 를 통하여 connection 객체 생성
-			: Connection conn = DriverManager.getConnection(url , dbID,dbPW );
-
-		3. connection 객체를 통하여 Statement 객체를 생성(정확히는  PreparedStatement 객체이긴 함)
-			: PreparedStatement pstmt = conn.prepareStatement(쿼리문);
-			
-		4. PreparedStatement 객체를 통하여 sql 쿼리문을 실행한 결과를 ResultSet 객체로 받음
-			: ResultSet rs = pstmt.executeQuery() 혹은 pstmt.excuteUpdate( ) 
-
-
-		5. ResultSet 객체에서 결과를 꺼내서 활용하기	
-			: while(rs.next()){
-	
-				String id = rs.getString("ID"); 
-				String pw = rs.getString("PW"); 
-				String name = rs.getString("NAME"); 
-			}
-
-			
-
-		6. 연결 해제
-			: 가장 최근에 사용했던 것부터 거꾸로 올라가면서 "finally 문 내부에서" 해제한다
-				: 이를 위해선 try 문에서 rs, pstmt, conn 을 선언하는게 아니라 try 문 밖에서 미리 해둬야 finally 문에서도 접근이 가능
-			try{
-				if (rs != null) rs.close();
-		 		if (pstmt != null) pstmt.close();
-		 		if (conn != null) conn.close();
-			}catch(Exception e){}
-				
+db 연결에 있어 핵심 객체 정리
+ 	Connection 클래스의 객체 >> DB 와 연결성을 가지게 해주는 객체
+	PreparedStatement 객체 >> 생성당시 arg 로 투입된 sql 쿼리문을 저장하고 있으며, 이를 실행 가능한 객체
+ 	ResultSet >> PreparedStatement 의 쿼리문 실행 결과를 담은 객체
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-자바빈 >> jsp 에서 java 기반의 클래스 객체를 쉽게 사용하기 위함
-	<jsp:useBean id="bean1" class="bean.BeanEx" scope="page"/>
-	<jsp:setProperty name="bean1" property="age" value="25"/>
-	<p><jsp:getProperty name="bean1" property="age"/></p>
-
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------
-
-
-
-int excuteUpdate( ) 메소드
-	: DML(Data Manipulation Language 데이터 조작어)인 INSERT와 UPDATE, DELETE 문인 경우에는 관련된(추가, 변경, 삭제) 레코드의 수를 반환한다.
-		: insert 는 어차피 1 만 반환하고, update 와 delete 는 때에 따라 다르다
-
-
-PreparedStatement 객체
-	: SQL문에서 변수(데이터)가 들어갈 자리는 ' ? ' 로 표시한 후 setter 메소드를 사용하여 ? 로 표시한 곳에 데이터를 넣어준다.
-
-	: 굳이 Statement 냅두고 PreparedStatement 쓰는 이유 >> 쿼리문에 일단 ? 써놓고 Setter 계열의 메서드인 setString( ) 을 활용하여 ? 에 바로 값 대입할 수 있어서
-		: setString(인덱스, 값); 
-			: 주의 ) 인덱스는 1부터 시작한다
-			: 해당 인덱스에 해당하는 물음표에 해당 값을 넣는다
-
-		: 예시
-			: String query= "INSERT INTO KGMEMBER VALUES (?,?,?,?,?) ";
-			:	 
-pstmt.setString(1,id);		
-pstmt.setString(2,pw);		
-pstmt.setString(3,name);
-pstmt.setString(4,email);
-pstmt.setString(5,address);
-				
 
 
 DAO TAO >> 둘다 java 기반의 클래스로 만들어서 사용한다	
-	: db와 관련한 경우 java 기반의 코드가 많고, 화면 과의 교류가 적어 html 기반 보다는 java 기반이 더 좋다
+	: db와 관련한 경우 java 기반의 코드가 많지, 화면 인터페이스 구현이 주가 되는게 아니라서 html 기반 보다는 java 기반이 더 좋다
 
 DAO
-	: Data Access Object
-	: 데이터베이스의 data 에 접근하기 위한 객체
-		: form 으로 입력된 내용을 자바빈을 통하여 받아서 저장한다
+	: Data Access Object	
+	: db의 data 에 접근하는 용도
+
+	: DAO 용 클래스		
+		: 싱글톤 패턴으로 구현한다
+			싱글톤 패턴의 조건 << 애플리케이션 전체적으로 해당 클래스의 객체가 하나만 존재하게 하고 무분별한 접근을 방지한다
+				1.모든 필드와 생성자를 private 으로 한다 
+				2. 해당 클래스 타입의 (private) 레퍼런스 필드 도 하나 만들어 두고 그 필드에 해당 클래스의 객체를 하나 만들어둔다
+				3.  객체를 반환받을 수 있는 getInstance( ) 메서드를 public 으로 생성해둔다
+
+				** 참고<< DTO 처럼 꼭 getter setter 를 구현할 필요는 없고 필요에 따라 메서드 만들어씀 된다
+
 
 DTO
 	: Data Transfer Object
-	: 계층간 데이터 교환을 위한 자바빈즈
-		:
-	
+	: java 기반의 서블릿 과 html 기반의 jsp 사이에서 정보 공유를 쉽게 하는 목적
+	: DTO 용 클래스
+		 ;자바빈 형식으로 만든다
+			1. 생성자는 public 으로 하되 나머지 필드는 모두 private
+			2. getter setter 구현
 
-
+	: DTO 용 자바빈 응용
+		(1) 자바빈 객체 생성
+			<jsp:useBean id="dto" class="com.jsp.memberDTO" scope="page"/>
+		(2) 자바빈 프로퍼티 설정
+			: 개꿀팁 >>
+				:request.getParam(이름) 으로 일일이 값꺼내서 setProperty 액션 태그의 value 값으로 넣어 자바빈 객체의 필드값을 채울 수도 있긴 하지만 , property 값을 "*" 로 하면 자동적으로 request 객체로 넘어온 모든 값을 자바빈 내부의 필드와 매치시켜주는 편의 기능을 제공하고 있다.
+					: 주의해야할 것은 무조건 request 를 통해 받은 값이라고 다 되는게 아니라 자바빈 객체가 가지고 있는	 필드명과 같은 이름으로 바인딩된 값만 가능하다
+				: "*" 편의 기능을 사용하는 경우 별도로 value 는 명시하지 않는다
+				<jsp:setProperty name="dto" property="*" />
 		
 
-// 싱글톤패턴구현
-	private static memberDAO instance = new memberDAO(); // private static  +자기자신 타입의 레퍼런스 변수 선언후 넣어둠
-	private memberDAO() {
-	}
-    public static memberDAO getInstance() {// 반환할 수 있는 객체
-        return instance;
-    }
 
-		: DTO >> 자바빈 규약 지켜 생성
-			: 각 column 의 타입을 짘켜 변수 생성
-			: Timestamp 타입 같은 경우 java.sql.Timestamp 따로 import 필요
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-<style>
-	{
-		text-align:center;
-		margin: 0 auto;
-	}
-
-</style>
+추가 지식 
 
 
+(0) 자바 스크립트 관련 기본 지식 ;
+	0. ' 랑 " 랑 같은데 ' 를 선호한다
 
- 자바 스크립트로 함수 만들기 ;
-		<script type="text/javascript">
-			function joinFormCheck(){
-				var id = document.joinForm.id.value; 
-				}
-		</script>
+	1. 변수타입
+		(1) var >> 일반적인 변수 선언
+		(2) let >> 지역변수 선언 (해당 블럭 내부에서만 사용 가능)
+		(3) const >> 상수 변수 선언
+		
+	2. 모든 문장은 ; 단위이다ㄴ
 
-	;  함수 >> function 이란 키워드로 시작
-	:  변수의 타입 >> var
-	: document 객체 << 현제 웹페이지를 나타내는 객체
-		: documemt.웹페이지서사용하고자하는값의NAME값.values
-			: document 를 대상으로 html 태그의 name 값을 사용하여 그 태그로 접근하고 그 태그의 values 속성을 사용한다.
-		: var id = document.joinForm.id.value; 의 경우 현재 문서의
+	3. html 에서는 <script type="text/javascript">    </script>  태그 내부에 쓴다
 
- 자바 스크립트로 함수 만든 함수를 html 코드 상에서 호출하기  << onclick 이벤트 속성에 할당한다
-	<input type="button" onclick="joinFormCheck()" value="회원가임"> 
 
-자바스크립트에선에선 이름으로 접근한다
+
+(1) 자바 스크립트에서 html 요소를 선택하는 방법
+	: https://pledge.tistory.com/entry/Dom%EC%9A%94%EC%86%8C2
+	1. 태그명 자체를 선택 
+		: getElementByTagName( tagname ) 
+		: document 객체를 대상으로 사용한다
+	2.  id 를 선택
+		: getElementById( id )
+		: document 객체를 대상으로 사용한다
+	3. class 를 선택
+		: ? 
+	**** 4. 태그의 name 속성을 선택<< 일단 이건 수업에서 해봤음
+		: ( 잴 먼저 document 객체를 대상으로 하고 ) 해당 name값을 또 대상으로 하고 그 태그에 해당하는 또다른 속성의 값이나 함수를 실행시키면 된다
+
+	
+(1) 자바 스크립트에서의 함수 선언과 호출
+	:  함수 선언 형식
+		function 함수명(  param1, param2 ..  ){
+			...
+			return 값 ;	
+		}
+		
+		: function >> 해당 부분이 함수 선언임을 나타내는 부분이다
+			:  return 값이 있건 없건  걍 function 만 쓴다
+
+		: param >> 쓸 parpam 의 명만 적음 되고 각 param 의 타입을 밝혀서 선언하지 ㅇ낳는다
+		: return >> 단순 종료 목적으로 쓰일 수 도 있고 값 반환목적으로도 쓰일 수 있다
+		
+	: 함수 호출 방법 
+		: 직접 선언한 자바스크립트 함수 뿐 아니라, 자바스크립트 내장 객
+		1. 자바 스크립트 언어에서 >> document.함수명( ) 
+		2. html 태그의 특정 속성의 이벤트로 >> 이벤트속성명="함수명 ( )"
+			ex ) <input type="button" onclick="joinFormCheck()" value="회원가임"> 
+
+ 
+
+
+(2) 자바 스크립트의 유명한 내장 객체 
+	1. document 객체
+		: 현재 웹 페이지 전체를 나타냄
+			: 클래스에서 this 객체와 비슷한 느낌이다
+		: 이 객체를 대상으로 현제 페이지 내의 태그 혹은 함수에 접근이 가능
+			: 각 태그 부분의 name 속성값을 기준으로 태그를 구분한다
+				: 근데 단순 name 값을 쓴다고 그 value 값이 나오는건 아니니까 value 뽑을 목적이면 value 속성을 명시해야된다
+				: ex)  var id = document.joinForm.id.value; 
+
+			: 걍 document.함수명( ) 하면 함수 호출된다.
+
+
+
+
+(3) 자바 스크립트의 유명한 내장 함수
+	1. 알림창 관련
+		(1)alert( msg )
+			: 버튼은 '확인' 하나인 경고창을 띄우며, 리턴 값이 없다
+
+		(2) comfirm(msg)
+			: 버튼은 ' 확인 ' 과 '취소' 2가지인 경고창의 띄우고, 리턴 값은 '확인' 을 누르면 true, 취소를 누르면 false 를 반환한다.
+
+
+(2) style 태그
+	 : 해당 html 문서 내의 특정 태그의 스타일을  css 코드를 기반으로 설정한다
+	: 사용 방법
+		: head 부분에 위치
+		: 시작 , 끝 태그 내부에 스타일 설정 원하는 태그의 이름을 적고, 그 뒤에는(여전히 시작, 끝 태그 내부이다) 바로 중괄호 를 치고 그  내부에 설정 원하는 속성과 그의 값을 ' : ' 로 연결하여 적고, 각 문장은 ';' 표기
+			: 설정 가능한 속성
+				(1) background-color 	
+					: 베경 색 지정
+					: 할당 가능한 값 >> 유명한색깔명 혹은 #16진수rgb값
+					ex) background-color:white;
+				(2) color
+					: 글자색 지정
+					: 할당 가능한 값 >> 유명한색깔명 혹은 #16진수rgb값
+					ex)  color:maroon;
+				(3) font-size
+					: 글자 크기 설정
+					: 할당 가능한 값 >> 퍼센트값 혹은 px 값
+						: html 이랑 다르게 반드시 단위 명시필요
+					ex) font-size=200%;
+
+				(4) text-align
+					: 문단 정렬 변경
+					: 할당 가능한 값 >> left , right , center 
+					ex)  text-align:center
+
+				(5) margin 류
+					: 테두리 바깥쪽 여백 관련
+					: 할당 가능한 값 ) % 값 || px 값 혹은 auto
+						: auto >> 좌우 여백이 (균등하게) 자동 설정
+							: 위 아래는 따로 설정된는게 아님
+								: 만약 위아래까지 따로 지정 원하면 margin: 숫자 auto ;  와 같이 auto 앞에 크기를 나타내는 px 단위 혹은 % 단위의 값 하나 정해주어야함 (예외적으로  0 은 별다른 단위 필요 없음)
+
+							: margin 에만 할당 가능한게 아니라 margin-left , ... 에 각각 할당 가능
+					: 종류
+						0. margin 
+							: 아래 4가지의 축약표현으로, 위 아래 양옆 을 다 통틀음.
+							: top, right,bottom, left 순이다 (시계방향)
+						1. margin-top
+						2. margin-right
+						3. margin-bottom
+						4. margin-left
+
+	 : 전체적 ex)
+		<style>
+		h2{
+			text-align:center;
+			margin: 0 auto;
+		}
+		</style>
+
+
+
+(3) 자바스크립트에서 문자열 비교 << 어쨌뜬 같은 객체냐까진 비교 안함
+	1. == 
+		: 담고 있는 값의 의미가 같기만 하면 true
+			ex) '3' == 3 은 true
+	2. ===
+		: 담고 있는 값이 타입까지 같으면 true
+
+(3) 표 관련 일반 태그
+		(1) caption
+			: table 의 제목을 나타냄
+			: 얘도 table 태그의 내부에 쓰는거 주의
+
+		(2) tr
+			: table 의 행을 나타냄
+			: 행 단위로 셀을 나타내는 태그들을 감싼다
+				: 그러니까 td 뿐 아니라 th 도 감싼다
+			: Table Row
+
+		(2) th
+			: table 의 제목셀을 나타냄
+				: 그러니까 해당 열의 제목 같은거 들어가고 실제 데이터는 안들어가는 셀들
+					:  기본적으로 텍스트 가운데 정렬 && 굵은 글자 표시된다
+
+			: 속성
+				: 사용 tip >> 합치기로 한 부분이면 합침 당하는 셀은 이미 표시한걸로 치는거다.( 그러니까 rowspan="2" 했으면 바로 아랫행의 해당 셀은 생략하고 나머지 셀만 정의하는거고 colspan="2" 했으면 해당 행의 바로 옆 셀은 생략하고 그 뒷 셀만 정의하는거다)
+				1. rowspan
+					: 행 합치기 (== 아래 방향셀이랑 합치기)
+					: 값으로는 몇개의 셀과 합칠것인지 숫자를 (문자열의 꼴로) 할당
+					: span ) 가로지르다. 포괄하다 << 합치다 라는 느낌
+ 
+				2. columnspan
+					: 열 합치기 (== 오른쪽 방향 셀이랑 합치기)
+					
+			: Table Head
+
+		(3) td
+			: table 의 셀 들 중 실제로 유의미한 데이터를  셀들을 의미
+			: 속성
+				: th 의 속성과 사용방법이 같음
+				1. rowspan
+					: 행 합치기 (== 아래 방향셀이랑 합치기)
+
+				2. columnspan
+					: 열 합치기 (== 오른쪽 방향 셀이랑 합치기)
+			: Table Data
+		
+		(5) table
+			: 표 table 의 구성
+				: row(=행=가로찍), column (=열=세로찍) , cell(=셀=한칸) 으로 이루어진다
+
+
+
+
+(4)폼태그 구조
+	<form action="목적지" method="post">
+		<fieldset>
+			<legend>폼요소 묶음 제목</legend> 
+			<lable><input type="어쩌구" name="어쩌구" value="어쩌구"></lable>
+		</fieldset>
+	</form>
+
+(6) &nbsp >> NonBreakingSPace ==공백표시
+
+
+
+
+(7) 버튼 생성하기 << input 의 type 속성값으로 "button" 을 준다
+	: 보통 onclick 속성과 함께 쓴다
+	: 버튼에 표시하고 싶은 문구는 type 이 submit 일때와 마찬가지로 value 값으로 주면 된다,
+	: ex) <input type="button" onclick="joinFormCheck()" value="회원가임"> 
+
+
+(8) document.name속성명.submit( ) 을 이용하여 submit 버튼을 누른 것과 같은 효과를 낼 수 있다
+	: 아직 안배워서 잘 모르겠는데 form 도 일종의 객체이고 , 이 form  객체가 submit(  )을 가지고 있다고 한다. 
+
+
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
