@@ -40,22 +40,39 @@ String val = context.getInitParam("firstInitalParam");
 
 
 ---------------------------------------------------------------
+개헷갈리는 속성명 file, page 
+	: 암기 tip 
+		1. 논리적인 이유 : 지시자의 경우 지시자명으로 page 가 이미 쓰이고 있기에 속성명으로 page 가 있담 굉장히 불편할 것. 따라서 file 을 속성명으로 사용
+		2. 단순 암기: 파지 페액 (파지. (우유)팩)
+	: 액션 태그에서 url 할당 받는 속성은 page 
+	: 지시자 태그에서 url 할당 받는 속성은 file 
+---------------------------------------------------------------
 forward vs redirect
+	: 헷갈리지 말아야할것은 forward, redirect 는 ( include 태그 처럼 액션 태그와 지시자 태그 2가지 모두 존재하는게 아니라 ) 각각 한가지 방법으로밖에 구현 못한다.
+
 	: forward  >>웹 컨테이너 차원의 페이지 이동
-		: 그러니까 request 는 유지된다 << 객체를 재사용한다
+		: 그러니까 기존 request 객체(+ 물론 response 객체도)는 유지된다 << 객체를 재사용한다
 			:따라서 기존 url 유지
+			:따라서 이전 페이지에서의 데이터를 사용 ,공유 가능
 		: 하는 방법 >> forward 액션 태그를 사용하고 page 속성을 통해 경로 할당
 			<jsp:forward page="resultPage.jsp"/>
 
 		: 중간에 param 액션 태그로 데이터도 함께 전송이 가능
+		: 작동 방식 ) 액션 태그를 만나면 제어권이 "영구적으로" 해당 페이지로 넘어간다. 
+			: include 액션 태그처럼 다시 제어권을 돌려받는게 아니다
+				: 따라서 include 액션 태그 이후의 소스 코드는 실행되지 않는다
+			: https://do-dam.tistory.com/49
 
 	: redirect >> 중간에 클라이언트 끼고 이동
 		:그러니까 새로운 request 가 생긴다  
-		: 새로운 url 생성
-		: 하는 방법 >> response객체의 메서드인 sendRedirect() 를 이용 
-			
+			:따라서 새로운 url 생성
+			:따라서 이동하기 전 페이지에서의 데이터 사용,공유 불가
+		: 하는 방법 >> response객체의 메서드인 sendRedirect() 를 이용
+			: response 객체를 사용하는 것에서 알 수 있듯이 일단 해당 웹페이지와의 연결은 끊어지고(response 받음 연결 끊어짐), 클라이언트가 response 로 받은 url 을 토대로 새로 request 를 보내는거다. 
+			repsonse.sendRedirect("이동페이지");
 
-	: 객체를 재사용한다 >> request, respond 객체가 유지된다.
+		: 작동 방식 ) 
+
 
 
 
