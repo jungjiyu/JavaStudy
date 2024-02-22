@@ -33,3 +33,11 @@ include 변수 빨간색
   requestScope >> request 의 attribute 만 참조 가능
   param >> request 객체의 param 만 참조 가능
 
+12
+session 내장객체
+	: javax.servlet.http.HttpSession 인터페이스의 객체이다.
+
+일단 에러가 나는 이유는
+	>> invalidate 쓰면 서버 상에선 제대로 없어지겠지. 그런데 여전히 브라우져에 남아있잖아. 그래서 일단 쿠키를 가져온다음에 수정해줘야지.
+taglib 지시자 >> jst l 을 사용하기 위해 지정하는 것. 
+
