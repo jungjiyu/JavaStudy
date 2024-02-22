@@ -22,6 +22,9 @@ url 과 request 의 차이점
 9.
 매핑과 바인딩의 차이점
 
+10. https://dd-developer.tistory.com/60
+참고해서 이미 로그인 되있는 브라우져 다른 사용자 로그 아웃 시키기
+
 10. 
 include 변수 빨간색
 
