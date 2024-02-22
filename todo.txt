@@ -15,3 +15,11 @@ https://inpa.tistory.com/entry/%F0%9F%91%A9%E2%80%8D%F0%9F%92%BB-multi-process-m
 
 
 8. 부모의 부모를 대상으로 하고 싶음 어케함
+
+8. 
+url 과 request 의 차이점
+
+9.
+매핑과 바인딩의 차이점
+
+
