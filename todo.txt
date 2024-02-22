@@ -29,4 +29,7 @@ url 과 request 의 차이점
 include 변수 빨간색
 
 
+11
+  requestScope >> request 의 attribute 만 참조 가능
+  param >> request 객체의 param 만 참조 가능
 
