@@ -60,7 +60,7 @@ forward vs redirect
 		: 중간에 param 액션 태그로 데이터도 함께 전송이 가능
 		: 작동 방식 ) 액션 태그를 만나면 제어권이 "영구적으로" 해당 페이지로 넘어간다. 
 			: include 액션 태그처럼 다시 제어권을 돌려받는게 아니다
-				: 따라서 include 액션 태그 이후의 소스 코드는 실행되지 않는다
+				: 따라서 forward 액션 태그 이후의 소스 코드는 실행되지 않는다
 			: https://do-dam.tistory.com/49
 
 	: redirect >> 중간에 클라이언트 끼고 이동
