@@ -43,14 +43,14 @@ String val = context.getInitParam("firstInitalParam");
 forward vs redirect
 	: forward  >>웹 컨테이너 차원의 페이지 이동
 		: 그러니까 request 는 유지된다 << 객체를 재사용한다
-		: 기존 url 유지
+			:따라서 기존 url 유지
 		: 하는 방법 >> forward 액션 태그를 사용하고 page 속성을 통해 경로 할당
 			<jsp:forward page="resultPage.jsp"/>
 
 		: 중간에 param 액션 태그로 데이터도 함께 전송이 가능
 
 	: redirect >> 중간에 클라이언트 끼고 이동
-		:그러니까 새로운 request 가 생긴다   << 객체를 재사용한다
+		:그러니까 새로운 request 가 생긴다  
 		: 새로운 url 생성
 		: 하는 방법 >> response객체의 메서드인 sendRedirect() 를 이용 
 			
