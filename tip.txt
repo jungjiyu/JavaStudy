@@ -358,14 +358,22 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 			: html 언어 바로 사용 가능하고, 다양한 태그를 활용하여 자바 코드도 쉽게 삽입 가능
 			: 코드를 수정하면 알아서 컴파일해줄껄?
 		: Servlet 을 기반으로 한다
-		: jsp 파일이 실행되는 과정
-			: jsp 컨테이너는 jsp 파일을 서블릿 소스로 변환하는 과정까지만 담당하고, 변환된 서블릿의 수행은 서블릿 컨테이너로 넘어가서 실행한다
-			1. 웹 서버로부터 HTTPrequest 중에서도 jsp 파일을 요청하는 request 를 JSP컨테이너가 받음 
-			2. 기존에 request 되었던 jsp 파일이닞
-				(1) 웹
-				(2) jsp 가 서블릿컨테이너에서 서블릿 소스코드로 변환됨
-				(3) 서블릿 소스코드는 자동으로 컴파일 된 후 실행되어 결과를 html 형태로 클라이언트에게 돌려줌
-
+	: JSP 라이프 사이클
+		: https://blog.devez.net/ko/420
+		: 
+	: 절차
+		1. 클라이언트가 web server 로 jsp 관련 request
+		2. web server가 request 를 받음
+		3. 웹 server 가 그 request 를 컨테이너에게 전달
+		4. 해당 jsp 파일에 대응되는 서블릿객체(= ,class 확장자의 파일 이 메모리에 올라와있는지)가 존재하는지 검사
+			case1 )  존재 : 바로 다음 단계로 넘어감
+			case2 ) 존재 안함 : 
+				1.  jsp "엔진"이 해당 jsp 파일을 servlet 파일의 형태( .java 의 형태)로 변환
+				2. 해당 파일을 servlet 컨테이너에게 전달해서 컴파일한다
+					: .class 파일 생성한다
+		5. 해당 jsp 파일에 대응되는 servlet 객체를 servlet 컨테이너에서 실행 시키고 난 결과물을 web server 에게 반환
+		6. web server 에서 최종적으로 이를 client 에게 response 함
+		7. 자원 해제시 서블릿 객체의 destory( ) 가 실행되고 최종적으로 메모리에서 없어짐
 		:사용자에게 결과를 보여주는 View 층을 담당 
 			: html 코드 사용이 편리해서 그렇다
 
