@@ -252,6 +252,8 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 
 18. servlet --> jsp
 	: 참고
+		0. https://blogshine.tistory.com/25
+		1. https://sallykim5087.tistory.com/122
 		1. https://codevang.tistory.com/193
 		2.. https://skyfox83.tistory.com/142
 
@@ -273,30 +275,27 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 		: 언제 사용 )
 			1.  화면 인터페이스 구현과 별 관련 없는 처리할때
 			2. controller 구현할때
+	: 서블릿의 라이프 사이클 
+		: 처음 호출되서 .class로 컴파일되어 메모리에 상주하게 되면 해당 객체를 계속 재활용함, 
+		: 참고로 kg 피피티 상으로는 requet 를 받으면 httpservletRequest, httpServletResponse 를 일단 생성한 이후, 해당 servlet 객체의 존재 유무를 찾는다고 되있는데 인터넷에 찾아봄 죄다 servlet 객체 존재유무 먼저 파악하고 (없으면 만든 후) httpservletRequest , httpservletREseponse 객체 만드는 거라 써있어서 일단 후자로 정리함
 
-		: 서블릿 라이프 사이클
-			1. 웹 서버로부터 HTTP request 가 Servlet contatiner 로 전송됨(== servlet 클래스 파일과 관련한 request 를 받음)
-				: HTTP request >> Http 프로토콜을 따르는 request
-			2. request를 전송받은 Servlet container 는 HttpServletRequest, HttpServeltResponse 객체를 생성한다
-				: servlet 객체가 이미 있나 없냐 상관 없이 HttpServletRequest , HttpServletresponse 객체는 request 마다 새로 생성되는거다
-					: HttpServletRequest 는 request 내용을 담은 객체인데, 항상 request 내용이 같은 것도 아니니까 새로 생성시키는거ㅓ고 , Servlet 객체는 있으면 또 생성 안하는건 기존 request 내역 및 처리를 보유하고 잇기 때문이다.(물론 response 내역은 포함 안한다- response 하면 종료되니까) 
+		1. servlet containter 가 servlet 관련 request 를 받음	
+		2. web.xml 을 기반으로 사용자가 요청한 url 이 어느 servlet 에 대한 요청인지 찾는다
+		3. 해당 servlet 의 인스턴스 존재 유무를 확인한다(= 해당 servlet 이 메모리에 로딩되어있는지 확인한다)
+			case 1) 해당 servlet 이 메모리에 로딩되어있으면 >> 바로 다음단계 이동
+				: 서블릿은 최초의 요청이 들어왔을때만 한번만 객체를 생성되고 그거 하나만 주구장창 사용한다(=싱글톤으로 관리된다)
 
-			3. web.xml 을 기반으로 사용자가 요청한 URL 이 어느 Servlet에 대한 요청인지 찾는다.(=맵핑할 서블릿 찾는다)
-			4. 해당 Servlet 의 인스턴스 존재 유무를 확인한다
-				case1 )  해당 Servlet이 메모리에 로딩되어있으면 >> 바로 다음 단계로 넘어간다
-				case2 )  해당 Servlet이 메모리에 로딩되어있지 않은경우(= 해당 Servlet 의 인스턴스가 존재하지 않으면) Servlet 인스턴스를 생성한다
-					1. 해당 Servlet 클래스의 생성자를 실행해서 그 Servlet 클래스의 인스턴스를 생성한다
+			case 2 ) 해당 servlet 이 메모리에 로딩되어있지 않으면 >> servlet 인스턴스를 새로 생성한다
+				1. 해당 servlet 클래스의 생성자를 실행해서 그 servlet 클래스의 인스턴스를 생성한다
+				2. servlet container 가 설정정보(web.xml 속은 어노테이션)을 바탕으로 ServletConfig 객체를 생성한다
+					: init(ServletConfig config) 의 arg 가 필요하기 때문
+					: ServletConfig 객체 ) web.xml의 <servlet> 태그에서 설정한 정보를 서블릿 파일 내에서 추출하는 것을 가능하게 하는 객체
+						: <servlet> 내부에서는 서블릿의 이름. 초기 파라미터, 듣등의 여러 속성으ㅡㄹ 결정할 수 있다.
 
-					2. servlet container가 설정정보(web.xml 혹은 WebServlet 어노테이션)를 바탕으로 ServletConfig 객체를 생성한다
-						: init(ServletConfig config) 의 arg 가 필요하기 때문
+				3.servlet containter 가 앞서 생성한 servlet 의 인스턴스를 대상으로 servletConfig 객체를 arg 로 하여 init(ServletConfig config) 메서드를 호출한다
+					: 그러니까 서블릿인스턴스.init(conif객체) ; 한다는거다
 
-					3. 'servlet container"가 앞서 생성한 Servlet 의 인스턴스를 대상으로 ServletConfig 객체를 arg 로 하여 init(ServletConfig config) 메서드를 호출한다
-						: 그러니까 서블릿인스턴스.init(서블릿콘피그인스턴스); 한다는거임
-
-					4. 다음의 init( ) 메서드가 실행된다
-						: 참고 자료 
-							1. https://www.asknsay.com/difference-between-init-and-init-servletconfig.html
-							2. https://codevang.tistory.com/193
+				4. 다음의 init( ) 메서드가 실행된다.
 						: 일단 init(ServletConfig config) 이건 init( ) 이건 GernericServlet 에 정의된 메서드이다
 
 					 	case1 ) servlet 클래스에서 init(ServletCongfig config) 만 오버라이딩한 경우 << 비추되는 방식
@@ -316,19 +315,33 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 						case3 ) init(ServletCongfig config) 이건 init() 이건 둘다 오버라이딩 안한 경우
 							: 걍 GenericServlet 의 init(ServletConfig config) 만 실행된다.
 
-			5. HttpServlet에 정의된 service(HttpServletRequest , HttpServletResponse ) 메서드를 호출해서 클라이언트에게 받은 Request 를 doPost 혹은 doGet 을 호출한다
-				: HttpServlet에 정의된  service(ServletRequest, ServletRespone) 호출하는거 아니다
-				: 오버라이딩 할꺼면 지켜야하는 형식 )
+
+			5. HttpServletRequest, HttpServletResponse 객체를 생성함
+				: (servlet 객체가 이미 있냐 없냐 상관없이 ) HttpServletRequest, HttpServletResponse 객체는 request 마다 새로 생성됨 
+					: request 마다 다 같은 내용을 담고 있는게 아니니까
+				: HttpServletRequest객체는 http request 의 정보를 servlet 에게 전달하기 위해 사용되는 객체로, 서블릿 컨테이너에서 생성되고, 서블릿에게 전달된다.
+				: HttpServletResponse객체는 http response의 정보를 클라이언트에게 전달하기 위해 사용하는 객체로, 마찬가지로 servlet containter 에서 생성되고, 서블릿에게 전달되고, 서블릿은 여기에 response 정보를 담아 반환한다.
+			6. HttpServlet에 정의된 service(ServletRequest, ServletRespone) 메서드가 호출되고, 이 메서드 내부에서  HttpServlet에 정의된 또다른 메서드인 service(HttpServletRequest , HttpServletResponse ) 메서드를 호출한다
+				: HttpServlet에 정의된  service(ServletRequest, ServletRespone) 의 param 타입을 보면 알 수 있듯이 부모 타입이고 내부적으로 어떤 자식 타입이냐에 따라서 내부에서 호출하는 service(  )메서드가 달라진다.
+
+				: 오버라이딩하는 경우   service(HttpServletRequest , HttpServletResponse )  메소드를 주로 오버라이딩한다. 
 					@Override
-					protected void service() throws ServletException,IOException{
+					protected void service( HttpServletRequest , HttpServletResponse ) throws ServletException,IOException{
 						...
 						super.service();
 					}
-				: 자원이 해제되기 전까지 request 가 올때마다 실행된다.
 
-			6. doGet 혹은 doPost 는 동적 페이지를 생성하고, resposne을 보낸다
-			7. response가 끝나면 destroy() 메서드를 사용하여 HttpServletRequset 와 HttpServletResponse 두 객체를 소멸 시킨다.
-				: 자원해제시 1회 실행된다.
+			7. service( ....) 메서드는 arg 로 들어온 HttpServletRequest 따라서  doGet 혹은 doPost 를 호출한다
+			8. doGet ( ) 혹은 doPost(  )에서 동적 페이지를 생성하고, response을 보낸다
+
+			9. "하나"의 request 에 대한 resposne 가 모두 끝나면(=service(... ) 가 종료되면 ) HttpServletRequset 와 HttpServletResponse 두 객체는 모두 소멸 된다.
+				: HttpServletResponse , HttpServleetRequest 는 각각 serivce(  )메서드가 실행되는 동안에만 메모리에 상주하고 있는거다
+
+			9.자원해제시  destroy() 메서드를 호출되고, 실행된다.
+				: 자원해제 
+					case1. 서블릿을 수정
+					case2. 서버 종료
+				
 				: 오버라이딩 할꺼면 지켜야하는 형식)
 					@Override
 					protected void destroy( ){
@@ -337,7 +350,6 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 					}
 
 			
-
 	
 	: jsp ) 
 		: html 코드 기반이고, 자바 코드가 삽입되는 구조
