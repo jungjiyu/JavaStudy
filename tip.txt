@@ -49,24 +49,36 @@ web container == JSP container + Servlet container +...
 
 6. 인코딩 관련 정리
 
-	(1)Servlat에서는 doPost 메서드 내부서 아래의 세 줄을 기본적으로 적어주는 편
+	: contentType vs pageEncoding
+		: pageEncoding >> 실제로 이렇게 파일을 인코딩 하는것
+			: 주로 "utf-8" 로 설정해주는 편
+				: 디폴트가 ISO-8859-1 라서 한국어 쓰고 싶음 필수임
+			: charset 을 지정하는 것
+		: contentType >> 받는 쪽에게 이렇게 디코딩하라고 알려주는거
+			: "type/subytpe; charset=어쩌구" 형식의 값을 할당
+			: 주로 "text/html; charset=UTF-8"
+			: MIME type 중 하나로 contentType 을 명시하는 것
+
+	Servlet에서는 "doPost" 메서드 내부서 아래의 세 줄을 기본적으로 적어주는 편
 	  request.setCharacterEncoding("UTF-8"); 
 	  response.setCharacterEncoding("UTF-8"); 
 	  response.setContentType("text/html; charset=UTF-8"); 
 	
-	  : 일단  `response.setCharacterEncoding("UTF-8")` 는 클라이언트로 부터 받은 request의  문자 인코딩을 설정합니다. 이것이 없으면 기본적으로 ISO-8859-1이 사용되니까 얘는 필수다
-	  : response 객체 관련 세팅 에서는  response.setContentType("text/html; charset=UTF-8");  만 해도 문제가 없긴 하지만  response.setCharacterEncoding("UTF-8");  까지 해주는 게 좋다
-	      : response.setContentType("text/html; charset=UTF-8")  >> 클라이언트에게 전달되는 응답의 콘텐츠 타입(콘텐츠의 유형과 문자 인코딩)을 설정
-	      : `response.setCharacterEncoding("UTF-8")`>>   문자 인코딩을 명시적으로 설정함으로써 코드의 가독성을 높이고, 서블릿의 다른 부분에서도 이를 참조하여 사용할 수 있음.
+		: 일단  `request.setCharacterEncoding("UTF-8")` 는 클라이언트로 부터 받은 request를 utf-8 로 직접 인코딩 하는 것. 
+		: request.setContentType 을 할 필요가 없는건 ContentType 은 반대편에게 이렇게 디코딩하라고 알려주는건데 반대편은 자기 자신이잖아. 자기자신한테 알려줄 필요는 없음.
+		: response 객체 관련 세팅 에서는  response.setContentType("text/html; charset=UTF-8");  만 해도 문제가 없긴 하지만  response.setCharacterEncoding("UTF-8");  까지 해주는 게 좋다
+	   	   : response.setContentType("text/html; charset=UTF-8")  
+			>> response 된 데이터를 이렇게 디코딩하라고 알려주는 것	
+			>> jsp 에서 지시자 부분의 contentType 속성에 해당함
+
+	   	   : `response.setCharacterEncoding("UTF-8")`
+			>>  response 할 데이터를 인코딩하는 방식을 정함
+			>> jsp 에서 지시자 부분의 pageEncoding 속성에 해당함
 
 
-	(2)JSP 에서는 파일 생성시 코드 윗 부분에 아래와 같은 지시자가 기본적으로 생성됨
-	  <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%> 
-	
-	  : 이때 contentType 는 Servlet의  response.setContentType 에 대응하는 거고 , pageEncoding 에서는  response.setCharacterEncoding  에 대응하는 거임
-	
+
 	  : ***** 지시자 부분 tip << 지시자 부분에서는 주로 response 객체와 관련된 설정을 지정한다(request 객와 관련된 설정을 여기서 하진 않는다) . request 객체에 관련한 설정은 스크립트릿(<% %>)에서 처리한다.
-	      : 그래서 답장 받고 전송하는 코드에서 request.setCharacterEncoding("UTF-8"); 은 해주지만 별도로 response.setContentType("어쪼규") 이런건 안해주는 거다.
+
 	
 
 7.  의미
