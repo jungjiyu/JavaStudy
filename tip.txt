@@ -254,7 +254,6 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 	: 참고
 		1. https://codevang.tistory.com/193
 		2.. https://skyfox83.tistory.com/142
-		3. https://velog.io/@effirin/Servlet%EA%B3%BC-JSP%EC%97%90-%EB%8C%80%ED%95%B4
 
 	: 동적처리의 역사 ) CGI --> servlet --> jsp
 	: 최근 경향 ) jsp 와 servlet 을 섞어 쓴다
@@ -270,11 +269,13 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 		: 단점 )
 			: java 언어 기반이지, html 기반이 아니라 화면 인터페이스 구현하는데 코드가 너무 길게 쓰임
 			: 코드가 수정되면 다시 일일이 빌드해야됨
-		: 대안 >> 언어는 html을 기본으로하고, 빌드 과정은 자동처리한  Servlet 을 기반으로 f람 jsp
 
-		: 클라이언트의 request을 받고, 분석하여 처리하고, 처리한 결과를 클라이언트에게 response하는 Controller 층을 담당
+		: 언제 사용 )
+			1.  화면 인터페이스 구현과 별 관련 없는 처리할때
+			2. controller 구현할때
+
 		: 서블릿 라이프 사이클
-			1. 웹 서버로부터 HTTP request 가 Servlet contatiner 로 전송됨(== servlet 클래스 파일의  request 를 받음)
+			1. 웹 서버로부터 HTTP request 가 Servlet contatiner 로 전송됨(== servlet 클래스 파일과 관련한 request 를 받음)
 				: HTTP request >> Http 프로토콜을 따르는 request
 			2. request를 전송받은 Servlet container 는 HttpServletRequest, HttpServeltResponse 객체를 생성한다
 				: servlet 객체가 이미 있나 없냐 상관 없이 HttpServletRequest , HttpServletresponse 객체는 request 마다 새로 생성되는거다
