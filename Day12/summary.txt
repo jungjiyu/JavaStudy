@@ -1,0 +1,388 @@
+ select * from yayTest
+
+UPDATE 테이블명 SET  컬럼1 = 변경할 값, 컬럼2 = 변경할 값 WHERE 조건;
+insert into YayTest values ('김김김', 17 , 'naver@naver.com' );
+delete from YayTest where ageXX <=20;
+-------------------------------------------------------
+
+
+
+
+
+코드 개선
+	:  중복된느 부분은 아예 메서드로 만들자
+	private void close(ResultSet rs , PreparedStatement pstmt, Connection conn ) {
+		try{
+			if(rs!= null) rs.close();
+			 if (pstmt != null) pstmt.close();
+			 if (conn != null) conn.close();
+		}catch(Exception e){}
+	}
+
+
+
+커넥션풀 DBCP
+	:Connection 객체을 미리 만들어놓고. 필요할 때마다 빌려서 사용하고 반환해주는 것
+		: 웹 서버가 db 에 접속할때 request 가 넘 많을 경우 발생하는 과부하를 방지하는 거다
+		: 잊지 않았겠지만 우리가 매번 하던 작업은 아래와 같았었는데 이걸 안해도 된다는거다
+			 Class.forName(driver);
+    			conn = DriverManager.getConnection(dbURL,dbID,dbPW);
+
+	: 하는 법 
+		step1. 
+			context.xml 에 아래의 코드를 적는다
+    <Resource auth="Container"
+    	name="jdbc/oracle"
+    	driverClassName="oracle.jdbc.OracleDriver"
+    	type="javax.sql.DataSource"
+    	url="jdbc:oracle:thin:@localhost:1521:xe"
+    	username="C##JAVAUSER"
+    	password="java2024"
+    	loginTimeout="10"
+    	maxActive="50"
+    	maxIdle="20"
+		maxWait="2000"
+		testOnBorrow="true"/> 
+
+		
+				: Resource 태그의 속성  
+					(1) name
+						: 이거 개중요. 자원 태그의 이름 설정해놓은 것
+							: 이후 코드에서 해당 커넥션 풀을 JNDI 를 이용하여 구할 때 name 을 기준으로 구하기 때문에 중요
+
+
+	
+		step2.
+			자바 소스 코드에서 DataSource 객체를 생성해서 그걸로 Connectionpool 을 관리하는 객체를 담아서 사용한다
+			
+				try {
+			Context context =new InitialContext();
+			ds = (DataSource)context.lookup("java:comp/env/jdbc/oracle"); // 이름으로 해당하는 객체를 얻을 수 있다
+				}catch(Exception e) {e.printStackTrace();}
+ 
+			conn = ds.getConnection();
+
+					:DataSource ds;
+						: DataSource 객체는 Connection pool 을 관리하는 객체.
+						: JNDI (Java Naming and Directory Interface ) API 를 통해서 이용된다.
+	
+
+
+
+ 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+EL(Expression Language) 표현식
+	: 형식 ) ${ } 
+	: 객체의 프로퍼티 값을 꺼낼때 주로 사용된다
+
+
+JSP 내장 객체
+	
+	pageContext
+		: jsp 페이지에 대해 1:1 로 연결된 객체. 
+			: 각 jsp 페이지 당 하나의 pageContext 객체가 생성되있음
+		: 특정 jsp 페이지 내의 객첼 공유하거나, 페이지 흐름을 제어할 떄 사용
+		: javax.servlet.jsp.PageContext
+		:  메서드
+			1. 내장 객체 반환  메서드
+				: 이 메서드 들은 jsp 페이지가 자동적으로 servlet 으로 변환될때 기본 객체들을 생성하는데 사용되고, 우리가 직접 사용할 수 있다.
+				: 주의 )  <%! %> 전역 전언문 안에서는 사용할 수 없는데 그 이유는 서블릿으로 변환될때 기본객체들이 _jspService() 라는 메서드의 지역변수로 생성되기 때문
+				(1) ServletRequest getRequest()
+				(2) ServletResponse getResponse( ) 
+				(3) HttpSession getSession( ) 
+				(4) Object getPage( )
+				(5) JspWriter getOut()
+				(6) ServletContext getServletContext()
+					: application 기본 객체를 반환한다
+				(6 )ServletConfig getServletConfig( )
+					: config 기본 객체를 반환합니다.
+
+				(7) Exception getException()
+
+
+
+EL 내장 객체
+	(1) pageScope >> page 객체를 참조하는 객체
+	(2) requestScope >> request 객체를 참조하는 객체 << 얘는 request 객체의 attribute 를 참조함
+	(3) sessionScope >> session 객체를 참조하는 객체
+	(4) applicationScope >> application 객체를 참조하는 객체
+
+		${applicationScope.appliNam }<br>
+		${appliNam }<br>
+			: 맨 처음 application 을 돌고 >> session 돌고 >> requset 돌고 >> page 도는 순으로 찾고 있음 get 한다.
+
+
+
+	(5) param >> 요청 파라미터를 참조하는 객체
+		: 태그의 name 속성값을 이용하여 접근
+		: 방법
+			1. 도트연산자사용>> ${param.id }<br>
+			2. 대괄호 사용 >> ${param["id"]}<br>	
+		
+------------------------------------------------------------------------------------------------------
+
+JSTL
+	: JSP Standard Tag Library
+	: 궁극적 목적 >> 스크립트릿 을 대체
+		: html 이랑 스크립트릿을 섞어 씀 가독성 떨어지고 로직 분리가 어렵다고 한다. (난 별로 안불편하지만)
+		: 요즘엔 스크립트릿보다 jstl 을 더 많이 쓴다
+	: 톰켓 컨테이너에 포함되어있지 않으므로 별도의 설치를 하고 사용한다
+
+
+	: 사용 방법
+		0. jar 파일을 넣기
+			: webapp/WEB-INF/lib 에 넣는다
+				: 여기에 저번에 jdbc jar 파일도 여기 넣어놨었다
+
+		1. 해당 페이지에서 지시자로 라이브러리 선언
+			<%@taglib prefix="c"uri="http://java.sun.com/jsp/jstl/core" %>
+
+				: 자바에서 import 문을 선언하듯 jsp 파일에서 jstl 확장 태그를 사용하려면 taglib 지시자로 라이브러리의 선언이 필요 
+				: uri 는 ctrl+shift 해서 나오는것 중 3번째꺼 pick 함 된다
+				: 속성
+					prefix 
+						: 단어적으론 접두사란 의미인데, 여기에서는 어떤 이름으로 태그명으로 쓸건지 정하는거다
+   						: 아무거나 해도 상관 없긴 한데 주로  "c" 를 쓴다
+							: core 를 의미한다.
+
+	
+		2. 해당 페이지에서 사용하기
+			: 사용은 jsp 의 액션 태그 처럼 사용한다
+				<jsp:액션태그명 / > 에서 <우리가 :태그명 / > 
+			: 주요 태그
+				(1)   set  : 변수값선언
+					<c:set var="name" value="홍길동" scope="page"/> 
+						: 속성
+							: var == variable . 즉, 값과 바인딩 시킬 변수명 
+							: value == 변수값
+							: scope == 범위
+								: javaBean 과 마찬가지로page, application , session ,request 중 하나 택 (디폴트 - page) 
+
+
+				(2) out: 변수값 출력
+					 <c:out value="${name}"/><br>
+						: 속성
+							: value  
+								: 화면에 표시할 내용을 el 표현식을 이용하여 작성
+									: el 표현식 내부에 변수명 쓰면 자동으로 그 변수의 값이 들어가게 됨
+
+
+   				(3) remove: 변수값 제거
+			<c:remove var="name" scope="page"/><br>
+
+
+제어문
+	: if
+		  :if 문은 있는데 else 문은 엇ㅂ다
+		:test 속성에 조건식을 쓴다
+  		: if 문이 맞으면 해당 태그 내부에 있는 것들이 실행된다. 아님 걍 지나간다.
+
+<c:if test="${1+2==3}">
+<p>1+2==3입니다</p>
+</c:if>
+
+<c:if test="${1+2!=3}"> <%-- else 문이 없어서 별도로 써줘야됨 --%>
+<p>1+2!=3입니다</p>
+</c:if>
+
+
+
+	: choose
+		choose 태그는 자바의 switch 문과 비슷한 역할을 한다.
+		case 문과 같은 역할을 하는 것은 choose 태그 안의 when 태그이다.
+		default 문과 같은 역할을 하는 것은 choose 태그 안의 otherwise 태그이다.
+
+		: when
+			: test 속성을 가지고, if 태그에서와 마찬가지로 test 속성의 값으론 el 표현식을 준다 
+			: 걍 겨의 if 태그이다
+
+		: otherwise
+			: 음. 별로 할 말없다
+
+		: switch 문과는 다르게 when 마다 break 안써도 1개의 when 만 실행되고 끝난다
+
+
+
+<c:set var="a" value="20"/>
+<c:choose >
+	<c:when test="${a==10}">
+	a는 10 이다<br>
+	</c:when>
+	
+	<c:when test="${a==20}">
+	a는 20 이다<br>
+	</c:when>
+	
+	<c:when test="${a==30}">
+	a는 30 이다<br>
+	</c:when>
+	<c:otherwise>
+		a는 10,20,30 이 아니다<br>
+	
+	</c:otherwise>
+
+</c:choose>
+
+
+	: forEach
+		: 일반적인 for 문 역할인데 
+		: 속성들 
+			1. var >> 루프제어 변수 할당
+			2. begin >> 루프 제어 변수의 시작 값 할당	
+			3. end >> 루프 제어 변수의 끝 값 할당 
+
+<c:forEach var="i" begin="0" end="20" step="3">
+	<c:out value="${i}"/><br>
+</c:forEach>
+
+
+
+
+
+
+<%
+ArrayList<String> list = new ArrayList<String>();
+list.add("홍길동");
+list.add("성춘향");a
+list.add("심봉사");
+
+request.setAttribute("names",list);
+
+%>
+
+<%---
+향상된 for 문
+items 속성에 컬렉션 객체를 넣음 순서대로 뽑아준다
+ --%>
+<c:forEach var="name" items="${names}">
+	<c:out value="${name}"/><br>
+</c:forEach>
+
+
+
+다음과 같이 private 으로 선언된 필드에 바로 접근이 가능하다. 자바 빈처럼 걔네가 알아서 getter 메서드를 찾아서 해준다.
+	<td><c:out value="${ins.getAddress()}"/></td>
+	<td><c:out value="${ins.address}"/></td>
+
+
+----------------------------------------------------------
+
+
+" -- " 로 주석 처리 가능
+시퀀스(Sequence)란?
+	: https://m.blog.naver.com/dnjswls23/222311759854
+	: 오라클 시퀀스란 유일(UNIQUE)한 값을 생성해 주는 오라클 객체입니다.  주로 PRIMARY KEY 값을 생성하기 위해 사용합니다. 시퀀스는 테이블과는 독립적으로 저장, 생성됨.
+	 : 자동으로 증가하는 순번 객체
+① START WITH : 시퀀스의 시작 값을 지정합니다. n을 1로 지정하면 1부터 순차적으로 시퀀스 번호가 증가합니다.
+② INCREMENT BY : 시퀀스의 증가 값을 지정합니다. n을 2로 지정하면 2씩 증가합니다. 
+③ MAXVALUE : 시퀀스 최대값
+④ MINVALUE : 시퀀스 최소값
+⑤ CYCLE | NOCYCLE : 최대값 도달시 순환 여부
+⑥ CACHE | NOCACHE : 메모리에 시퀀스 값을 미리 할당할지 여부 
+⑦ ORDER | NOORDER : 반드시 순차적으로 모두 채워서 시퀀스를 사용하거나 건너뛸 수 있을지 여부
+
+	:  생성 형식
+CREATE SEQUENCE sequence_name
+    [START WITH n]
+    [INCREMENT BY n]
+    [MAXVALUE n | NOMAXVALUE]
+    [MINVALUE n | NOMINVALUE]
+    [CYCLE | NOCYCLE]
+    [CACHE | NOCACHE]
+    [ORDER | NOORDER] ;
+
+
+NOMAXVALUE >> 무한대
+ NOCACHE >> 캐시 안함
+
+create TABLE BOARD(
+    BOARD_ID NUMBER(4) PRIMARY KEY,
+    WRITER NVARCHAR2(50) NOT NULL,
+    TITLE NVARCHAR2(500) NOT NULL,
+    CONTENT NVARCHAR2(500) NOT NULL,
+    BOARD_DATE TIMESTAMP DEFAULT SYSTIMESTAMP,
+    HIT NUMBER(4) DEFAULT 0
+    );
+    
+select * from BOARD;
+
+commit;
+
+CREATE SEQUENCE BOARD_SEQ
+START WITH 1
+INCREMENT BY 1
+NOMAXVALUE
+NOCACHE;
+
+commit;
+
+
+-------------------------------------------
+
+시퀀스
+	: 주의 >> 증가된 값은 그냥은 다시 못내린다
+		: SELECT 시퀀스명.NEXTVAL FROM dual; 은 되도록 하지말라 (되도록 실제로 사용할때만 사용해라)
+	: 만약에 잘못하고 증가 시켰다면 다시 내리는 법 <<  INCREMENT  바꿔서 다시 내리고 다시  INCREMENT  복구
+		: ALTER SEQUENCE 시퀀스명 INCREMENT BY -1 
+
+
+		: ex) 
+ALTER SEQUENCE yaytest_seq INCREMENT BY -1; 
+
+SELECT yaytest_seq.CURRVAL FROM dual;
+  
+  SELECT yaytest_seq.NEXTVAL  FROM dual;
+
+ALTER SEQUENCE yaytest_seq INCREMENT BY 1; 
+
+
+SELECT yaytest_seq.CURRVAL FROM dual;
+
+	: 조회 >> 
+		select * from seq; 해서 시퀀스 전체 조회 가능
+		SELECT 시퀀스명.CURRVAL FROM dual; 해서 현재 번호 확인 가능	
+			: 주의 ) 한번 이상 nextval 을 실행한 상태에서 실행 가능
+
+1. 시퀀스생성 - 테이블 이름이랑 다른거 해야됨
+CREATE SEQUENCE yaytest_seq
+START WITH 1
+INCREMENT BY 1
+NOMAXVALUE --무한대
+NOCACHE; -- 캐시 생성 안함
+
+
+2. 일련번호 생성 <<  번호 매길때마다 잘 사용 가능
+
+ex) 
+insert into 테이블명 values(.. , ... , .. ,  시퀀스명.nextval );
+
+
+
+1. DataSource 객체 선언
+	private DataSource ds;
+
+2. 생성자 부분에서 생성 //JNDI
+		try {
+			Context context =new InitialContext();
+			ds = (DataSource)context.lookup("java:comp/env/jdbc/oracle");
+
+		}catch(Exception e) {e.printStackTrace();}
+
+
+   3. 활용 		
+		// class.forName(driver);
+		//     conn = DriverManager.getConnection(dbURL,dbID,dbPW);
+
+    		conn = ds.getConnection();
+  		pstmt = conn.prepareStatement(query);
+    		pstmt.setString(1,id);		
+    		rs = pstmt.executeQuery();
+
+
+    	String query = "SELECT * FROM BOARD ORDER BY BOARD_ID DESC ";
+
+
+db에서 데이터가 겹칠때는 보통 _ 쓰고 자바에선 보통 캐멀케이스
+
