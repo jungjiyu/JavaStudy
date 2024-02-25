@@ -1,0 +1,1 @@
+1. server.xml 파일과 web.xml 파일 등 servers 디렉터리의 개층 구조
