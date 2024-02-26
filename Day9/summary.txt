@@ -111,8 +111,31 @@ DTO
 
 
 (2) 자바 스크립트의 유명한 내장 객체 
-	1. document 객체
+
+	1. window 객체 
+		: https://www.zerocho.com/category/JavaScript/post/573b321aa54b5e8427432946
+		: 현재 브라우져 창을 나타내는 전역 최상위 객체
+			: 전역 최상위 객체이기 때문에 window 에 포함되어있는 요소는 window 를 대상으로 밝히지 않고 바로 사용이 가능하다
+
+		: window 객체가 포함하는 대표적인 객체
+			1. document
+				: window 객체는 브라우저 창의 전체를 다루는 반면, document 객체는 웹 페이지에 한해 다루는 객체이다.
+				: 더 자세한건 밑에 따로 써놨다
+			2. location
+			3. history
+
+		: 유명한 필드
+			: location
+				: 창의 이동을 원하는 url 주소를 할당
+				: 
+			ex) window.location = 'login.jsp' ; 
+
+
+
+	2. document 객체
 		: 현재 웹 페이지 전체를 나타냄
+			: window 객체 내부에 포함되어있음
+				: window.document 랑 doucmnet 랑 같은 의미, 기능인데 이는 window 가 전역 최상위 객체이기 때무이다.
 			: 클래스에서 this 객체와 비슷한 느낌이다
 		: 이 객체를 대상으로 현제 페이지 내의 태그 혹은 함수에 접근이 가능
 			: 각 태그 부분의 name 속성값을 기준으로 태그를 구분한다
@@ -120,6 +143,13 @@ DTO
 				: ex)  var id = document.joinForm.id.value; 
 
 			: 걍 document.함수명( ) 하면 함수 호출된다.
+
+
+	3. history 객체 이용
+			: 바로 이전 페이지로 돌아가게 하는거면 개추
+
+
+
 
 
 
