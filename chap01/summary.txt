@@ -1,1 +1,389 @@
+Oracle JDK , Open JDK 
+	: Oracle JDK >> 유료
+	: Open JDK >> 무료
+
+apache tomcat
+	: 아파치 소프트웨어 재단에서 제공하느 웹 어플리케이션 서버
+	: jsp. serlvet 등 웹 개발에 필요한 기술을 지원(동적 작업)
+	: 톰캣은 ㅇ클립스와 연동하여 실행할 수도 , 단독으로 사용할 수도 있음
+		: 개발 단계에선 보통 연동하여 사용하고, 서비스 다 만들었을땐 단독 실행
+	: 이클립스는 톰캣 웹서버를 내장하고 있는 것이 아니라 외부의 톰캣환경을 이클립스로 복사해서 사용함. 그러니까 server.xml 같은 파일은 원본이 아니라 이클립스가 만든 복사본임. 따라서 문제가 있어서 서버를 삭제한 후 다시 생성하면 server.xml 같은 파일의 내용도 원상태로 돌아가게 됨.
+		: tomcat 서버의 원본을 수정하는 게 좋음 >> 파일에 직접 들어가서 conf 같은 디렉터리로 들어가 메모장으르로 편집
+
+
+eclips
+	: 가장 널리 쓰이는 통합개발환경(IDE Intergrated Development Enviornment )
+	: Eclips IDE for Enterprise Java Deveopers 를 사용
+	:기본 브라우져 설정 
+		:  window - properties 로 들어가서 web browser  입력해서 나오는 탭에서 설정
+	: 내 컴퓨터의 프로젝트를 이클립스로 불러오기
+		: file -import - general - existing projects into workspace 
+			:  여기서 select root directory 하면 일반적인 웹 프로젝트 선택하는거고 , select archaive file 하면 zip 파일 선택하는거임
+	: 웹 프로젝트의 이름 바꾸기
+		: 우클릭- refactor -rename
+
+dynamic web project 
+	: generate web,xml deployment discriptor 를 체크하고 생성하는걸 추천
+	: ctrl + f11 이 run on server실행 단축키 
+
+context root
+	: 프로젝트의 context root 경로
+
+content directory
+	: jsp 파일를 생성할 폴더명
+
+servers 디렉터리
+	web.xml
+		: 배포 서술자 Deployment descriptor
+		: 웹 어플리케이션의 환경설정 정보를 담은 파일
+		: WAS 가 처음 구동될때 이 파일을 바탕으로 설정 내용을 톰캣에 적용하게 됨.
+			: 서블릿 설정, 필터 설정 , 오류 페이지 등등
+
+	server.xml
+		:포트번호 바꾸기 위한 코드 작성 가능
+			: 물론 직접 서버 클릭하고 입력하여 포트번호를 수정 가능
+	
+
+
+JSP Java Server Pages
+	: java 언어를 사용하여 server 측에서 웹 pages 를 생성해 웹 브라우져로 전송해주는 기술
+		: 그러니까 동적인 웹페이지를 개발하기 위한 웹 프로그래밍 기술
+		: 얘 땜에 웹 프로그래밍 언어로 java 가 유명한거임
+
+	
+	: 스레드 기반으로 실행되어 시스템 자원을 절약해줌
+
+	
+JAVA EE 
+	: Java Platform. Enterprise Edition
+
+
+웹브라우져 >> http >> 인터넷 >> 서버 ( 포트 >> WAS( 웹서버 >> 웹 컨테이너))
+
+
+
+
+HTTP Hyper Text Transfer Protocol
+	:  www( 월드와이드웹 )에서 웹 서버와 사용자 사이의 통신을 위해 사용하는 통신 프로토콜
+	: 클라이언트가 request 하면 web server 가 response 하는 구조
+
+protocol
+	: 네트워크를 통해 컴터들이 정보를 주고받는 통신규약
+	: 컴퓨터들의 공용어 느낌
+	: http , ftp 등등
+
+HTTP Protocol
+	: request 받고 response 를 모두 마치면 클라이언트와 서버의 연결이 종료되는 프로토콜
+	: 특징
+		1. connectionless >> reponse 를 다 마치면 연결을 종료함
+		2. stateless >> 연결 종료 이후 상태를 유지하지 않음
+
+
+Port
+	: 도메인 네임을 통하여 얻게되는 ip 주소는 "서버" 컴퓨터의 위치를 파악하는데 쓰이고, 포트 번호는 "서버" 컴퓨터에서 제공하는 특정 서비스의 위치를 파악하는데 쓰임.
+
+
+
+WAS Web Application Server
+	: 웹 어플리케이션이 실행될 수 있는 환경을 재공하는 소프트웨어
+	: 웹 서버 + 웹 컨테이너
+	: tomcat 이 WAS 이다 (웹 서버와 웹 컨테이너 역할을 한다)
+
+클라이언트 
+	: server 쪽으로 request 하는 쪽
+	: 주로 웹 브라우져.
+
+서버
+	: 클라이언트로부터 request 받고 그에 따른 웹 페이지를 response 하는 쪽
+
+정적 웹페이지와 동적 웹페이지
+	: 정적인 페이지가 물론 더 간편하고 속도도 빠르기 때문에 가능하면 정적 페이지로 하고, 필요에 따라 동적 웹페이지도 섞어서 사용하는거다
+
+	: 정적웹페이지 static web page
+		: "웹 서버"에 저장되어있는 파일 "그대로" response 되는 웹페이지
+			:  모든 클라이언트가 동일한 response 를 받게 됨.
+			: 웹 컨테이너를 거치지 않는거임
+
+		: 대략적인 절차
+			1,클라이언트의 정적페이지 request
+			2. 웹 서버에서 request 된 웹페이지를 웹 서버에서 찾음
+			3. 그 페이지를 그대로 resposne 함
+
+		: html , css , java script 가 이에 해당
+			
+
+	: 동적인웹페이지 dynamic web page
+		: 클라이언트의 request 따라 적절한 웹 페이지를 그때그때 생성해 response 되는 웹페이지
+		: 대략적인 절차
+			1. 클라이언트의 동적페이지 request
+			2. webserver에서 해당 request 를 웹 컨테이너에게 전달
+			3. 웹 컨테이너에서 해당 request 따른 전처리를 함
+			3. 전처리된 페이지(= 동적 생성)을 webserver 에게 반환함
+			4. web server 가 web container 에게 반환받은 페이지를 response 로 줌
+
+		: servlet, jsp, php 가 이에 해당
+
+
+Web server
+	: 클라이언트와 직접적인 통신을 ( http request 를 받고, http response)하는 소프트웨어.
+		: 정적인 웹페이지를 request 받으면 그냥 web server 에 저장되어있는 정적인 웹 페이지 파일을 찾아 그대로 resposne 해준다.
+		: 동적인 웹페이지 request 를 받으면 web conainter 로 그 request 를 전달해 동적으로 웹 페이지를 생성하게 하고, 그 생성된 페이지를  web containter에게 받아서 client 에게 반환한다.  
+
+
+Web Containter
+	: web server로 부터 전송받은 request 를 기반으로 "동적인 웹 페이지"를 생성해서 web server 로 돌려보내줌
+		: 필요에 따라서 Data Base 에 접근이 필요하다면 db 에 접근하여 작업을 처리함
+
+	: 구성 요소
+		(1) servlet contianter 
+			: 서블릿 파일을 동작시키고 그 결과를 반환하는 컨테이너
+			: ex) apahce tomcat
+
+	: 주의 ) jsp 컨테이너는 별도로 존재하지 않음
+		: jsp 파일은 jsp 엔진을 통하여 servlet 파일로 컴파일된 이후 servlet 컨테이너에서 실행됨.
+
+	
+
+Java Applet 자바 애플릿
+	: 요즘엔 잘 안쓰는 웹을 동적으로 만들기 위헤 옛날에 쓰던 자바 기술
+	: 웹에서 실행되도록 설계된 자바 애플리케이션을 통째로 클라이언트에게 response 하고. 가상머신을 탑재한 클라이언트가 이를 실행하는 방식이었음
+		: 애플리케이션 전체가 클라이언트에 다운로드 되어 실행되는 자바 애플릿은 보안, 속도 등에서 한계가 있었음.
+	: 동적인 웹 페이지기술에 해당하진 않음
+	
+
+ Servlet 서블릿
+	:  서버 측에서 실행되는 파일
+	: java 기반에다 중간중간 html 이 삽입된 .java파일을 컴파일하여 생성된 클래스 파일(.class) 형태.
+	: servlet 컨테이너에서 실행되고 관리됨.
+	: 단점 >> html 코드 쓸렴 코드가 넘 길어짐
+	: 언제 사용
+		1.  view(=화면 처리)와 별로 관련 없는 작업할때 (=java 코드가 주가 될때) 사용
+		2. controller 를 만들때
+
+	: 서블릿의 라이프 사이클 
+		: 참고로 kg 피피티 상으로는 requet 를 받으면 httpservletRequest, httpServletResponse 를 일단 생성한 이후, 해당 servlet 객체의 존재 유무를 찾는다고 되있는데 인터넷에 찾아봄 죄다 servlet 객체 존재유무 먼저 파악하고 (없으면 만든 후) httpservletRequest , httpservletREseponse 객체 만드는 거라 써있어서 일단 후자로 정리함
+
+		1. servlet containter 가 servlet 관련 request 를 받음	
+		2. web.xml 을 기반으로 사용자가 요청한 url 이 어느 servlet 에 대한 요청인지 찾는다
+		3. 해당 servlet 의 인스턴스 존재 유무를 확인한다(= 해당 servlet 이 메모리에 로딩되어있는지 확인한다)
+			case 1) 해당 servlet 이 메모리에 로딩되어있으면 >> 바로 다음단계 이동
+				: 서블릿은 최초의 요청이 들어왔을때만 한번만 객체를 생성되고 그거 하나만 주구장창 사용한다(=싱글톤으로 관리된다)
+
+			case 2 ) 해당 servlet 이 메모리에 로딩되어있지 않으면 >> servlet 인스턴스를 새로 생성한다
+				1. 해당 servlet 클래스의 생성자를 실행해서 그 servlet 클래스의 인스턴스를 생성한다
+					: java 파일이 class 파일로 컴파일되어 메모리에 로드된다.
+				2. servlet container 가 설정정보(web.xml 속은 어노테이션)을 바탕으로 ServletConfig 객체를 생성한다
+					: init(ServletConfig config) 의 arg 가 필요하기 때문
+					: ServletConfig 객체 ) web.xml의 <servlet> 태그에서 설정한 정보를 서블릿 파일 내에서 추출하는 것을 가능하게 하는 객체
+						: <servlet> 내부에서는 서블릿의 이름. 초기 파라미터, 듣등의 여러 속성으ㅡㄹ 결정할 수 있다.
+
+				3.servlet containter 가 앞서 생성한 servlet 의 인스턴스를 대상으로 servletConfig 객체를 arg 로 하여 init(ServletConfig config) 메서드를 호출한다
+					: 그러니까 서블릿인스턴스.init(conif객체) ; 한다는거다
+
+				4. 다음의 init( ) 메서드가 실행된다.
+						: 일단 init(ServletConfig config) 이건 init( ) 이건 GernericServlet 에 정의된 메서드이다
+
+					 	case1 ) servlet 클래스에서 init(ServletCongfig config) 만 오버라이딩한 경우 << 비추되는 방식
+							: 오버라이딩한 init(config) 가 호출된 후 super.init(config) 가 호출되어 실행된다
+								: servlet클래스내서 오버라이딩 한 init(config)는 부가적인 기능하는거고 사실상 핵심적인 내용, 즉 ServletConfig 객체를 메모리에 올리는건 super.init(config) 가 하는거라서 오버라이딩할때 필수적으로 super.init(config) 를 쓰지 않으면 좆되게 된다.
+ 
+						case2 ) servlet 클래스에서 init( ) 만 오버라이딩한 경우 << 개추
+							: 해당 Servlet 클래스 내에 init(ServletConfig config) 가 오버라이딩 되있지 않으므로 GenericServlet 클래스 내의 init 이 실행되게 된다. 그리고 GenericServlet 클래스 내의 init() 은 마지막에 항상 init( ) 을 호출하게 되있으므로 해당 Servlet 클래스 내에서 오버라이딩 한 init( ) 의 내용이 실행되게 된다
+								: 그러니까 init( ) 자체는 init(ServletConfig config) 실행될때 같이 실행할 내용 적는거임
+
+							: 오버라이딩 할꺼면 지켜야하는 형식 )
+								@Override
+								public void init() throws ServletException{
+									...
+								}
+
+						case3 ) init(ServletCongfig config) 이건 init() 이건 둘다 오버라이딩 안한 경우
+							: 걍 GenericServlet 의 init(ServletConfig config) 만 실행된다.
+
+
+			4. HttpServletRequest, HttpServletResponse 객체를 생성함
+				: (servlet 객체가 이미 있냐 없냐 상관없이 ) HttpServletRequest, HttpServletResponse 객체는 request 마다 새로 생성됨 
+					: request 마다 다 같은 내용을 담고 있는게 아니니까
+				: HttpServletRequest객체는 http request 의 정보를 servlet 에게 전달하기 위해 사용되는 객체로, 서블릿 컨테이너에서 생성되고, 서블릿에게 전달된다.
+				: HttpServletResponse객체는 http response의 정보를 클라이언트에게 전달하기 위해 사용하는 객체로, 마찬가지로 servlet containter 에서 생성되고, 서블릿에게 전달되고, 서블릿은 여기에 response 정보를 담아 반환한다.
+			5. HttpServlet에 정의된 service(ServletRequest, ServletRespone) 메서드가 호출되고, 이 메서드 내부에서  HttpServlet에 정의된 또다른 메서드인 service(HttpServletRequest , HttpServletResponse ) 메서드를 호출한다
+				: HttpServlet에 정의된  service(ServletRequest, ServletRespone) 의 param 타입을 보면 알 수 있듯이 부모 타입이고 내부적으로 어떤 자식 타입이냐에 따라서 내부에서 호출하는 service(  )메서드가 달라진다.
+
+				: 오버라이딩하는 경우   service(HttpServletRequest , HttpServletResponse )  메소드를 주로 오버라이딩한다. 
+					@Override
+					protected void service( HttpServletRequest , HttpServletResponse ) throws ServletException,IOException{
+						...
+						super.service();
+					}
+
+			6. service( ....) 메서드는 arg 로 들어온 HttpServletRequest 따라서  doGet 혹은 doPost 를 호출한다
+			7. doGet ( ) 혹은 doPost(  )에서 동적 페이지를 생성하고, response을 보낸다
+
+			8. "하나"의 request 에 대한 resposne 가 모두 끝나면(=service(... ) 가 종료되면 ) HttpServletRequset 와 HttpServletResponse 두 객체는 모두 소멸 된다.
+				: HttpServletResponse , HttpServleetRequest 는 각각 serivce(  )메서드가 실행되는 동안에만 메모리에 상주하고 있는거다
+
+			9.자원해제시  destroy() 메서드를 호출되고, 실행된다.
+				: 자원해제 
+					case1. 서블릿을 수정
+					case2. 서버 종료
+				
+				: 오버라이딩 할꺼면 지켜야하는 형식)
+					@Override
+					protected void destroy( ){
+					...
+					super.destroy();
+					}
+
+			
+
+
+
+
+JSP 
+	: html 기반이고, 중간중간 java 를 삽입하는 형태의 파일
+	: jsp 파일은 직접 실행되지 못하고, jsp 파일에 대응하는 서블릿을 생성하고 그 서블릿을 실행 시키는 방식
+	: 자바 코드로 작성된 부분은 웹 브라우져로 보내지는 것이 아니라 웹 서버에서 실행되는 부분이다.
+	: 한번 서블릿으로 컴파일된 jsp 파일은 캐시되어 성능 저하없이 개발 새어ㅏㄴ정, 
+		: 캐시된다 의 뜻
+			: 한번 호출한 리소스를 '캐시' 저장소에 저장해두어, 이후 같은 request 을 받았으면 저장해놓았던걸 바로response 로 사용하는 형태
+				: 물론 캐시 저장소에 없는 request 의 경우 서버로 request 됨.
+
+	: 언제 주로 사용) 
+		view(=화면 처리) 작업이 주가될 때(=html 코드가 주가될때) 주로 사용
+
+	: JSP 라이프 사이클
+		: https://blog.devez.net/ko/420
+		: 
+	: 절차
+		1. 클라이언트가 web server 로 jsp 관련 request
+		2. web server가 request 를 받음
+		3. 웹 server 가 그 request 를 컨테이너에게 전달
+		4. 해당 jsp 파일에 대응되는 서블릿객체(= ,class 확장자의 파일 이 메모리에 올라와있는지)가 존재하는지 검사
+			case1 )  존재 : 바로 다음 단계로 넘어감
+			case2 ) 존재 안함 : 
+				1.  jsp "엔진"이 해당 jsp 파일을 servlet 파일의 형태( .java 의 형태)로 변환
+					: 지시자 태그 부분을 반영하여 변환된다.
+				2. 해당 파일을 servlet 컨테이너에게 전달해서 컴파일한다
+					: .class 파일 생성한다
+		5. 해당 jsp 파일에 대응되는 servlet 객체를 servlet 컨테이너에서 실행 시키고 난 결과물을 web server 에게 반환
+		6. web server 에서 최종적으로 이를 client 에게 response 함
+		7. 자원 해제시 서블릿 객체의 destory( ) 가 실행되고 최종적으로 메모리에서 없어짐
+
+	: jsp 태그 종류
+		(1) 지시자 태그 Directive
+			: jsp 파일을 servlet 파일로 변환하는데 있어 필요한 정보를 jsp 엔진에 알려줌
+				: 스크립트 언어 , 인코딩 방식 등
+				: 그러니까 컴파일되기 이전에 읽히는 부분이다.
+
+			: 형태) <%@ 지시자종류 속성1="값1" 속성2="값2" ... %>
+			: 지시자 종류
+				1. page 지시자 : jsp 페이지에 대한 정보를 설정
+					: 속성 종류 
+						(1) info 
+							: 페이지에 대한 설명을 입력
+						(2) language
+							: 스크립팅언어(= 스크립틀릿 내부에서 기본적으로 사용할 언어) 를 지정
+							: 할당 가능한 값 >> "java" 같은 언어명
+
+						(3) contentType
+							: https://codevang.tistory.com/196
+							: https://pygmalion0220.tistory.com/entry/HTTP-Content-Type
+							: https://m.blog.naver.com/minhyupp/222210489136
+							: 쉽게 말하면 클라이언트에게 response된 메세지를 이렇게 디코딩 하시오 라고 알려주는 것
+							: 주로 "text/html; charset=utf-8" 값을 부여
+							: 서블릿의 response.setContentType 에 대응한다
+							: Content-type
+								: http "body" (http request 의 body 혹은 http response 의 body)에 담겨져 전송되는 데이터의  인코딩 타입을 명시하는 필드로, http header (http esponse header 또는 http request header )에 들어있다
+									: 그러니까 데이터를 수신 받는 쪽에서 디코딩을 어떻게 해야할지 알려주는 필드이다
+								: 클라이언트 쪽에서 오는 데이터는 우리가 뭐 어쩔수 없고, 우리가 정할 수 있는건 어떤 방식으로 인코딩하여 resposne 할 거냐는 거다
+									: 그래서 servlet 에서도 request.setContentType 은 안하고 resposne.setContentType 만 하는거다
+
+								: MIME 표준에 정의된 타입 중 하나를 값으로 가질 수 있다.
+									: MIME Multipurpose Internet Mail Extensions
+										: 마임이라고 읽는다
+										: 텍스트 파일뿐 아니라 바이너리 파일까지 네트워크 상에서 문제없이 전달하기 위한 인코딩 방식으로, 다양한 형태의 파일을 "텍스트" 파일의 형식으로 인코딩하여 전달하는 방식이다.
+										: MIME 로 인코딩당한 파일은 인코딩한 방식을 나타내는 "Content-type" 을 파일 앞부분에 담게 되어있다.
+											: 그러니까 content type 은 MIME 인코딩 방식 중에서도 어떤 세부 인코딩 방식으로 인코딩 되었냐를 의미하는 거다
+										: 'type/subtype; charset=어쩌구' 구조
+											: type >> 파일의 카테고리
+												: text , image, audio ... 
+											: subtype >> 파일의 카테고리 중에서 특정 포맷
+												: png, jpg , html , javascript
+											: charset >> 텍스트의 인코딩 방식 설정
+												: 안쓰면 default 값이 ascii 라서 utf-8 쓰고 싶음 명시해야된다.
+												: type 부분에서 단순 text 라고 명시하는 것으론 "utf-8" , "ascii" 까지 결정이 되진 않으므로 세부적으로 적는거다
+												
+									: MIME type 을 Media Type 이라고도 부름
+
+								: 암기 tip (text/html 이랑 html/text 랑 헷갈리니까)
+									: THang !
+
+						(4) pageEncoding
+							: 해당 jsp 파일을 해당 방식으로 실제로 인코딩 ,디코딩 함 
+							: servlet 의  resposne.characterEncoding( ) 에 대응한다
+								: request 객체 설정은 지시자 부분에서 거의 되는게 없고 대부분 스크립틀릿 내부에서 해준다
+									: request 는 resposne 를 이끌어낼때 활용되는거지, 그 자체가 결과로 남아서 컴파일 되는건 아니니까 그런거라고 이해하자.
+								
+							: contentType vs pageEncoding
+								: pageEncoding >> 실제로 이렇게 인코딩 하는것
+								: contentType >> 받는 쪽에게 이렇게 디코딩하라고 알려주는거
+
+							: 할당 가능한 값 >> "utf-8" , "ms949" 같은 charset 명
+								: default 값은 ISO-8859-1 로, 기본적으론 한국어 지원이 안되기 때문에 UTF-8로 지정을 해줘야됨
+
+						(5)import
+							: 페이지에서 사용할 자바패키지, 클래스 지정
+
+						(6) session
+							: 세션 사용 여부를 지정
+							: 할당 가능한 값 >> true 혹은 false
+								: default 는 true 값임 
+
+						(7) buffer
+							: 출력 buffer 의 크기를 지정
+							: 할당 가능한 값
+								1. none >> 버퍼를 사용하지 않겠다
+									: 그러니가 바로바로 출력된는거임
+								2 숫자 >> 해당 크기의 버펄를 사용
+									: default 값은 8kb임
+
+						(8) autoFlush
+							: 출력 버퍼가 모두 채워졌을때 자동으로 비울지 결정
+							: 할당 가능한 값
+								1. true 
+									: default 값이다
+								2. false
+									: 주의) buffer="none" 으로 했는데 autoFlush="false" 로 하면 에러난다
+
+						(9)errorPage
+							: 해당 페이지에서 에러가 발생했을때 사용할 errorPage를 직접 일일이 지정한다
+								: web.xml 파일에서도 지정가능
+	
+						(10) isErrorPage
+							: 해당 페이지를 errorPage 로 사용하겠다고 선언한다
+								: 그러니까 해당 에러 발생시 띄워지는 웹 페이지로 선언한단 말이다
+							: 할당 가능한 값 >> true. false
+								: default 값은 false
+
+					: 이클립스에서 jsp 파일의 생성시 다음의 지시자 태그가 기본적으로 생성된다
+						<@page language="java" contentType="text/html ; charset=UTF-8" pageEncoding="UTF-8" %>
+
+				2. include 지시자 : 외부 파일을 현재 jsp 페이지에 포함
+					: 어플리케이션 내부의 자바 클래스, 패키지는 외부 파일 축에 끼는게 아니라 include 지시자에서 정의되는게 아님 (page 지시자의 속성에서 정의 가능)
+				3. taglib 지시자 : 자바 클래스나 JSTL 을 선언
+
+
+
+
+	: 내장객체가 제공됨
+	
+
+
+
+
+
+
+
+
+
 
