@@ -1,4 +1,10 @@
- select * from yayTest
+include 지시자의 경우 다른 페이지의 코드 자체가 그대로 삽입되어 컴파일 되는 것이기 떄문에 다른 페이지의 변수를 사용할수 있는데, 이클립스 에디터 창 자체에서는 빨간 줄로 뜬다. 근데 실행해보면 문제가 없다
+	: 이는 이클립스가 그냥은 해당 변수가 inclue 된걸 인식을 못해서 그런것으로, 확장자를 jspf 로 하면  핵결된다
+	: 실행에는 문제가 없는데 근냥 보기 안좋으니까 뭐
+
+-------------------------------------------------------
+
+select * from yayTest
 
 UPDATE 테이블명 SET  컬럼1 = 변경할 값, 컬럼2 = 변경할 값 WHERE 조건;
 insert into YayTest values ('김김김', 17 , 'naver@naver.com' );
@@ -123,15 +129,35 @@ EL 내장 객체
 		
 ------------------------------------------------------------------------------------------------------
 
+El 에서 데이터 보관소를 참조할 때 사용하는 이름
+EL에서 보관소를 참조할때 사용하는 이름
+	(1) pageScope	
+		: jsp 의 page 객체를 참조
+		: 그러니까 JspContext 를 참조
+	(2) reqeustScope
+		: jsp 의 request 객체를 참조
+		: 그러니까 HttpServletRequest 를 참조
+	(3) sessionScope
+		: jsp 의 session 객체를 참조
+		: 그러니까 Httpsession 을 참조
+	(4) applicationScope	
+		: jsp 의 application 객체를 참조	
+		: 그러니까 ServletContext 을 참조
+
+객체를 명시 안할시 attribute 를 탐색하는 순서
+	: JspContext → ServletRequest → HttpSession → ServletContext
+		: 그러니까 page --> request --> session --> application 순서로 탐색
+
 JSTL
 	: JSP Standard Tag Library
 	: 궁극적 목적 >> 스크립트릿 을 대체
 		: html 이랑 스크립트릿을 섞어 씀 가독성 떨어지고 로직 분리가 어렵다고 한다. (난 별로 안불편하지만)
 		: 요즘엔 스크립트릿보다 jstl 을 더 많이 쓴다
 	: 톰켓 컨테이너에 포함되어있지 않으므로 별도의 설치를 하고 사용한다
+	: https://hailey-v.tistory.com/37
 
 
-	: 사용 방법
+	: 사용 절차
 		0. jar 파일을 넣기
 			: webapp/WEB-INF/lib 에 넣는다
 				: 여기에 저번에 jdbc jar 파일도 여기 넣어놨었다
@@ -140,125 +166,169 @@ JSTL
 			<%@taglib prefix="c"uri="http://java.sun.com/jsp/jstl/core" %>
 
 				: 자바에서 import 문을 선언하듯 jsp 파일에서 jstl 확장 태그를 사용하려면 taglib 지시자로 라이브러리의 선언이 필요 
-				: uri 는 ctrl+shift 해서 나오는것 중 3번째꺼 pick 함 된다
 				: 속성
 					prefix 
-						: 단어적으론 접두사란 의미인데, 여기에서는 어떤 이름으로 태그명으로 쓸건지 정하는거다
+						: 단어적으론 접두사란 의미인데, 이때 설정한 prefix 로  <우리가설정한prefix :태그명 > </우리가설정한prefix> 꼴로 사용하게 된다.
+							: jsp 의 액션 태그에서 jsp 대신에 들어가는 거라 생각함ㅁ 된다
+								:  <jsp:액션태그명 / > 에서 <우리가설정한prefix :태그명 / > 
+
+
    						: 아무거나 해도 상관 없긴 한데 주로  "c" 를 쓴다
 							: core 를 의미한다.
 
-	
+					uri
+						: ctr+ space 해서 나오는 것 중에 3번째로 나오는 CORE 라이브러리를 택한다
+							: Core 라이브러리는 jstl 의 태그 라이브러리 중 하나로, 변수 제어문 처리등의 기능을 제공한다
+							
 		2. 해당 페이지에서 사용하기
-			: 사용은 jsp 의 액션 태그 처럼 사용한다
-				<jsp:액션태그명 / > 에서 <우리가 :태그명 / > 
+			: 주의 ) value 속성에 el 표현식 값을 할당 가능한데, 스크립틀릿 내부에서 자바로 선언한 변수의 경우 el 표현식 내부에서 그냥은 인식되지 않는다. 따로 " 어떤객체.setAttribute("이름",값) "을 통하여 저장한 후에야 el 표현식으로 접근이 가능하다.
+				: jstl 로 선언한 변수는 jstl에 설정된 scope 에 해당하는 객체에 저장시키기 때문에 인식이 잘 되는거다
+
 			: 주요 태그
-				(1)   set  : 변수값선언
-					<c:set var="name" value="홍길동" scope="page"/> 
+				1. 변수 관련 태그
+					(1)   set  : 변수생성
+						<c:set var="name" value="홍길동" scope="page"/> 
+							: jstl 로 생성된 변수의 경우 설정한 socpe 에 따라서 page 객체, application 객체, session . request 객체 에 저장되게 되고 각각의 객체를 참조하는 변수를 통하여 접근함으로 이를 확인 가능하다(물론 걍 내장객체 생략하고 변수명만 써도 잘 참조 된다)
+								<c:set var="num" value="100"/>
+								<c:out value="${pageScope.num}"></c:out>  <br>
+		
+								<c:set var="num1" value="10" scope="application"/>
+								<c:out value="${applicationScope.num1}"></c:out> <br>
+		
+								<c:set var="num2" value="0" scope="request"/>
+								<c:out value="${requestScope.num2}"></c:out> <br>
+	
+							: 속성
+								: var == variable . 즉, 값과 바인딩 시킬 변수명 
+								: value == 변수값
+								: scope == 범위
+									: javaBean 과 마찬가지로page, application , session ,request 중 하나 택 (디폴트 - page) 
+	
+							: 암기 tip
+								: 일단 변수의 값이 할당되는 속성명은 공통적으로 value
+								: 변수명 할당하는 속성 
+									: tn << 투네
+										 (그냥) 태그>> name
+									: bi << 양성애자
+										(자바)빈 액션태그>> id
+									: jv << 좀비
+										jstl 태그 >> var
+	 
+	
+	
+					(2) out: 변수값 출력
+						 <c:out value="${ 변수명 }"/><br>
+							: 속성
+								: value  
+									: 화면에 표시할 내용을 el 표현식을 이용하여 작성
+										: el 표현식 내부에 변수명 쓰면 자동으로 그 변수의 값이 들어가게 됨
+										: 물론 단순 값을 입력하면 단순 값이 출력됨
+	
+	
+	   				(3) remove: 변수값 제거
+						<c:remove var="name" scope="page"/><br>
+							: 주의 
+								>> value 가아닌 var 을 명시하는 것이므로 el 표현식 쓰는게 아니라 걍 변수명만 써야됨. 
+								>> 변수 생성 당시에 저장한 범위와 같은 범위에서 remove 시켜야됨
+									: 안그럼 엉뚱한 위치에서 그 변수를 지우려고 시도하니까
+						
+													
+												
+
+				2.제어문 관련 태그
+					(1) if
+			  			: 조건문이 참이면 해당 태그 사이에 있는 것들이 실행된다. 아님 걍 지나간다.
+						: else 문 관련 태그는 따로 없는거 주의
+							: else 문을 구현하고 싶으면 if 태그를 하나 더 쓰되 조건식의 조건을 정 반대로 함됨
 						: 속성
-							: var == variable . 즉, 값과 바인딩 시킬 변수명 
-							: value == 변수값
-							: scope == 범위
-								: javaBean 과 마찬가지로page, application , session ,request 중 하나 택 (디폴트 - page) 
+							1. test
+								: 조건식을 할당한다
+								: 대부분 el 표현식의 형식으로 값을 주는 것 같다
+						: ex) 	
+							<c:if test="${1+2==3}">
+							<p>1+2==3입니다</p>
+							</c:if>
+							
+							<c:if test="${1+2!=3}"> <%-- else 문이 없어서 별도로 써줘야됨 --%>
+							<p>1+2!=3입니다</p>
+							</c:if>
+							
 
 
-				(2) out: 변수값 출력
-					 <c:out value="${name}"/><br>
-						: 속성
-							: value  
-								: 화면에 표시할 내용을 el 표현식을 이용하여 작성
-									: el 표현식 내부에 변수명 쓰면 자동으로 그 변수의 값이 들어가게 됨
+					(2) choose
+						choose 태그는 자바의 switch 문과 비슷한 역할을 한다.
+						case 문과 같은 역할을 하는 것은 choose 태그 안의 when 태그이다.
+						default 문과 같은 역할을 하는 것은 choose 태그 안의 otherwise 태그이다.
+				
+						: 암기 tip:  cow << Choose , When , Otherwise
+				
+						: when
+							: test 속성을 가지고, if 태그에서와 마찬가지로 test 속성의 값으론 el 표현식을 준다 
+							: 걍 겨의 if 태그이다
+				
+						: otherwise
+							: 음. 별로 할 말없다
+				
+						: switch 문과는 다르게 when 마다 break 안써도 1개의 when 만 실행되고 끝난다
+						
+						: ex) 
+							<c:set var="a" value="20"/>
+							<c:choose >
+								<c:when test="${a==10}">
+								a는 10 이다<br>
+								</c:when>
+								
+								<c:when test="${a==20}">
+								a는 20 이다<br>
+								</c:when>
+								
+								<c:when test="${a==30}">
+								a는 30 이다<br>
+								</c:when>
+								<c:otherwise>
+									a는 10,20,30 이 아니다<br>
+								
+								</c:otherwise>
+							
+							</c:choose>
+							
+				
+					(3) forEach
+						: 어떤 속성과 함께 사용하느냐 따라서 일반적인 for문, 향상된 for 문으로 쓰임
+						: 속성들 
+							(1) 공통적이로 필요한 속성
+								1. var >> 루프제어 변수 선언
 
+							(2) 일반적인 for 문의 경우 필요한 속성
+								1. begin >> 루프 제어 변수의 시작 값 할당	
+								2. end >> 루프 제어 변수의 끝 값 할당 
+									: 주의 ) end 부분도 포함되는거다
+										: 그러니까  begin <= var <=end 되는거다
+								: ex) 
+									<c:forEach var="i" begin="0" end="20" step="3">
+										<c:out value="${i}"/><br>
+									</c:forEach>
 
-   				(3) remove: 변수값 제거
-			<c:remove var="name" scope="page"/><br>
+							(3) 향상된 for 문의 경우 필요한 속성
+								1. items >> 객체에 할당된 attribute 중에서 하나를 할당
+									: 대부분 EL 표현식 내부에 변수명을 쓴다.
+									: 일반 배열 레퍼런스 변수 뿐 아니라 컬렉션 프레임 레퍼런스 변수도 할당 가능하다
+									: 주의 ) 단순히 스크립틀릿에서 선언된 변수는 내장 객체로 참조가 불가능하다. 따라서 스크립틀릿에서 선언한 변수를 대상으로 루프 돌게하고 싶으면 겍체.setAttribute("이름",스크립틀릿내부서선언한변수); 를 통하여 객체에 저장시켜야 items 에 할당되는 EL 표현식 내부에 쓸 수 있다.
 
-
-제어문
-	: if
-		  :if 문은 있는데 else 문은 엇ㅂ다
-		:test 속성에 조건식을 쓴다
-  		: if 문이 맞으면 해당 태그 내부에 있는 것들이 실행된다. 아님 걍 지나간다.
-
-<c:if test="${1+2==3}">
-<p>1+2==3입니다</p>
-</c:if>
-
-<c:if test="${1+2!=3}"> <%-- else 문이 없어서 별도로 써줘야됨 --%>
-<p>1+2!=3입니다</p>
-</c:if>
-
-
-
-	: choose
-		choose 태그는 자바의 switch 문과 비슷한 역할을 한다.
-		case 문과 같은 역할을 하는 것은 choose 태그 안의 when 태그이다.
-		default 문과 같은 역할을 하는 것은 choose 태그 안의 otherwise 태그이다.
-
-		: when
-			: test 속성을 가지고, if 태그에서와 마찬가지로 test 속성의 값으론 el 표현식을 준다 
-			: 걍 겨의 if 태그이다
-
-		: otherwise
-			: 음. 별로 할 말없다
-
-		: switch 문과는 다르게 when 마다 break 안써도 1개의 when 만 실행되고 끝난다
-
-
-
-<c:set var="a" value="20"/>
-<c:choose >
-	<c:when test="${a==10}">
-	a는 10 이다<br>
-	</c:when>
-	
-	<c:when test="${a==20}">
-	a는 20 이다<br>
-	</c:when>
-	
-	<c:when test="${a==30}">
-	a는 30 이다<br>
-	</c:when>
-	<c:otherwise>
-		a는 10,20,30 이 아니다<br>
-	
-	</c:otherwise>
-
-</c:choose>
-
-
-	: forEach
-		: 일반적인 for 문 역할인데 
-		: 속성들 
-			1. var >> 루프제어 변수 할당
-			2. begin >> 루프 제어 변수의 시작 값 할당	
-			3. end >> 루프 제어 변수의 끝 값 할당 
-
-<c:forEach var="i" begin="0" end="20" step="3">
-	<c:out value="${i}"/><br>
-</c:forEach>
-
-
-
-
-
-
-<%
-ArrayList<String> list = new ArrayList<String>();
-list.add("홍길동");
-list.add("성춘향");a
-list.add("심봉사");
-
-request.setAttribute("names",list);
-
-%>
-
-<%---
-향상된 for 문
-items 속성에 컬렉션 객체를 넣음 순서대로 뽑아준다
- --%>
-<c:forEach var="name" items="${names}">
-	<c:out value="${name}"/><br>
-</c:forEach>
+								: ex )
+									<%
+									ArrayList<String> list = new ArrayList<String>();
+									list.add("홍길동");
+									list.add("성춘향");a
+									list.add("심봉사");
+									
+									request.setAttribute("names",list);
+									
+									%>
+									
+									<c:forEach var="name" items="${names}">
+										<c:out value="${name}"/><br>
+									</c:forEach>
 
 
 
