@@ -1,0 +1,260 @@
+constraint
+	: 데이터 제약조건
+	: 데이터의 무결성 지키기 위함
+	: primary ket, foregin key 같은거
+
+
+SELECT 시퀀스명.CURRVAL FROM DUAL;
+SELECT 시퀀스명.NEXTVAL FROM DUAL;
+
+INSERT INTO TABLE1 VALUES( .... ,  DEFAULT , .... ,  시퀀스명.NEXTVAL);
+
+ALTER SEQUENCE 시퀀스명 INCREMENT BY -1;
+
+
+CREATE SEQUENCE 시퀀스명
+INCREMENT BY 2
+START WITH 100
+MAXVALUE 199999
+MINVALUE 9
+NOCACHE
+CYCLE;
+
+DELETE FROM TABLE1 WHERE NAME1='홍길동';
+UPDATE 테이블명 SET ROOM1=202 WHERE NAME1 LIKE '홍길동';
+
+ALTER TABLE TABLE1 ADD(컬럼명 NVARCHAR2(100));
+ALTER TABLE TABLE1 MODIFY(컬럼명 NUMBER(2));
+ALTER TABLE TABLE1 DROP COLUMN 컬럼명 ;
+ALTER TABLE TABLE1 RENAME COLUMN 이전이름 TO 이후이름;
+
+-------------------------------------------------------------------------------------------------
+
+DAO data access object
+	: db 접근위한 객체
+	: 싱글톤
+	: 순서
+		1. DataSource 객체 생성
+			Context context =new InitialContext();
+			ds = (DataSource)context.lookup("java:comp/env/jdbc/oracle");
+
+
+			: 이 과정은 아래를 생략할 수 있게 해줌
+				Class.forName(driver); // jdbc 드라이버를 메모리에 올림
+
+		2. 각 메서드에서 아래 과정 되풀이
+			(1) connection 객체 생성
+				conn = ds.getConnection( ) ;
+			(2) prepareStatement 객체 생성 << 쿼리문을 저장
+				pstmt = conn.prepareStatment( 쿼리문 );
+
+			(3) 쿼리문 제대로 완성
+				: setter 계열 메서드 사용	<< 값의 자료형에 맞는 메서드 픽
+				pstsm.setXXXX( 물음표인덱스, 값 );
+
+			(4) pstmt 객체 실행 << 쿼리문 실행
+				case1. ResultSet excuteQuery( ) << insert 문
+					1. 일단 rs 객체 얻음
+					2. rs 객체에서 레코드 단위로 값을 뽑음
+						while(rs.next( ) )	{
+							.	.	.
+						XXXX tmp = rs.getXXXX( 컬럼명 );
+						}
+				case2. int excuteUpdate( ) << update , delete 문
+
+
+			(5) close( )
+
+	: 활용
+		: jsp 에서 DAO 클래스 내의 메서드를 사용하기 위해서 스크립틀릿에서 dao 객체를 getInstance( ) 써서 만들고 그 객체로 메서드에 접근한다
+		: 	memberDAO dao = memberDAO.getInstance();
+			String id = request.getParameter("id");
+			String pw = request.getParameter("pw");
+			int flag = dao.loginCheck(id,pw); 
+
+
+
+DTO 객체 Data Transfer Object
+	: 운반책이지, 실제 데이터 가 아니다
+		: 실제 데이터는 dto 객체에 담겨져온 데이터 덩어리중 활용 원하는 값을 선별하여 쿼리문에 넣어 업데이트 하고 그러는거다
+
+	: DTO 활용
+		(1) 객체 생성
+			case1. 걍 자바 클래스로써
+				(1) 객체 생성
+					클래스명 dto = new 클래스명( );
+				(2) 초기화
+					dto.set필드명(초기화값);
+				(3) 값꺼내쓰기
+					dto.get필드명( ) ;
+
+			case2. 자바빈으로써
+				(1) 자바빈 객체 생성
+					<jsp:useBean id="dto" class="com.jsp.memberDTO" scope="page"/>
+				(2) 자바빈 프로퍼티 설정
+					: 개꿀팁 >>
+						<jsp:setProperty name="dto" property="*" />
+		
+		(2) 객체 저장
+			: 다른 jsp 페이지에서 해당 dto 객체의 정보를 사용하기 위함
+				: 단순히 dao 객체의 메서드의 arg 로 할 목적으로 만든 dto의 경우 따로 저장할 필요 없음
+			: 주로 세션에 저장
+				session.setAttribute("member",dto);
+
+		(3) 객체 활용
+			: 다른 jsp 페이지서 사용
+			: memberDTO dto = (memberDTO)session.getAttribute("member");
+
+ 
+
+
+-------------------------------------------------------------------------------------------------
+session , application , request, pageContext
+	(1) setAttribute( "이름" , 값 )
+	(2) Object getAttribute("이름")
+		: Object 타입이라 형변환 필수
+	
+-------------------------------------------------------------------------------------------------
+EL 표현식
+	: 변수명 설정하는건 var 속성
+	: 태그들
+		<c:set var='변수명' value='${값}' /> 
+			: 변수 생성
+
+		<c:out  value='${변수명}' /> 
+			: 출력
+			: <c:out value="${ins.address }"/> 처럼 getter setter 메서드가 존재하는 객체의 경우 el 표현식 내부에서 필드명으로 바로 접근 가능
+
+		<c:forEach var="i" begin="0" end="20" step="3">
+			<c:out value="${i}"/><br>
+		</c:forEach>
+			: 일반for문
+
+
+		<c:forEach var="i" items="${ 객체에저장된변수 }">
+			<c:out value="${i}"/><br>
+		</c:forEach>
+			: 향상된 for문
+
+
+		<c:if test="${조건문}">
+			어쩌구
+		</c:if>
+			: if 문
+
+		<c:choose>
+			<c:when test="${조건문}">
+				어쩌구
+			</c:when>
+	
+			.
+			.
+			.
+
+			<c:otherwise>
+				어쩌구
+			</c:otherwise>
+			
+		</c:choose>
+			: choose 문(switch 문과 비슷)
+
+
+---------------------------------------------------------------------------------------------------------------
+업데이트 쿼리문에서 + 1 바로 시킬 수 있다
+    	String query = "UPDATE Board SET hit=hit+1 WHERE board_id=?";
+
+
+---------------------------------------------------------------------------------------------------------------
+
+MVC Model View Controller
+	: 디자인 패턴 중 하나고 , 세가지 역할로 구문한 개발 방법론이다.
+		: 또다른 디자인 패턴으론 싱글톤이 있다
+
+	: Model
+		:  내부 비즈니스 로직을 처리하기 위한 역할을 한다. 
+			:즉, 모델은 컨트롤러가 호출을 하면 데이터베이스(DB)와 연동하여 데이터 추출, 저장, 삭제, 업데이트 등의 역할을 수행한다.
+
+	: View
+		: View는 사용자에게 보여주는 화면(UI)이 해당된다. 
+사용자와 상호작용을 하며 컨트롤러로부터 받은 모델의 결과값을 사용자에게 화면으로 출
+력하는 일을 수행한다. Model에서 받은 데이터는 별도로 저장하지 않는다.
+		: 예) jsp
+
+	: Controller
+		: Controller는 Model과 View 사이를 이어주는 인터페이스 역할을 한다.
+			:사용자로부터 View에 요청이 있으면 Controller는 해당 업무를 수행하는 Model을 호출하고, Model이 업무를 모두 수행하면 다시 결과를 View에 전달하는 역할을 한다.
+
+
+	: MVC 모델의 종류
+		: 모델 1 방식은 Controller 영역에 View 영역을 같이 구현하는 방식으로, jsp 가 이 둘을 모두 처리한다
+: 사용자의
+요청을 JSP가 전부 처리한다. 요청을 받은 JSP는(DAO / DTO)를 사용하여 클라이
+언트 요청작업을 처리하고 그 결과를 출력한다.
+
+
+		: 모델2
+			: Controller >> 하나의 Servlet
+				: 클라이언트로부터 request 를 받는다
+				: Model , view 을 호출한다
+			: Model >> java  클래스들
+				: Controller 내부서 호출된 클래스가 알맞은 로직 수행
+					: Model 인 클래스들 내부에서 DTO, DAO 객체가 사용된다
+						: DTO , DAO 는 Model에 속하는게 아니다(아무것도 아니다) 
+						: 필요하다면 DAO 객체가 db에 접근하는거다
+
+			: View >> jsp 파일들
+				: Controller 에게 포워드 방식으로 호출되어 해당 페이지를 Client 에게 response 한다
+					: 포워딩
+						: <jsp:forward page="이동할페이지"/>
+						: url 유지
+						: request 객체 유지
+				: 필요하다면 jsp 파일에서 DTO/DAO 객체의 참조를 할 수 있다
+
+
+
+--------------------------------------------------------------------------------------------
+//.do >>jsp 에서 사용하는 가상의 주소
+	// 사용자는 파일의 실제 경로룰 알 수 없으므로 보안에 도움이 된다
+@WebServlet("*.do")  // *.do >> 어떤 request 이든 .do 로 끝나면 BoardController 가 이를 처리하겠다
+
+	: 어쨌거나 지금은 잘 안쓰는 추세이다.
+
+
+https://jamesdreaming.tistory.com/81
+	: String subString(int start, int end)
+		: start<= < end 이다
+	: 인덱스 기준으로 문자열에서 문자열을 추출
+
+
+jsp 페이지를 지정할 String 객체 생성
+	String viewPage =null; 
+
+		// command 객체>> 컨트롤러에서 받은 요청을 분석해 어떤 처리가 필요한지에 따라서 각 처리에 필요한 command 객체를 실행시켜 로직을 처리하게 하고 필요한 데이터를 가지고 컨트롤러로 보내준다
+		Command command = null; // model 역할을 수행하는 Command 객체
+		
+		// .do 만 필요한거지 전체 url 이 필요한게 아님
+		String uri = request.getRequestURI(); // url 에서 context 부분부터 문자열로 뽑아온다
+		System.out.println("URI: "+uri);
+		
+		String conPath = request.getContextPath(); // contextpath 즉 프로젝트 명만 얻어온다
+		System.out.println("conPath: "+conPath);
+		
+		String result = uri.substring(conPath.length(), uri.length()); // 이상이다.
+		
+
+서블릿의 forward 객체
+	RequestDispatcher dispatcher = request.getRequestDispatcher(viewPage);
+	dispatcher.forward(request, response); //해당 jsp 페이지로 forward
+
+
+
+
+
+
+https://youngjinmo.github.io/2020/08/servlet-redirect-forward/
+	
+
+
+비즈니스 로직이란?
+	:https://velog.io/@eddy_song/domain-logic
+	:  '도메인 로직'이나 '비즈니스 로직' 이라고 말할 때는, 그 '현실 세상의 문제'를 해결하는 코드를 의미한다. 도메인에 대한 해결책이나 솔루션이라고 할 수 있다.
