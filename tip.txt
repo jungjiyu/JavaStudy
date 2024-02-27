@@ -243,7 +243,7 @@ abstract class HttpServlet extends GenericServlet
 				: 메서드 접근 제한자가 public 인걸 보면 알 수 있다 싶이 별로 건들여도 개의치 않는 no 중요한 얘임
 
 		(2) protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException
-			: http request 를 받고 doPost 혹은 doGet 으로 request 를 넘긴다.
+			: request , response 객체를 받고 request 의 내용에 따라 doPost 혹은 doGet 메서드로 request, response 객체 를 넘긴다.
 			: 오버라이딩한 service 메서드를 오버로딩 한 것
 			: servletReqeust , Response 가 아니라 "HTTP"ServletRequest, Response 이기 때문에 httpServlet 내부의 Dopost , DoRequest 와 같은 메서드를 사용할 수 있다
 			: 오버라이딩할꺼면 접근제한자가 protected 인걸 잊지 말면서 오버라이딩하고 , "반.드.시." super.service(req, res) 를 해주어야한다.
