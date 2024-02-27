@@ -343,7 +343,9 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 						super.service();
 					}
 
-			7. service( ....) 메서드는 arg 로 들어온 HttpServletRequest 따라서  doGet 혹은 doPost 를 호출한다
+			7. service(HttpServletRequest req, HttpServletResponse resp) 메서드는 arg 로 들어온 request 객체의 header 부분에 명시된 method 필드의 값에 따라서  doGet 혹은 doPost 를 호출한다
+				: service( ) 는 HttpServlet 에 정의된 메서드이다
+				: 내부적으론 if 문으로 reqest 객체의 mehot 필드 값이 뭔지 알아내게 되어있다
 			8. doGet ( ) 혹은 doPost(  )에서 동적 페이지를 생성하고, response을 보낸다
 
 			9. "하나"의 request 에 대한 resposne 가 모두 끝나면(=service(... ) 가 종료되면 ) HttpServletRequset 와 HttpServletResponse 두 객체는 모두 소멸 된다.
@@ -399,4 +401,23 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 
 	: 물론 주의해야할 것은 애플리케이션에 저장되는 객체인 session 의 경우엔 arg 로 넣는 dto 객체 그 자체가 저장되는거라 완전한 값을 갖춘 dto 객체를 arg 로 해야된다.
 
+
+21. request 와 url 의 관계
+	: 요약 >> URL 은 request 의 일부이다.
+	http request
+		: client 가 server 에게 어떤 동작을 요청하는 것
+		: 구성
+			1. header 부분
+				: 구성
+					1. request 방식(get,post)
+					2. URL << URL 은 request의 일부이다 
+					3. cookie
+					4. encoding 정보
+					5.기타
+			2. body 부분
+				: client 의 어떤 다른 데이터
+
+
+	URL Uniform Resource Locator
+		: 자원의 위치를 나타내는 주소
 
