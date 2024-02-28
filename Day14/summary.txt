@@ -1,0 +1,161 @@
+
+
+-------------------------------------------------------------------------------------------------
+session , application , request, pageContext
+	(1) setAttribute( "이름" , 값 )
+	(2) Object getAttribute("이름")
+		: Object 타입이라 형변환 필수
+
+
+주의 >>> request.getParameter 는 반환형이 무조건 String
+	
+-------------------------------------------------------------------------------------------------
+
+
+
+
+
+MVC Model View Controller
+	: 디자인 패턴 중 하나고 , 세가지 역할로 구문한 개발 방법론이다.
+		: 또다른 디자인 패턴으론 싱글톤이 있다
+
+	: Model
+		: 내부 비즈니스 로직을 처리하기 위한 역할을 한다. 
+
+		: Service 클래스
+			: Model 기능을 하는 클래스들
+			: 필요에 따라 dto, dao 객체를 쓴다.
+				: dto . dao 객체가 service 클래스들은 아니다
+			
+	: View
+		: 클라이언트에게 response 될 화면(UI User Interface)을 처리하는 코드
+
+	: Controller
+		: Client 에게 직접 request 를 받고 response 를 하며 ,  Model과 View 사이를 이어주는 인터페이스 역할을 하는 코드
+
+
+
+MVC 모델2 실습
+	: DTO , DAO 객체 준비하기
+
+	: Controller 구현하기
+		0. servlet class 생성
+		1. url 패턴을 servlet 과 매핑 시키기
+			@WebServlet("*.do")  
+			
+
+		2. service(HttpServletRequest, HttpServletResponse) 오버라이드 하기
+			: 절차
+				1. 일단 위에 @Override 어노테이션 명시
+
+				2. request 객체 인코딩 설정
+					request.setCharacterEncoding("UTF-8");
+				
+				3. request 객체로 넘어온 요청 URL 에서 URL pattern 추출하기 >> 결과적으론  / *.do 만 남는다
+					String uri = request.getRequestURI(); 
+					String conPath = request.getContextPath();
+					String result = uri.substring(conPath.length()); 
+
+			
+	
+				4. viewPage 객체 생성
+					String viewPage =null; 
+					
+				5. Command 인터페이스 생성 << 뷰 페이지 반환  메서드
+					: 규격 맞춤 밎 다형성 구현이 가능해짐
+						public interface Command {
+							public String excute(HttpServletRequest request, HttpServletResponse response);// 뷰페이지 반환
+						}
+
+						
+				6. Command command = null; 
+					: Command 인터페이스 타입의 레퍼런스 변수를 일단 생성한다
+					: excute 메서드 실행 목적
+
+				7. if 문 으로 URL  pattern 따라 다른 viewPage을 받음
+					
+				8. viewPage 를 arg 로 Reqes t Dispatcher 객체 생성
+					RequestDispatcher dispatcher = request.getRequestDispatcher(viewPage);
+
+
+				9. RequestDispatcher 객체를 대상으로 forward 메서드를 호출
+					dispatcher.forward(request, response); //해당 jsp 페이지로 forward
+
+
+
+
+
+		
+		
+
+
+
+--------------------------------------------------------------------------------------------
+
+form 태그
+	: method 로 방식을 post 로 할 수있다
+	
+input 태그
+	: value 속성>> type 이 submit 이 아닌 이상 미리보기 값이 저장된다.
+	: hidden 속성>> 안보이게 해당 값이 함께 submit 된다		
+
+textarea 태그
+	: 미리 보여지게 하는 값은 시작태그와 끝 태그 사이에 직접 적는다
+
+el 표현식에서
+	: 클라이언트로부터 직방으로 받은 데이터는 param 내장 객체를 이용해서 받는거다
+
+jstl 라이브러리에서 core 라이브러리뿐 아니라 fmt 라이브러리도 꽤 쓴다
+	: 선언부
+		<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+			: 주로 prefix 는 fmt 로 하는 편
+
+	: timestamp 타입의 데이터를 fmt 라이브러리의 formatDate 태그를 사용하면 예쁘게 포맷이 가능하다 	
+		: 속성  
+			1. value : 포맷당할 대상<< el 표현식 사용 가능
+			2. pattern: 포맷 패턴
+	: 예시
+		<fmt:formatDate value="${element.boardDate}" pattern="yyyy년 MM월 dd일 HH:mm:ss"/>
+
+
+
+a 태그에서도 쿼리 스트링을 사용하여 데이터를 보낼수 있따
+	: 이는 get 방식으로 전달된 것이므로 getParameter 로 구할 수 있따.
+	<td><a href="/JSP_MVC/contentView.do?boardId=${element.boardId}"><c:out value="${ element.title}"/></a><br></td>
+
+
+ parameter 의 경우 getParameter 로 그 값을 뽑아내는데 getParameter 는 반환타입이 objcet 인 getAttribute 와는 다르게 반환형이 String 으로 고정되있어서 dto 객체 같은걸 넘겨도 별로 소용이 없다. parameter 는 그냥 일시적인, 일차원적인 값(객체에서 꺼내쓰는게 아니라 값 자체) 이라고 보면 된다.
+
+parameter 의 경우 el 표현식에서 반드시 param 내장 객체를 명시해야 사용 가능하다
+	: 생각해보면 얘까지 내장객체 명시 안해도 찾을 수 있게 만들면 request의 Attribute 와 좀 구분이 안가게 될 수 있잖아. 그리고 일시적인 거기도 하고.
+
+el 표현식 내부에 쓸 수 있는 값
+	: el 내장 객체로 접근 가능한 속성들
+	: 값  그자체
+		: 단순 숫자, 문자열 등
+	: 단순 숫자 연산식
+
+el 표현식에서 불가능한 값
+	: 문자열 연산식
+	: 함수 실행
+	: 태그
+		: ex) ${<br>} 한다고 다음줄로 줄바꿈 안된다
+ 
+jstl 라이브러리 사용시 가능한 것들
+	: 문자열 중간중간에 el 태그 삽입하기
+		: jstl 태그의 value 값 뿐 아니라 html 영역에서라면 문자열을 삽입 가능한 곳에서 필요한 만큼 사용 가능
+			: 스크립틀릿 내부는 자바 언어 전용이라서 인식이 안됨
+		ex)  value="현재 페이지에서 ${requestScope.myName}가 생성됨"
+		ex) <a href="page2.jsp?myName=${pageScope.myName}">:)</a>
+		ex) 걍 <body> 부분에 ${ myName }
+
+
+단순한 화면 전환이라도 view 에서 view 를 호출하지 않고 controller 를 매개로 하여 controller 가 다음 view 를 호출하게 함
+	: 단순히 보여진다고 끝나는게 아니라 중간중간에 필요한 작업을 model 을 통하여 해야되서 그렇다
+	: 그래서 jsp 파일에 쓰인 url 이 대부분 .do 로 끝남
+		ex)  <a href="/JSP_MVC/writeForm.do">글작성</a>
+		ex) 	<form action="/JSP_MVC/write.do" method="post">
+
+
+
+
