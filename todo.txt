@@ -68,3 +68,5 @@ request.setAttribute("name","jiyu");
 </body>
 </html>
 
+14.
+jspf 파일에 꼭 page 지시자는 명시해줘야하는 이유
