@@ -1,0 +1,411 @@
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+오라클 :=
+	: 오라클에서는 특이하게 대입 연산자를 '=' 가 아닌 := 를 쓴다
+		: mySQL에서의 = 에 대응한다
+
+오라클 ||
+	: 문자(열)를 합치는 방법이다
+		: 거의 아무데나 쓸 수 있다 
+			: select 문의 column명과 column 명 사이에도 쓸 수 있고
+			: insert 문에서 insert 되는 값과 값 사이에도 쓸 수 있다.
+
+오라클 as
+	: 특정 column 명에 별칭을 붙일때 쓴다
+		: column 명이 실제로 바뀌는게 아니라 일시적으로 사용되는거다
+	: 주로 select 문에서 쓰인다.
+		select colum명 as 별명 from 테이블
+			: 별명을 column명으로 하여 테이블의 record 들이 출력된다.
+
+	: 근데 우리가 만든게 아니라 오라클 자체적으로 제공하는 키워드나 함수 같은거는 대부분 as 를 생략하고 바로 별칭을 적어도 상관 없는 것 같다
+		: 인터넷에서 그렇게들 많이 한다
+		: ex) COUNT(어쩌구) count == COUNT(어쩌구) as count , ROWNUM num == ROWNUM as num
+
+	: AliaS 
+		: alias >> 별칭
+
+오라클 count( ) 
+	: 오라클에서 제공하는 함수로, 행의 개수를 반환한다. 
+	: 사용법
+		: column 을 arg로 한다
+		1. count(*)
+			: 해당 테이블의 전체 행 개수를 반환한다	
+			: null값과 상관 없이 count 한다
+
+		2. count( 컬럼명 )
+			: 해당 테이블의 특정 column 에 대응하는 행의 개수를 반환한다
+			: NULL 값을 가지는 행은 count 하지 않는다
+
+		2. count( DISTINCT 컬럼명 )
+			: 해당 테이블의 특정 column 에 대응하는 행의 개수를 중복된 행은 제외하여 반환한다
+
+
+	: select 문의 column 이 들어가는 자리에서 주로 쓰인다.
+		: 이때 결과로 반환되는 레코드들의 column 명은 'count( 어쩌구)' 꼴로 그대로 들어가게 된다.
+			: 만약 이를 변경하고 싶은 경우
+				sol1. as  문법을 사용
+					' count(어쩌구) as 별명 ' 의 꼴로 사용한다
+				sol2. 그냥 바로 뒤에 별명을 쓴다
+					: 어떻게 가능한건지는 몰라도 ' count( 어쩌구) 별명 ' 의 꼴로 column 명을 대입해도 잘 인식이 되서 as 문법을 쓴 것과 같은 효과가 난다
+		
+
+
+
+
+오라클 '집합'
+	: '하나'의 select 문이 반환한 결과를 '한'개의 집합이라고 한다
+
+오라클 '결과 집합'
+	: '하나' '이상' 의 select 문이 연결되어 만들어진 '한'개의 결과 집합이라고 한다.
+
+
+
+
+
+오라클 ROWNUM
+	: https://myblog1128.tistory.com/111
+	: 오라클 내부적으로 각 레코드에 붙여주는 인덱스를 값으로 하는 column 
+	: 엑셀에서 맨 왼쪽에 표시되는 행 번호랑 비슷한거다
+	: column 이 들어갈 수 있는 자리엔 ROWNUM 도 들어갈 수 있다
+			: ' select ROWNUM from 테이블명 ' 처럼 column명이 들어가는 자리에 들어갈 수 있다 
+
+	: 실제 column 이 아니라 가상 column 이라고 한다
+
+
+	: 주의
+		1. 0이 아닌 1부터 시작
+
+		2. ROWNUM 컬럼 과 함께 테이블 내의 다른 컬럼도 뽑아내야하는 경우 테이블을 대상으로 명시하여 그 컬럼을 사용해한다
+			: 잘 이해는 안가는데 ROWNUM 자체가 전부로 인식되서 그렇다는 것 같다
+				: 아래와 맥락이 비슷한것 같다
+					select * from BOARD; 로 했으면 
+					select * , writer from BOARD 하면 안되고
+					select BOARD.* , BOARD.WRITER  from BOARD 와 같이 테이블을 명시해야된다는 것 같다
+
+			:이런식으로 써야된다는거다 ex)  
+				"SELECT ROWNUM, MEMBER.* FROM MEMBER;" 
+				"SELECT ROWNUM , MEMBER.name FROM MEMEBER"  
+					:  " SELECT ROWNUM , * FROM MEMER; "이나 "SELECT ROWNUM , name FROM MEMEBER" 이런식으로 쓰면 안된다.
+
+		3.  select 해서 나오는 결과마다 새로 ronum 매겨지는게 아니라(select 할때 젤 처음 레코드로 온거라고 그 레코드의 rownum이 1번이 되는게 아니라) 데이터가 들어간 순서대로 rownum 이 매겨진다
+			: 그렇다고한번 매겨진 rownum 은 영원히 그 레코드의 rownum 이 아니란 말이다. 앞 레코드가 삭제되면 자동적으로 rownum 이 앞당겨진다. 
+				: 그러니까 db 에 저장되어있는 레코드의 순서대로 rownum 이 매겨져있다
+
+
+		4. 결과 집합을 생성하는 시점에서 rownum 이 만들어진다.
+			:  이게 뭔말인지 잘 모르겠는데 어쨌뜬 결론적으론 이때문에 ROWNUM이 1이 아닌 레코드부터 값을 뽑아내는 것이 불가해진다고 거다
+				: ex )  
+					SELECT * FROM MEMBER WHERE NUM BETWEEN 6 AND 10; 가 안된다.
+
+		5. ROWNUM이 1이 아닌 레코드부터 데이터를 뽑을는 경우, 서브 쿼리를 사용해야된다
+			: 서브쿼리를 사용해서 본격적인 select문을 실행하기에 앞서 ROWNUM 을 먼저 생성시켜주는 거다.
+			: 서브 쿼리에서 ROWNUM 을 미리 생성시킬때 별칭을 거의 무조건 붙여줘야되는것 같다
+				 : 안그럼 결과가 여전히 이상하게 나온다
+				: 추측하건데 ROWNUM 이란 column 은 호출될때마다 새로 생성되는거라 아무리 앞서서 생성한 적이 있다 하더라도 그걸 쓰지 못하는것 같고, 이때문에 앞서 생성한 ROWNUM 을 별칭으로 저장후 그 별칭으로 그 시점에 생성한 ROWNUM 을 불러와서 써야되는 것 같다
+
+			: ex ) 
+				 SELECT * FROM (SELECT ROWNUM NUM,MEMBER.* FROM MEMBER)
+WHERE NUM BETWEEN 6 AND 10;
+	
+
+오라클 BEGIN-END
+	: PL/SQL oracle's Procedural Language extension to SQL
+		: PL/SQL 이란
+			: 오라클에서 제공하는 SQL 을 확장한 프로시져 지향 프로그래밍 언어로, "블럭 구조" 를 가진다
+				: 그러니까 프로시져를 만들때 사용하는 문법이다.
+			: procedure 프로시져
+				: 메서드 , 함수 와 같은 것을 의미하는 표현으로, 재사용 및 유지보수를 용이하게 한 특정 기능을 구현한 블럭(=코드 덩어리)이다.
+					: 영단어 그자체인 procedure 즉 '절차' 의 뜻으로 쓴다면 오번역 한것.
+				: sql 에서 프로시져는 다른 언어의 함수와 비슷하게 특정 로직 처리를 위하여 여러 쿼리를 한번에 실행이 가능하고 재사용이 가능한데, 다른 점이 있다면  결과값을 반환하지 않는다.
+
+				: Procedural Programming >> 프로시져 지향 프로그래밍
+					: https://kikit-study.tistory.com/entry/%EA%B0%9D%EC%B2%B4%EC%A7%80%ED%96%A5-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-Object-Oriented-Programming
+					: 위에서부터 아래로 절차적으로 실행시키는걸 지향한다는 말이 아니라, 프로시져 의 사용을 지향한다는 의미이다.
+						: 한국에서는 절차 지향 프로그래밍이라고 많이 일컫는데 이건 오번역된거다
+					: 그러니까 기능별로 구분하여 메서드 혹은 함수로 구현해서 재사용 및 유지보수를 쉽게 하는 것이 목적이다
+					: 프로시저 지향 프로그래밍은 객체 지향 프로그래밍과 대립한다
+						: 엄청 다른건 아니고, 걍 관심사가 객체에 맞춰져 있느냐 아니냐 인거다
+	
+		: PL/SQL 의 구조
+			:	
+				DECLARE
+					변수명1 변수타입;
+					변수명2 변수타입;
+					변수명3 변수타입;
+					.
+					.
+					.
+				BEGIN
+					쿼리문1;
+					쿼리문2;
+					.
+					.
+					.
+				END;
+
+			: 전체가 하나의 블럭이고 , 구성 요소는 아래와 같다
+				(1) DECLARE
+					: 선언부로, 변수나 상수를 정의한다
+						: 단순 선언만 해도 되고, 선언과 동시에 값을 할당해놔도 된다.
+					: 옵션이다
+				(2) BEGIN
+					: 실행부로, 로직을 수행한다
+					: 필수이다
+				(3) EXCEPTION
+					: 예외처리부로, 로직 수행중 발생한 예외를 처리한다
+					: 옵션이다
+				(4) END
+					: 블록의 종료를 나타내고, 맨 끝에 쓴다
+					: 필수이다
+
+		: PL/SQL 블럭의 종류
+			1. Anonymous PL/SQL
+				: 익명 블럭
+				: 일회성으로 사용할 경우 사용 
+			2. stored PL/SQL
+				: 저장블럭
+				: 다회성으로 사용할 경우 사용
+
+		: 실행할때 전체를 드래그 하고 ctrl + enter 눌러야되는거 주의
+
+오라클 반복문
+	(1) for loop 문
+		:  범위는 '시작값<= 루프제어변수<=끝값' 이고 , 증감은 무조건 +1 로 고정되있는  for 문
+		: 구조
+			: for loop문의 루프제어변수는 따로 자료형 선언 없이 걍 사용 가능하고, 정수형이다.
+		
+	(2) loop 문
+		: do-while 문 중에서도 while문의 조건이 true 인것
+			: 그러니까
+				do{
+					. . .
+				}while(true);
+
+		: 구조
+			LOOP 
+				쿼리문1; 
+				EXIT WHEN 조건문;
+				.
+				.	
+				. 
+			END LOOP;
+
+			: 구성 요소
+				: LOOP >> LOOP 문의 시작을 나타낸다
+					: while(true) 라고 봄된다
+				: END LOOP >> LOOP 문의 끝을 나타낸다
+				: EXIT WHEN >> LOOP 문의 탈출 조건을 나타낸다
+					: while 문 안의 태클거는 if 문이라고 봄 된다.
+
+	(3) while loop 문
+		: 일반적인 while 문과 똑같음
+		: 구조
+			WHILE 조건문 LOOP
+				쿼리1;
+				쿼리2;
+				.
+				.
+			END LOOP;
+		: 일반 loop 문에서처럼 내부에 exit 을 사용 가능하다
+
+
+drop table board;
+create table board(
+BOARD_ID NUMBER(4,0) primary key,
+WRITER NVARCHAR2(50),
+TITLE NVARCHAR2(500),
+CONTENT	NVARCHAR2(500),
+BOARD_DATE TIMESTAMP(6),
+HIT	NUMBER(4,0)
+);
+
+
+
+-- 오라클에서 반복문을 사용하여 더미데이터 넣기
+BEGIN
+    FOR i IN 1..100 LOOP -- i 는 1부터 시작해서 100까지 반복
+    INSERT INTO BOARD(BOARD_ID , WRITER , TITLE , CONTENT ) VALUES (BOARD_SEQ.NEXTVAL, '이순신'||i,'이순신입니다'||i,'나는 이순신입니다'||i);
+    END LOOP;
+END;
+
+commit;
+COMMIT;
+rollback;
+
+select * from BOARD order by board_id desc;
+
+-- 10개의 데이터를 가져오고 싶다
+select * from board where board_id between 1 and 10; -- 글이 삭제가 되면 board id 도 일부 삭제되므로 이렇게 해서 10 개 가 나온다는 보장이 없다
+
+-- 1페이지당 10개씩 글의 목록을 출력하는 sol
+    -- 오라클에서 행의 범위를 정해주는 ronum 사용 << 레코드의 순번
+select ROWNUM, BOARD.* FROM BOARD;
+
+
+--- 서브 쿼리 << 쿼리문 안의 쿼리
+select * from
+    (
+select ROWNUM num, B.* from  -- B의 ROWNUM 의 집합을 num 이라고 붙였다
+    (
+    select * from BOARD order by board_id desc
+    )B -- 결과 집합의 별칭이 B이다
+    )
+where NUM between 1 and 10; -- 1 이 아니라 2가 되도 잘 나온다
+
+
+-----------------------------------------------------------------------------
+더미 데이터: ?
+
+
+public 으로 선언되있는것은 굳이 getter setter 만들필요는 없다
+next이름은 특이하게 setNext( ) 가 아니라 isNext()  가 된다.
+
+
+-----------------------------------------------------------------------------
+paging 클래스 
+	: 웹 페이지 밑에 페이지 인덱스를 나타내기 위한 클래스
+		: 개인적으로는 dto 역할로 추측이 된다.
+
+	: 필드 네임을 통한 용도 파악 tip
+		post >> 게시글 관련
+		page >> 목차 페이지 관련
+
+	: private 일반 필드 , private 상수 필드의 초기화 시점 추천
+		: 상수 필드 >> 어차피 객체 생성될때마다 바뀌는 것도 아닌데 걍 선언할때 값 대입한다
+			: 물론 원하면 생성자 부분에서 초기화해줄 순 있음
+		: 일반 필드 >> 객체마다 다를 수 있으므로 생성자 이후 부분에서 대입한다
+			: 생성자 부분에서 초기화 할것이라도, 그 코드의 분량이 꽤 된다면 (=단순히 arg 로 받은 값으로 그대로 초기화 하는게 아니고 별도의 식을 써야된다면 ) 직접 생성자 부분에 그 코드를 직접 써놓지 말고 걍 그 뭉텡이를 메서드로 따로 만들어 그 메서드만 호출하는걸 추천
+
+	: 객체 생성 필요 시점
+		: list.jsp 를 response 해야할때
+			: 즉, 페이지 인덱스 아이콘을 화면에 표시해야할때
+		
+	: 상수 필드 << 개발자가 설정해놓는다. 클라이언트에 상관없이 일정하다
+		1. final int VIEW_POSTS_NUM
+			: 한 목차 페이지당 보여지는 게시글(제목)의 수의 단위
+
+		2. final int VIEW_PAGE_NUM
+			: 한 목차 페이지당 밑에 표시될 페이지 인덱스 하이퍼링크의 갯수의 단위
+			: [1]  ,[2] , [3] ... 같은거 몇개 단위로 보여줄 지 결정한다는거임 
+			: ex) 5 개 --> [1] [2] [3] [4] [5] ,  [6] [7] [8] [9] [10] 으로 표시됨
+
+	: 일반 필드
+		1. int totalPosts
+			: 총 게시글 수
+			: db에서 객체 생성 시점마다 불러와야됨
+				: 총 게시글 수는 지속적으로 바뀌니까
+
+		2. int totalPage
+			: 목차 페이지의 총 개수 
+				: 즉, 어플리케이션 전체적으로 접근 가능한 [1] , ... [n] 의 개수
+					: 한 페이지에서 [1] , [2] , ... [n] 으로 접근 가능하다는게 아님 << 이건 VIEW_PAGE_NUM 이다
+
+			: 따로 db 에서 불러오거나 클라이언트에게 받는게 아니라  이미 있는 totalPost, VIEW_POSTS_NUM 을 이용해 구한다
+			: 단순히 totalPost/VIEW_POSTS_NUM 하면 안된다.
+				: ex )  totalPosts = 11 , VIEW_POSTS_NUM =10 인데 단순 11/10 하면 1.1 인데 정수/정수 이므로  totalPage= 1 이 되고 , 나머지 한개의 게시글은 들어갈 곳이 없어진다. 그리고 totalPosts = 9 , VIEW_POSTS_NUM=10 일 경우 단순 9/10 하면 totalPage= 0 이 되고 , 게시글은 어떤 페이지에도 들어가지 못한다.
+			: 방정식 
+				: 정수/정수 하면 소수점 부분은 날라가고, 페이지의 갯수는 소수점값으로 나타내지 못한다는 사실들을 생각하여 짜야된다.
+
+				sol1. (totalPosts-1)/VIEW_POSTS_NUM + 1
+					: totalPosts 가 VIEW_POSTS_NUM 으로 나뉘어 떨어지지 않을 경우(= 소수점 부분이 남을 경우) 자동으로 +1 올림시키는거다
+						: 해석)
+							: 일단 생각해보면 totalPost / VIEW_POSTS_NUM 자체의 결과는 몫이다 (=소수점 부분이 날라간 꼴)
+
+							:   마지막의 +1
+								: 일단  totalPost / VIEW_POSTS_NUM  값이 소수점 부분이 있다고 가정하고 올림 처리를 해준다.
+							:  (totalPosts-1)/VIEW_POSTS_NUM 부분
+								:   totalPost / VIEW_POSTS_NUM 했을때 소수점이 남는 상황인경우
+									: (totalPosts-1)/VIEW_POSTS_NUM 은  totalPost / VIEW_POSTS_NUM 의 몫 값을 반환하게 된다.
+									: 결과적으로는 (totalPosts-1)/VIEW_POSTS_NUM + 1  == 몫 + 1 이므로 소수점 처리가 잘 된거다
+
+								:  totalPost / VIEW_POSTS_NUM 했을때 딱 나누어 떨어지는 경우
+									: (totalPosts-1)/VIEW_POSTS_NUM 은  totalPost / VIEW_POSTS_NUM 의  (몫 - 1) 값을 반환하게 된다.
+									: 결과적으로는 (totalPosts-1)/VIEW_POSTS_NUM + 1  == ( 몫 -1 )+ 1 === 몫이므로 소수점 처리가 잘 된거다
+
+
+
+
+				sol2.  totalPage =  (int)Math.ceil((double)VIEW_PAGE_NUM/VIEW_POSTS_NUM) 
+					: Math.ceil 를 이용하여 소수점이 남을 경우 자동 반올림 시킨다.
+
+
+ 		3. int currentPage
+			: 클라이언트가 request 보내는 시점에 있었던 목차 페이지 번호 
+			: 클라이언트로부터 값을 받는다.
+				: MODEL 인 ListCommand 에서 request 객체의 parameter 값으로 얻는다
+
+		4. int endPage
+			: 현재 목차 페이지에서 보여줄 [ n] 아이콘 들 중에서 가장 마지막에 보여줄 n 값을 얻는다
+			: 방정식
+				endPage = ((currentPage-1)/VIEW_PAGE_NUM +1)*VIEW_PAGE_NUM;
+				if( endPage> totalPage) endPage =totalPage;
+		
+					: 설명
+						: endPage = ((currentPage-1)/VIEW_PAGE_NUM +1)*VIEW_PAGE_NUM;
+							: 일단 VIEW_PAGE_NUM*m개 단위로 값을 결정하는거다
+								: 해석
+									: m=  (currentPage-1)/VIEW_PAGE_NUM +1 은 currentPage/VIEW_PAGE_NUM 했을때 소수점 부분이 남을 경우에 올림 시킨값이다.
+
+						: if( endPage> totalPage) endPage =totalPage;
+							: 맨 마지막 목차페이지에서까지  VIEW_PAGE_NUM*m개의 [ n ] 아이콘이 보인다는 보장이 없으므로  해주는 조치이다.
+							: 실제 목차페이지 개수보다 [n] 아이콘의 n 이 더 크다면 n 을 강제로 전체 목차 페이지의 개수로 한다.
+						
+		5. int startpage
+			: 현재 목차 페이지에서 보여줄 [ n ] 아이콘들 중 가장 첫번째로 보여줄 n 값을 얻는다
+			: 방정식
+				startPage = ((currentPage-1)/VIEW_PAGE_NUM )*VIEW_PAGE_NUM +1;
+
+
+		6. boolean prev
+			: 목차 아이콘에 [이전] 을 표시할 지의 여부
+				: 젤 처음 목차 페이지의 경우 [이전] 을 표시할 필요가 없다
+			: 식 >> prev = (startPage==1)? false:true ;
+
+		7. boolean next
+			: 목차 아이콘에 [다음] 을 표시할지의 여부
+				: 젤 마지막 목차 페이지의 경우 [다음] 을 표시할 필요가 없다
+			:식 >> next = (endPage==totalPage)? false:true ;
+
+
+
+-----------------------------------------------------------------------------
+ListCommand , 즉 list 관련 Model 에서의 Paging 클래스 활용
+
+			
+	: Paging 클래스를 사용하는 목적 >> endPage , startPage, prev , next 값을 얻으려고
+		: endPage , startPage 
+			>> list.jsp에서 특정 범위의 아이콘을 생성할 수 있게 함
+ 		: prev, next 
+			>> list.jsp 에서 [이전] , [다음] 을 표시할지 말지 결정할 수 있게 함
+
+	: Paging 클래스를 사용하기 위해 필요한 값들(== 생성자 부분의 arg) >> totalPosts, currentPage 값
+		totalPosts
+			: dao 객체의   getTotalPosts( ) 메서드로 뽑아온다.
+
+		currentPage
+			: 일단 client 에게 param 으로 받는다. 유효성 검사는 Paging 객체 내부에서 하게 했으니까 딱히 MODEL 에서 해줄 필요 없다 << 이따 이거 반영해서 고치자. 쌤이 써준것보다 더 나은 것 같다
+				: client 에게 param 으로 받은 값을 paging 객체가 아닌 model 에서 쓰는 경우 이건ㄴ 유효성 된 값이 아니므로 , currentPage 값을 활용할 일이 있음 paging 객체를 일단 생성하고 paging.getCurrentPage( ) 로 얻어온 값(=유효성 검사된 값)을 활용한다.
+
+	: 따로 처리해서 구해야 했었던 값 << 솔직히 이거 걍 paging 객체 내부의 필드로 주고 구하게 했었던게 더 나을 수도 있었던 것 같다.
+		: 현재 목차 페이지에서 표시할 게시글들의 시작  ROWNUMBER , 끝 ROWNUMBER
+			:BoardDAO 클래스의 boardList( ) 메서드
+				: dao.boardList( start, end ) 의 arg 로 들어가서 , 특정 ROWNUM의 게시글을 유db에서 가져올 수 있게 도와준다.
+
+			int start = (currentPage-1)*10 +1;
+			int end = (currentPage)*10;
+
+	: 저장한 것들
+		request.setAttribute("list",list);	 >> 화면에 표시할 게시글 목록들 데이터
+		request.setAttribute("paging",paging); >>  endPage , startPage ,prev, next  뽑아낼 수 있게 하려고
+-----------------------------------------------------------------------------
+
+jstl for 문에서 증감 정도 정할수 있다
+		 <c:forEach var="pageNum" begin="${paging.startPage}" end="${paging.endPage}" step="1">
+			: step 속성을 활용한다
+
+	 <c:forEach var="pageNum" begin="${paging.startPage}" end="${paging.endPage}" step="1">
+	 		<a href="/JSP_MVC/list.do?page=${pageNum}" style="${paging.currentPage == pageNum ? 'color:red':'color:blue'}">  ${pageNum} </a>&nbsp 	
+	 </c:forEach>
+
+boolean 은 getter 메서드가 is 로 시작
