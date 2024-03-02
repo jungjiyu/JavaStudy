@@ -417,6 +417,18 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 			2. body 부분
 				: client 의 어떤 다른 데이터
 
+22. request, response 객체의 생성과 소멸
+	: 클라이언트로부터 새로운 request 가 들어오면(=클라이언트로부터 새로운 데이터를 받으면) 새로운 request, respone 객체가 생기고, 기존 reqeust, respones 객체는 소멸된다.
+
+22. 페이지 이동 방식
+	1. forward
+		:기존 페이지의 response. request 객체를 포워딩 된 페이지로 제어권과 함께 넘겨서 , 그 포워딩된 페이지에서 클라이언트에게 response 하게 하는거다
+		: url 이 유지된다
+			: 클라이언트에게 새로운 reuqest 를 받지 않고 서버내에서 처리하는 거라 기존 request 객체가 유지되어 헤더 부분도 안바뀌어서 그렇다
+		: 기존 페이지에서 flush( ) 한 이력이 있으면 forward 기능을 사용하지 못한다
+			: request 객체가 바뀌어서 그렇다???/
+
+
 22. el 표현식과 <%= %> 를 속성값의 일부로 사용하는 케이스들
 	; 내장객체(=request , application, page , session 객체)의 attribute 혹은 param 값만 사용하면 되는 경우 >> el 표현식 사용
 		: ex) <c:out value="${ param.name }">
