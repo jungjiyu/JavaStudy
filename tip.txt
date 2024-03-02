@@ -417,6 +417,12 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 			2. body 부분
 				: client 의 어떤 다른 데이터
 
+22. el 표현식과 <%= %> 를 속성값의 일부로 사용하는 케이스들
+	; 내장객체(=request , application, page , session 객체)의 attribute 혹은 param 값만 사용하면 되는 경우 >> el 표현식 사용
+		: ex) <c:out value="${ param.name }">
+	: 내장 객체가 아닌 객체(=직접 만든 클래스의 객체들)를 사용하거나 java클래스의 메서드 같은걸 활용해야하는 경우 >> <%= %> 사용
+		: 참고로 , 그냥 <% %> 는 안된다.
+		: ex) <c:out value="<%=dto.name%>">
 
 	URL Uniform Resource Locator
 		: 자원의 위치를 나타내는 주소
