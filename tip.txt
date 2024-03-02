@@ -422,7 +422,7 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 		: ex) <c:out value="${ param.name }">
 	: 내장 객체가 아닌 객체(=직접 만든 클래스의 객체들)를 사용하거나 java클래스의 메서드 같은걸 활용해야하는 경우 >> <%= %> 사용
 		: 참고로 , 그냥 <% %> 는 안된다.
-		: ex) <c:out value="<%=dto.name%>">
+		: ex) <c:out value="<%= request.getContextPath() %>">
 
 	URL Uniform Resource Locator
 		: 자원의 위치를 나타내는 주소
