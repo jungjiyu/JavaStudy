@@ -41,3 +41,30 @@ session 내장객체
 	>> invalidate 쓰면 서버 상에선 제대로 없어지겠지. 그런데 여전히 브라우져에 남아있잖아. 그래서 일단 쿠키를 가져온다음에 수정해줘야지.
 taglib 지시자 >> jst l 을 사용하기 위해 지정하는 것. 
 
+13
+ 왜 flush() 한 후에 forward 호출하면 포워딩이 안될까?
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>main</title>
+</head>
+<body>
+<%
+
+for(int i = 0 ; i <10;i++){
+	out.print(i+"<br>");
+}
+out.flush();
+request.setAttribute("name","jiyu");
+
+%>
+<jsp:forward page="SubPage.jsp"/>
+
+<p>안녕하세요</p>
+<%out.flush(); %>
+</body>
+</html>
+
