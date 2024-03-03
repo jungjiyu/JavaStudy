@@ -1,1 +1,5 @@
 1. server.xml 파일과 web.xml 파일 등 servers 디렉터리의 개층 구조
+2. 언제 resposne 가 종료됬다고 하는거임
+2. PrintWriter 과 JspWriter 의 차이점
+   : PrintWriter 를 쓰면 JspWriter 가 작동하지 않는 이유
+  : JspWriter 가 언제 닫히는건지 -- response 가 종료되면? 제어권이 없어지면?
