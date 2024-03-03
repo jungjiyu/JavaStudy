@@ -1,3 +1,7 @@
+0. 일단 할 게 많아서 당장은 mvc 패턴 공부 중단 -- 1단원의 스크립틀릿 부분부터 계속
+
+
+
 1. server.xml 파일과 web.xml 파일 등 servers 디렉터리의 개층 구조
 2. 언제 resposne 가 종료됬다고 하는거임
 2. PrintWriter 과 JspWriter 의 차이점
