@@ -276,8 +276,14 @@ JSP
 				: 그러니까 컴파일되기 이전에 읽히는 부분이다.
 
 			: 형태) <%@ 지시자종류 속성1="값1" 속성2="값2" ... %>
+				: void element 이다(끝 태그가 따로 없다)
+
 			: 지시자 종류
-				1. page 지시자 : jsp 페이지에 대한 정보를 설정
+				1. page 지시자 : 해당 jsp 페이지에 대한 기본적인 사전 설정을 함
+					; jsp 파일의 지시자는 jsp 파일이 서블릿으로 변환될때 필요한 정보를 제공한다
+					: jsp 파일이라면 page 지시자는필수이다
+						: 심지어 include 되는 파일일지라도, 필요한 page 지시자는 모두 명시해야한다.
+
 					: 속성 종류 
 						(1) info 
 							: 페이지에 대한 설명을 입력
@@ -286,11 +292,15 @@ JSP
 							: 할당 가능한 값 >> "java" 같은 언어명
 
 						(3) contentType
-							: https://codevang.tistory.com/196
-							: https://pygmalion0220.tistory.com/entry/HTTP-Content-Type
-							: https://m.blog.naver.com/minhyupp/222210489136
+							: https://jong99.tistory.com/92
 							: 쉽게 말하면 클라이언트에게 response된 메세지를 이렇게 디코딩 하시오 라고 알려주는 것
-							: 주로 "text/html; charset=utf-8" 값을 부여
+								: 근데 이건 말 그대로 디코딩 방식을 지시하는거지, 서버 측에서 실제로 이 캐릭터 셋을 사용했음을 의미하는게 아니다
+									: 실제로 컨테이너가 사용한 charset 은 pageEncoding 속성의 값으로 주어진다.
+									: ex)
+										contentType= "text/html ; charset=utf-8"  pageEncoding="ms949"  
+
+											: 이페이지는 실제로는 ms949 방식으로 개발되었고, 클라이언트 너는 이를 html 언어로 받아들이고 utf-8 방식으로 디코딩해라.
+									
 							: 서블릿의 response.setContentType 에 대응한다
 							: Content-type
 								: http "body" (http request 의 body 혹은 http response 의 body)에 담겨져 전송되는 데이터의  인코딩 타입을 명시하는 필드로, http header (http esponse header 또는 http request header )에 들어있다
@@ -319,65 +329,352 @@ JSP
 									: THang !
 
 						(4) pageEncoding
-							: 해당 jsp 파일을 해당 방식으로 실제로 인코딩 ,디코딩 함 
-							: servlet 의  resposne.characterEncoding( ) 에 대응한다
+							: 쉽게 말하면 클라이언트에게 파일을 실제로 어떻게 인코딩해서 response 할지 정하는 속성
+								: 근데 실제로 이렇게 인코딩 시켜서 response 를 보냈다고, 클라이언트 측에서 이 방식으로 디코딩 하는게 아니다.
+									: 클라이언트는 자기가 어떻게 인코딩된 파일을 response 로 받았던 건 간에 contentType 에 명시된 방식으로 디코딩을 한다.
+										: contentType 속성을 아예 명시하지 않은경우 pageEncoding 의 값으로 인코딩 방식을 채택하긴 한다
+
+							: servlet 의  response.seteCharacterEncoding( ) 에 대응한다
 								: request 객체 설정은 지시자 부분에서 거의 되는게 없고 대부분 스크립틀릿 내부에서 해준다
-									: request 는 resposne 를 이끌어낼때 활용되는거지, 그 자체가 결과로 남아서 컴파일 되는건 아니니까 그런거라고 이해하자.
+								: request.setCharacterEncoding( ) 은 클라이언트에게 받은 reqeust 데이터를 어떻게 실제로 디코딩 할지 결정하는 거다
 								
 							: contentType vs pageEncoding
-								: pageEncoding >> 실제로 이렇게 인코딩 하는것
+								: pageEncoding >> 실제로 이렇게 인코딩, 디코딩 하는것
 								: contentType >> 받는 쪽에게 이렇게 디코딩하라고 알려주는거
 
 							: 할당 가능한 값 >> "utf-8" , "ms949" 같은 charset 명
-								: default 값은 ISO-8859-1 로, 기본적으론 한국어 지원이 안되기 때문에 UTF-8로 지정을 해줘야됨
-
+								: default 값은 ISO-8859-1 로,  한국어 지원이 안됨
 						(5)import
 							: 페이지에서 사용할 자바패키지, 클래스 지정
-
+							: 보통 단독으로 , url 하나마다 써주는 편
+							: 주의 ) jstl 라이브러리의 경우 page 지시자의 import 속성을 통하여 추가되는게 아니라, jstl 과 el 표현식 만을 위한 지시자인 taglib 지시자를 이용하여 추가되는거다
+							: ex) 
+								<%@page import="java.uti.Scanner" %>
+								<%@page import="java.uti.ArrayList" %>
 						(6) session
 							: 세션 사용 여부를 지정
 							: 할당 가능한 값 >> true 혹은 false
 								: default 는 true 값임 
 
 						(7) buffer
+							: https://dololak.tistory.com/151
 							: 출력 buffer 의 크기를 지정
 							: 할당 가능한 값
-								1. none >> 버퍼를 사용하지 않겠다
-									: 그러니가 바로바로 출력된는거임
-								2 숫자 >> 해당 크기의 버펄를 사용
-									: default 값은 8kb임
+								1. none >> 버퍼 기능을 사용하지 않겠다
+									 buffer="none" 이 버퍼 자체를 사용하지 않겠단 의미가 아니다. 그냥 뭐라도 들어오면 바로 바로 flush시켜서(== 바로바로 버퍼가 꽉 찬걸로 간주해서) response 하겠단 의미
+
+									: 잘 사용하지 않는다(포워드 기능, 에러페이지 처리 기능 등 버퍼 사용의 이점을 누리지 못하게 된다)
+									
+
+								2 숫자kb >> 해당 크기의 버펄를 사용
+									: default 값은 8kb임	
+									: kb 단위로 지정 가능
+									
+
 
 						(8) autoFlush
-							: 출력 버퍼가 모두 채워졌을때 자동으로 비울지 결정
+							: 출력 버퍼가 모두 채워졌을때 자동으로 비울지(=flush 할지) 결정
 							: 할당 가능한 값
 								1. true 
 									: default 값이다
+									: 굳이 값을 false 로 할 일이 없어서 걍 default 값인 true 를 그대로 사용함 되기 때문에 autoFlush 란 속성 자첼 별로 명시하지 않는다
+
+
 								2. false
-									: 주의) buffer="none" 으로 했는데 autoFlush="false" 로 하면 에러난다
+									: 출력 버퍼가 꽉 차도 자동으로 flush 시켜주지 않는다 
+									: 잘 사용하진 않는다
+										: 출력 버퍼가 꽉 차면 오버 플로우 에러 나기 때문
+
+							: 참고 >> 직접 flush 하는 법
+								: 출력 스트림 객체인 out 에 flush( ) 사용
+								: <% out.flush( ); %>
 
 						(9)errorPage
 							: 해당 페이지에서 에러가 발생했을때 사용할 errorPage를 직접 일일이 지정한다
-								: web.xml 파일에서도 지정가능
+
 	
 						(10) isErrorPage
 							: 해당 페이지를 errorPage 로 사용하겠다고 선언한다
 								: 그러니까 해당 에러 발생시 띄워지는 웹 페이지로 선언한단 말이다
-							: 할당 가능한 값 >> true. false
-								: default 값은 false
+							: 할당 가능한 값 >> true
+								: default 값은 false 이기 때문에 이 페이지가 에러페이지로 쓰일게 아니라면 애초에 이 속성자체를 표실 안해준다.
+
+							: 에러 페이지로 지시된 페이지는 exception 내장 객체의 사용이 가능해진다. 
+							: 에러 페이지의 기본 구성
+								1. request.setStatus(200);
+									: 상태코드를 정상을 의미하는 200 으로 바꿔준다
+										 : 일부 브라우저의 경우 404 같은 상태 코드에 따라 브라우져 자체적으로 설정된 에러페이지를 출력하기 때문에 , 내가 만든 에러 페이지를 브라우저에 상관 없이 보여주기 위해서는 상태를 200 으로 직접 바꾼다.
+								2. excetion 내장 객체 활용
+									: 대표적으로는
+										(1) exception.getClass( ).getName( ) 
+											: 예외명 반환
+												: nullpointerexception 같은 거
+										(2) exception.getMessage( ) 
+											: 예외 설명 반환
+												:  
+								3. 원하는 문구 쓰기
+								
+
+							: 이 방법으로 에러 페이지가 보여지는 경우 따로 url 이 바뀌지 않는데 이는 에러가 발생하고, 에러 페이지를 반환하는 과정 사이에서 클라이언트로부터 새로운 request 를 받은 적이 없기 때문에 기존 url 이 유지되는 것.
+
+							: 에러페이지를 따로 만드는 이유 >> 클라이언트에게 신뢰를 주지 못한다.
+
+						(11) trimDirectiveWhitespaces
+							: 브라우져에서 페이지 소스 보기 했을때 불필요한 공백을 제거하는 것
+							: 할당 가능한 값 : true
+								: 물론 false 도 할당 가능한데 default 값이 false 라 false 값 쓸꺼면 걍 쓰질 마라
 
 					: 이클립스에서 jsp 파일의 생성시 다음의 지시자 태그가 기본적으로 생성된다
 						<@page language="java" contentType="text/html ; charset=UTF-8" pageEncoding="UTF-8" %>
 
-				2. include 지시자 : 외부 파일을 현재 jsp 페이지에 포함
-					: 어플리케이션 내부의 자바 클래스, 패키지는 외부 파일 축에 끼는게 아니라 include 지시자에서 정의되는게 아님 (page 지시자의 속성에서 정의 가능)
-				3. taglib 지시자 : 자바 클래스나 JSTL 을 선언
+				2. include 지시자: 다른 jsp 파일의 코드 자체를 현재 jsp 페이지에 포함시켜, 애초에 같이 컴파일되게 하고 싶을 때 사용
+					: 속성
+						(1) file
+							: include 되는 파일의 uri
+							: 암기 tip ) 
+								: 액션 태그와 다르게 경로를 설정하는 속성이 page 가 아니라 file 인건 이미 지시자명으로 page 가 존재해서 그런 것 같다
+
+					: 주로 언제 사용? )  반복적으로 포함되는 부분인 경우 사용
+						: 반복적으로 포함되는 부분 << 홈페이지의 header, footer 등
+
+					: 특징
+						1. 애초에 같이 컴파일 시키는 거라서 client 로부터 새로운 request 를 받는게 아니므로, 브라우져 창의 url 은 유지된다
+						2. 애초에 같이 컴파일 시키는 거라서 각 페이지에서 정의된 변수를 그대로 사용 가능
+							: 이클립스 상에선 확장자를 jspf 로 안하고 걍 jsp 로 하면 빨간 줄이 뜨긴 하는데 정상적으로 작동하는 거임
+								: 컴파일될때서야 합쳐지는거지. jsp 파일 그자체론 별개라서 이클립스 측에선 잘못된걸로 인식된거다(누누히 말했지만 이클립스가 멍청한거지, 개발자가 잘못한게 아니다)
+
+					: include 지시자에 의해 include 되는 파일의 구성
+						1. 보통 확장자를 jsp 로 하지 않고 jsp Fragment 를 나타내는 .jspf 로 하는 편
+							: 그냥 jsp 로 해도 딱히 상관은 없는데, 이렇게 하면 이클립스가 이게 include 되는 파일이란걸 인식 가능하고(<< 그래서 다른 페이지의 변수를 활용할때 딱히 빨간줄이 뜨지 않음)
+						2. page 지시자를 제외하곤 <head>, <body >. <footer> , <html> 이런거 안써도 된다.
+							: page 지시자는 꼭 써야된다.
+								: 아무리 jsp"f" 파일이라도 기본적으론 jsp 파일이니 page 지시자만큼은 생략하면 안된다.
+							
 
 
+
+					: 주의 )	
+						: import 속성은 inlcude 가 아닌 page 지시자에서 사용하는거임
+		
+
+					: 비교 대상 ) 
+						include 액션 태그
+							: request 객체 유지 >> url 유지
+							: 제어권을 잠시 include 된 파일로 넘겼다가, 다시 제어권을 돌려받는 방식으로, 각각 컴파일 됨.
+						forward 액션태그
+							: 서버 내에서 다른 페이지로 이동하게 처리하는거라 request 객체 유지 >> url 유지
+							: 제어권을 아예 forwarding 된 파일로 넘김.
+						sendRedirect( ) 메서드
+							: 클라이언트에게 해당 페이지의 url을 response 하고, 클라이언트가 그 url 을 새로 request 하는거라 새로운 request 객체가 생성됨 >> url 바뀜
+							
+
+				3. taglib 지시자 : EL에서 자바 클래스를 호출하거나 JSTL 을 선언할때 사용되는 지시어
+					: 속성
+						1. prefix
+							: 사용할 태그의 접두어를 설정하기 위해 사용
+							: 주로 라이브러리명을 접두어로 사용하는 편이다.
+							: ex) 
+								prefix="c" 면 <c:어쩌구  >  </c:어쩌구 >의 형태로 사용하게 됨
+								prefix="fmt" 면 <fmt:어쩌구 > </fmt:어쩌구> 의 형태로 사용하게 됨
+						2. uri 
+							: 사용할 라이브러리의 uri 를 의미함
+							: 직접 일일이 안쓰고 ctrl + space 누름 된다.
+				
+ 					
+		(2) 스크립트 요소 Script Elements
+			: jsp 에서 자바 코드를 작성 가능하게 해줌
+			: jsp 는 client 의 request 를 받아 실행될때 servlet 으로 변환되고, class 로 컴파일 된후 응답되어짐. 이 과정에서 _jspService( ) 메서드가 생성되는데, 변환된 코드의 위치는 스크립트 요소의 종류에 따라 _jspService( ) 의 내부 혹은 외부에 놓일 수 있다. 
+				: _jspService(  )의 외부에서 선언된 변수는 전역변수, 내부에서 선언된 변수는 지역 변수가 된다
+					:  주의할 것은 '전역', '지역' 은 단순히 _jspSerivce( ) 의 외부서 선언됬느냐 내부서 선언됬느냐만 나타내는거지, 기능상의 차이는 없다( 둘다 똑같이 해당 jsp 페이지 내부 어디서든 사용 가능하고, 전역이라고 다른 jsp 페이지에서까지 사용가능한 변수가 되는게 아니다.)
+			: 종류
+				1. 선언부 Declaration
+					: <%! %>
+						: 스크립틀릿에서 사용할 전역변수 혹은 메서드를 선언
+							: 자바 언어 기반이므로 문장 끝마다 ';' 붙여줘야됨
+						: _jspService( ) 메서드의 외부에 선언됨
+							: 따라서 스크립틀릿에서 선언된 변수는 전역변수
+ 
+				2. 스크립틀릿 Scriptlet
+					: <% %>
+						: jsp 페이지에서 실행할 자바 코드를 작성하는 영역
+							: 스크립틀릿 내부에서도 변수 선언은 가능하지만, 메서드의 선언은 불가(아래에 이유 적음)(호출은 당연히 가능)
+							: 자바 코드를 작성하는 것 이므로 문장의 끝마다 ';' 적어줘야됨
+						: _jspService(  )메서드의 '내부'에 그대로 기술됨
+							: 따라서 스크립틀릿에서 메서드 선언은 불가하다
+								: 자바 언어의 경우 메서드 내부에서 또 메서드 선언이 불가
+							: 따라서 스크립틀릿 내부에서 선언한 변수는 지역변수이다
+
+
+				3. 표현식 Expression
+					: <%= %>
+						: out.print( ); 의 축약 버전으로, 내부에 표현식을 쓰면 out.print(표현식); 이 자동으로 실행된다.
+							: out.print( ) ';' 를 나타내는 것이므로 , 내부에 ';' 는 적지 않는다.
+							: 표현식이란? ) 실행결과로 하나의 값이 남는 문장. 그러니까 반환값이 있는 메서드의 호출 || 수식 || 단순값
+
+
+	: 워크스페이스 폴더 계층
+		워크스페이스
+			▼ .metadata 
+				: 해당 디렉터리를 워크 스페이스로 지정하면 생기는 디렉터리로, 이클립스의 기본 설정이 저장되어있다.	
+				▼ .plugins \ org.eclips.wst.server.core \ tmp0 \ work \ Catialina \ localhost
+					: Catalina 
+						: 톰캣의 서블릿 컨테이너 	
+						: 서블릿파일을 컴파일한다
+					: 해당 워크스페이스의 모든 웹 어플케이션들에 대한 디렉터리가 각각 하나씩 만들어져있다
+					▼웹어플리케이션명 \ org \ apache \ jsp
+						: jsp 파일을 서블릿 파일(.java) 로 변환시킨 파일과, 그 서블릿 파일을 컴파일한 파일(.class) 가 들어있다
+							: 주의 - 단순히 jsp 파일을 만들었다고 생기는게 아니라, 한번 이상 실행시킨 전적이 있을때 만들어지는 파일들이다.
+							: 하나의 jsp 파일에 대해 2개의 파일이 있는거다
+								: 서블릿 파일의 경우 '원래jsp파일명_jsp.java' 의 이름으로 저장되있다
+								: 클래스 파일의 경우 '원래jsp 파일명_jsp.class' 의 이름으로 저장되어있다
+						: 애초에 서블릿파일로 만들었던 얘들은 이 디렉터리에 없음 주의					
+
+
+		: jasper
+			: 톰캣의 jsp 엔진
+			: jsp 파일을 서블릿으로 변환한다
+
+	: jsp , servlet 의 출력 스트림
+		: 참고 url
+			: 차이점 한국어로 요약 >> https://dololak.tistory.com/326
+			: 차이점 영어로 자세히>> https://stackoverflow.com/questions/13201334/difference-between-jspwriter-and-printwriter-in-java-ee
+			: out implicit object 에 대한 쉬운 자세한 설명 >> https://beginnersbook.com/2013/11/jsp-implicit-object-out-with-examples/
+			: Response 객체의 종료와 flush>> https://stackoverflow.com/questions/5043657/do-i-need-to-flush-the-servlet-outputstream
+				: response 가 종료되면, 서블릿 컨테이너는 즉각적으로 버퍼에 남아있는 내용을 모두 클라이언트에게 flush 한다. 
+
+		: Response 객체의 PrintWriter 스트림
+			: response.getWriter( )  로 직접 얻어야된다.
+			: 서블릿 파일에서 클라이언트로 향하는 출력스트림이다
+				: PrintWriter 도 한번에 출력 시키는게 아니라 버퍼에 저장해놨다가 출력시키는거다
+					: Servlet 이라서 특별히 그런게 아니라 PrintWriter 타입의 스트림 기본적으로 버퍼를 사용하기 때문에 그런거다.
+
+			: 만들어진 객체를 사용할때 예외를 발생시키지 않는다
+				: 그러니까 PrintWirter 타입의 객체 out을 대상으로 out.print( ) 할때는 따로 try .. catch 처릴를 해주지 않아도 된다.
+				: getWriter( ) 는 호출해서 out 객체를 직접 생성할때만큼은 try .. catch 문 작성이 필요하다
+					: respone 객체의 getWriter( )  가 thows Exception 을 하고 있어서 그렇다
+
+
+		: JSP의 JspWirter 타입의 out 내장객체
+			: jsp 파일에서 서블릿 파일의 출력스트림 으로 향하는 출력 스트림이다.
+			: jsp 파일의 html 코드는 out 객체를 통하여 print 처리 되는거다
+				: jsp 파일의 서블릿으로 변환된 .java 파일의 _jspService( ) 메서드 내부를 확인해보면 파악이 가능하다
+				: 따라서 html 코드도 out 객체의 버퍼에 저장되었다가 출력되는거다
+
+			: default 로는 버퍼를 쓰게 되어있다
+				: 버퍼를 사용하는 상황에서(=따로 지시자 부분에 buffer="none" 을 명시하지 않은 경우 )  jsp 에서 out 객체를 사용하여 출력된 내용은 바로 (서블릿의 출력 스트림을 향하여) 출력되는게 아니라, out 스트림의 버퍼에 저장되었다가 flush( ) 당하면 그제서야 (서블릿의 출력 스트림을 향하여) 출력된다
+					: 최초의 flush( ) 이전에는 PrintWriter 스트림 객체가 존재하지 않고, 최초의 flush( ) 가 일어난 이후에는 자동으로 PrintWriter 스트림 객체가 생성되어 이 길로 서블릿에서 받은 데이터를 클라이언트에게 전송하게 된다.
+					: 헷갈리지 말아야할 것은 버퍼를 사용하는 jsp 파일이라고 항상 버퍼를 거쳐 서블릿 파일로 출력되는게 아니란 거다 >> jsp 파일에서 response 객체의 PrintWriter 스트림을 쓰면 jsp 파일에서 out 스트림의 버퍼를 거치지 않고 PrintWriter 스트림으로 전달된다.
+
+				: 버퍼를 사용하지 않는 상황에서(=따로 지시자 부분에 buffer="none" 을 명시한 경우 ) jsp 에서 out객체를 사용하여 출력된 내용  
+
+			: JspWriter 스트림의 경우 사용할때마다 Exception 이 발생한다.
+				: out 내장 객체를 스크립틀릿 내부에선 그냥 사용 가능한데 선언부(<%! %>)에서는 그냥은 사용 못한다
+					: 스크립틀릿 내부의 코드는 _jspService(  )의 내부에 위치하게 되는데, _jspService( ) 의 경우 out 객체에 대한 Exception 처리가 되어있어서( thorws IOExpetion 하고 있다) 그냥사용 가능한거고, 선언부는 _jspService( ) 의 외부에 위치하고 있어 별도의 예외처리가 안되어있기 떄문에 그렇다.
+
+			: jsp 파일에서 출력했다고 죄다 JspWriter 스트림을 통하여 출력되는건 아니다. jsp 내부에서 Response 객체의 PrintWriter 스트림을 대상으로 출력할경우,  JspWriter 스트림의 버퍼로 출력되지 않고 , 직방으로 서블릿의 출력스트림을 향해 출력된다 
+
+			: JspWriter 가 PrintWriter 의 서브 클래스가 아님을 주의(JspWriter 나 PrintWriter 나 모두 Writer 스트림의 직속 자식 클래스다)
+
+
+
+	: jsp 의 라이프 사이클
+		: https://blog.naver.com/silro812/221528382965
+		0. 클라이언트의 jsp 파일 관련 requeset
+		1. WebServer 가 해당 request 를 받음
+		2. WebServer 가 해당 requests 를 Web Contatiner 에게 전달
+		3. Web Container 에서 Servlet Contat
+
+
+	: 에러 관련 정리
+		: jsp 의 주요 '상태 코드'
+			200 : 정상 처리
+			400 번대 >> 클라이언트 측 에러
+				404 : 존재하지 않는 url 이 request 됨
+			500 번대 >> 서버 측 에러 
+				 500: jsp 파일 내의 예외 발생
+
+
+		: 특정 상태로 변환하는 법
+			response.setStatus(상태코드);
+
+		: jsp 에서 에러 처리하는 방법들
+			case 1. 그냥 tomcat에서 기본 제공하는 에러 페이지를 response
+			case 2. 스크립틀릿의 try-catch 구문의 catch 부분을 reponse
+			**caes 3. 지시자태그의 속성 errorPage 와 isErrorPage 로 지정한 에러 페이지를 response
+				: 한 두개 정도의 페이지에서만 특정 에러페이지를 사용할 경우 유용
+
+			***case 4. web.xml 에서 에러페이지 지정
+				: 특정 에러 페이지를 여러 페이지에서 사용할 경우 유용
+				: 하는법
+					<error-page>
+						<error-code>상태코드</error-code>
+						<location>에러페이지의URL</location>
+					</error-page>
+
+					: 주의 ) location 에 적히는 경로의 경우 "절대경로"로 써야하는데 contextpath 부터 시작하는게 아니라 webapp 내부의 디렉터리 부터 시작하는거다
+
+	: jsp 출력 버퍼
+		: jsp 는 response 결과가 만들어질 때마다 곧바로 클라이언트에게 respones 하는게 아니라, 출력 버퍼에 모아두었다 가득 찰때마다 response 하는 방식으로 작동한다.
+		: 주의 ) 출력 버퍼가 오버플로우 되면 에러가 발생한다
+			: 오버 플로우 안되게 하는 방법
+				 case1 . autoFlush='false' 를 명시하지 않은 경우
+					: 따로 작업할 필요가 없다. 버퍼가 가득 찰때마다 자동으로 flush( ) 시켜주기 때문에 오버플로우 일어날 일이 없다
+				case2. autoFlush='false' 를 명시한 경우 << 개 비추
+					: 매번 직접 out.flush( ) 해주거나 out.clear( ) 시켜서 버퍼가 꽉 차지 않도록 한다..
+
+		: jsp 가 버퍼를 사용하는 이유
+			1. 출력 비용 감소
+			2. 최종 출력 이전에 처리 결과 수정 가능
+			3. 포워딩과 에러페이지 처리를 가능하게 함
+				: https://yonghwankim-dev.tistory.com/295
+				: 포워딩은 결과적으로 다른 페이지를 포워딩 시키는 페이지에서 처리한 내용은 클라이언트의 화면상에 나타나지 않고, 포워딩 당한 페이지의 response 내용만 화면 상에 나타나게 하는 거다.
+					
+					: 이가 가능한 것은  기존 원래 페이지의 처리 결과는 출력 버퍼에 저장시켜놨다가, 포워드 액션 태그를 실행할 시, 그 출력 버퍼를 '비우기' 때문에 그렇다(+ 포워딩 된 페이지에서의 출력 내용으로 그 버퍼를 새로 채우고, respone 하게 되어 포워딩 된 페이지의 결과만 response 된다)
+					: 기존 페이지에서 클라이언트에게 response 된 이력이 하나라도 있는 경우 포워딩 자체가 이뤄지지 않는다
+						: 생각해보면 당연한 것이 포워딩은 
+							>> 따라서 출력 버퍼를 사용하지 못하면 기존 페이지의 처리 내역이 폐기될 틈도 없이 바로 클라이언트에게 repsonse 되므로 포워드의 정신을 실현하지 못하게 된는 것이다.
+							>> 따라서 출력 버퍼를 사용하더라도 기존 페이지에서 직접 flush( ) 한 전적이 있으면, 이전 페이지의 결과가 이미 클라이언트의 화면에 출력되었으므로 forward 가 일어나지 않는다
+
+					: 포워딩이란
+						:기존 페이지의 response. request 객체를 포워딩 된 페이지로 제어권과 함께 넘겨서 , 그 포워딩된 페이지에서 클라이언트에게 response 하게 하는거다
+
+
+
+				: 에러 페이지처리를 가능하게 하는것도 포워딩과 비슷한 맥락이다
+					: 원래 출력해야했었던 내용을 버퍼에 담아뒀었다가, 에러 발생하면 버퍼에 담아뒀던 내용을 폐기하고, 에러 페이지의 처리 결과로 새로 채워서 resposne 하는 거다
+
+		: jsp 의 out 내장 객체에는 출력 버퍼와 관련된 메서드 많다											: 메서드 종류
+				: 출력 버퍼 관련
+					1. getBufferSize( )
+						: 출력 버퍼의 크기를 바이트 단위로 출력
+					2. getRemaining( )
+						: 남은 버퍼의 크기 중에서 사용 가능한 용량을 바이트 단위로 출력
+					3. clearBuffer( ) 
+						: 버퍼에 있는 콘텐츠를 폐기함(flush 와는 다르게 걍 쓰레기 통에 버리는거고, close( ) 처럼 아예 스트림을 닫아버리는 것도 아님)
+					4. flush ( )
+						: 출력 스트림으로 콘텐츠를 전송하고, 버퍼를 비움
+					5. close( ) 
+						: 출력 스트림을 닫음. 이떄 자동으로 flush ( )됨
+							그냥 java 배울때도 close( ) 하면 자동으로 flush( )  시켜주는거랑 같은 이치임
+						: 출력 스트림이 닫힌 이후엔 더이상 response 못보내게 됨
+
+				: 클라이언트한테 response 시킬 내용으로 처리하는거 관련
+					1. print( 내용 )
+						: 클라이언트한테 response 될 내용을 적음
+					2. println(내용)
+						: 클라이언트에게 '내용\r\n' 을 출력 
+						: "<br>" 과 다른것임을 주의
+							: 클라이언트 상에서 줄바꿈이 일어나진 않는다
+					3. nextline( )
+						: 클라이언트에게 "\r\n" 을 출력
+  						: "<br>" 과 다른것임을 주의
 
 
 	: 내장객체가 제공됨
-	
 
+
+
+	
 
 
 
