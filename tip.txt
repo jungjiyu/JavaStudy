@@ -29,15 +29,25 @@ web container == JSP container + Servlet container +...
 		:  http://localhost:8282/Day2/Hello 에서 Day2
 
 	: URL == 도메인:포트번호/contextpath/url매핑
-  : URI == URL 에서 도메인 이런거 뺴고 contextpath 이후 부분부터의 경로
 
 5. 경로 비교
-	1.  URL
-	  System.out.println("URL : " + request.getRequestURL());	---->  /http://localhost/JSP/member/list.do :  전체주소
 	
-	2. URI
-	  System.out.println("URI : " + request.getRequestURI());	  ----> /JSP/member/list.do  :  프로젝트에서부터 현재 페이지를 부른 servlet주소까지
-	
+	1. URI Uniform Resource Identifier
+		: 인터넷 상의 자원을 식별하는 문자열
+		: 보통은 URL 에서 도메인 이런거 뺴고 contextpath 이후 부분부터의 경로
+			: 근데 꼭 그런건 아니다. JSTL 라이브러리의 의 URI는 http://java.sun.com/jsp/jstl/core 이다.
+			: https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1040201&docId=465526492&scrollTo=answer1
+
+		: 얻는법>> request.getRequestURI());	
+		: 형식 >>
+			/JSP/member/list.do  :  프로젝트에서부터 현재 페이지를 부른 servlet주소까지
+
+	2.  URL Uniform Resouce Locator
+		: 네트워크 상에서 통합 자원의 위치를 나타내는 문자열로, URI 의 하위 개념이다
+
+		: 얻는법>> request.getRequestURL());	
+
+
 	3. ContextPath
 	  System.out.println("contextPath : " + request.getContextPath());	---->  /JSP  :   프로젝트명
 	
