@@ -440,3 +440,5 @@ ServletConfig가 있는 객체만 ServletContext의 대상이 된다.
 	URL Uniform Resource Locator
 		: 자원의 위치를 나타내는 주소
 
+
+23. ctrl + '/' >> 해당라인 주석 처리
