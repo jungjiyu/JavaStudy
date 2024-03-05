@@ -1,0 +1,552 @@
+:왜 생성자 선언할때는 파라미터타입을 명시하지 않음?
+: 제한된 파라미터 타입과 제너릭 와일드 카드중 UpperbounedWildcard 의 차이점이 뭐임?
+	: <T extends 부모클래스> , <? extends 부모클래스> 의 차이점
+: 와일드카드는 보통 제네릭 타입(클래스 , 인터페이스 , 메서드) 의 선언할때는 별로 안쓰이고, 객체를 만드는 시점 혹은 메서드의 parameter 부분에서만 활용하는것 같은데 제네릭 메서드 만들때 타입 파라미터 로 와일드 카드를 쓸 순 없는거임?
+
+-1. 컬렉션 프레임워크
+0. 스레드
+1. 배열 얕은 복사, 깊은 복사
+1. Object 클래스의 clone( ) 메서드
+1. 람다식
+2. 파일입출력
+4. 클래스 로더
+
+
+
+		
+					
+Object 클래스의 Class<T> getClass( ) 메서드
+	: 이미 만든 객체를 대상으로 쓰이고, 해당 객체의 정보를 담은 Class 객체를 반환한다.
+		: 여기서 다양한 정보( 해당 객체의 이름, 부모클래스등.. ) 을 뽑아낼 수 있다
+		
+
+Class 클래스의 static Class<T> forName( String url ) 메서드
+	: Class 클래스 자체를 대상으로 쓰이고, arg 로 경로가 명시된 클래스의 정보를 담은 Class 객체를 반환한다. 또한 이 과정에서 arg 로 명시된 클래스가 로딩된다.
+			
+
+
+
+
+제네릭
+	: 타입을 Parameter 로 처리하고, 실제 사용할 때 Parameter 를 특정 타입으로 대체 시키는 '기법'
+		: 그러니까 선언 당시에는 특정 멤버의 타입을 미정으로 해놓고 , 활용할 때서야 그 타입을 정한다
+		: 참고로 generic 이란 단어 자체의 의미는 '일반화' 이다.
+
+
+	: tip
+		1. 제네릭 타입을 활용할때 타입 파라미터를 생략 할 수 있는 경우가 있어도, 반드시 타입 파라미터를 생략해야하는 경우는 없다. 만약에 코드 짤때 해당 경우에 타입 파리미터가 생략 가능한지 생략 불가한지 기억 안나면 걍 타입 파라미터를 정확하 명시한다
+
+		2. 파라미터 타입의 타입은 활용시점 이하까지 원하는 시점에 확정가능하다.
+			: 제네릭 타입을 상속하는 시점에서 파라미터 타입으로 결정할 수도 았고
+				public class Car<T> implements Rent<Car>
+			: 제네릭 타입을 상속할땐 그냥 파라미터 타입을 결정하지 않고 있다가, 활용 시점에 확정할 수도 있따
+				public class Plane<T,A> implements Rent<T>로 Plane 클래스를 선언하고, 활용할떄 Plane<어쩌구타입, 저쩌구타입> 으로 타입을 확정해준다
+
+
+	: 헷갈리는 용어
+		(1) 제네릭 : 기법
+		(2) type Parameter : 결정되지 않은 타입
+			: 일반적인 타입 파라미터
+				: type Parameter 의 기본적인 형식 			
+					<알파벳>
+						: 보통 type 를 의미하는<T> 로 많이 하는 편인데 어떤 변수명처럼 문자열이든 상관 없다
+
+			: 제한된 타입 파라미터 bounded Type Parameter
+				: 타입 파라미터의 arg 로 들어갈 타입을 특정 타입 이하(= 그 클래스 자체 혹은 자식 클래스)로 제한 할 필요가 있을때 사용
+					: 자식 클래스 자리에 부모는 함부로 못들어가도 부모 자리에 자식 클래스는 무리없이 잘 들어가니까
+
+				: 제한된 타입 파라미터의 형식
+					< 알파벳 extends 특정클래스혹은특정인터페이스>
+						: 주의 
+							1. 특정 클래스가  아니라 특정 인터페이스 일지라도 extends 라는 표현을 쓴다
+							2. 만약 특정클래스혹은특정인터페이스가 Generic Type 인데, extends 할때 타입파라미터값을 확정해주지 않을거면, Generic type 을 부모로써 상속할때와 마찬가지로 그 타입파라미터를 위한 알파벳까지 별도로 써줘야된다.
+								ex)  	public <T, A extends Rent<T>> void renting2(A a)   이지, public <A extends Rent<T>> void renting2(A a ) 만하면 안된다. << 컴파일러가 타입을 추측할수 없어서 그렇다.
+
+
+				: 효과
+					1. extends 대상으로 쓰인 클래스 혹은 인터페이스 의 멤버를 사용 가능하다
+						:기존에는 그냥 object 클래스의 멤버만 사용가능했었던거 알지?
+					 
+					2. 특정 타입으로 제한 시킬 수 있다
+
+			: 와일드카드 타입 파라미터 wild card parameter
+				: 제네릭 타입을 매개 값, 리턴 타입으로 사용할떄 타입 파라미터로 ?(=와일드카드) 를 사용할 수 있다
+					: ? 는 범위 내의 모든 타입으로 대체할 수 있단 표시이다.
+							
+
+
+
+		(3) Generic Type  << Generic Class 혹은 Generic Interface 혹은 Generic Method 를 통칭하는 말
+			: type Parmeter 와 함께 선언된 클래스 혹은 인터페이스 혹은 메서드
+			: Generic Class , Generic Interface
+				: 클래스, 인터페이스명 옆에 선언된 type parameter 을 해당 클래스, 인터페0이스내에서 type 으로 하여 멤버 선언 가능
+					: 주의 )
+						1. static 타입의 멤버에는 generic 을 적용할 수 없다
+							: static 멤버의 경우 객체  생성 이전에 메모리에 올라가기 떄문에 타입이 결정되지 않은 채로 올라가게 되면 문제가 생긴다
+								: 하지만 일반적인 멤버들과는 다르게 generic method 의 경우 static 이여도 generic 을 적용 가능하다
+
+						2.  Generic class 의 생성자는 클래스명+타입파라미터+( ) 이 아니라 클래스명( ) 이다
+	
+				: 선언 형식
+					접근제한자 클래스혹은인터페이스명<A, B ,.. >{
+						멤버1;
+						멤버2;
+						. . .
+							}
+
+				: 왜 필요할까 >> 여러 타입의 값을 담을 수 있게하면서, 잘못된 타입으로의 형변환에 의한 오류 방지를 묵적으로 함
+					: 여러 타입의 값을 담겠다고 무작정 Object 로 멤버의 타입을 설정해버리면 수많은 클래스에 대해 일일이 instanceof 연산자를 적용해야한다
+						: 솔지키 모든 클래스에 대해 일일이 쓸 수 있겠냐 ㅋ
+		
+					: 하지만 제네릭을 사용한다면, 클래스의 정의 당시에는 Object 를 타입으로 한 것처럼 여러 타입의 값을 담을 수 있는 무궁무진한 가능성을 가지고, 클래스의 사용 당시(= 객체 생성 당시) 에는 특정 타입을 지정하므로써 instanceof 연산자도 안쓰고 그 타입에 대하여 사용이 가능하다
+
+					: 주의) 제네릭이 구현된 상태에서도 다형성을 구현할 수 있다( 제네릭 타입의 파라미터 타입을 부모 타입으로 정했으면 그  제네릭 타입의 객체에 다양한 자식 타입 값을 할당할 수 있다). 근데 그렇다고 제네릭이 다형성 구현이 목적인건 아니다
+						: 다형성은 하나의 부모타입 레퍼런스 '변수'에 다양한 자식 타입의 레퍼런스 변수를 담아 다양한 내용을 구현할 수 있는거다.
+
+
+				: 활용 방법)
+					step 1.  제네릭 타입 선언
+						: type parameter 가 적용된 generic 클래스를 만든다
+
+					step 2. 제네릭타입을 타입으로하는 변수 선언
+						: type Parameter 부분에 특정 type 를 arg 로 넣은 타입으로 레퍼런스 변수를 선언한다
+							: 만약 type parameter 를 명시하지 않으면 자동으로 object 가 대입된다.
+								: 주의) generic method 의 경우 type parameter 을 명시하지 않으면 object 로 처리하지 않고, 눈치껏 arg 의 타입을 type parameter 로 한다
+			
+
+					step3 제네릭 타입의 생성자 호출 
+						: 앞서 만들었던 변수가 객체를 참조하게 한다
+						: 물론 step2 와 step3 는 동시에 할 수 있다 (객체 선언 및 초기화 동시에 가능)
+						: 타입파라미터와 함께 생성자를 호출하여 객체 생성
+							형식
+								클래스혹은인터페이스명<특정타입>( )
+									: 일반적으로는 타입 파라미터 부분에 타입을 명시해주는 편이다.
+									: 레퍼런스 변수 선언과 동시에 생성자가 호출되는 경우 클래스명<>( ) 으로 대체가 가능하고 , 이때 생성자 부분의 특정 타입은 자동으로 레퍼런스 변수 선언에 쓰인 특정 타입으로 선택 된다 
+										: 이렇게 할 수 있는건 컴파일러가 레퍼런스변수의 타입 파라미터로쓰인 값으로  타입 파라미터의 값을 추론할 수 있어서 그렇다
+									: 주의 ) 그렇다고 제네릭 클래스의 생성자가 클래스명<T>( ) 인게 아니다. 제네릭 클래스의 생성자는 클래스명( ) 꼴이다
+	
+				: 주의) 
+					1. 타입 파라미터 값은 레퍼런스 타입값 중에서 결정해야한다
+						: 일반 타입(int , char , bool... ) 같은 경우는 제너릭 적용이 불가하고, 레퍼런스 타입(클래스, 인터페이스) 에는 제너릭의 적용이 가능하다
+						: 이때문에 타입 파라미터 타입의 멤버들끼리 equals 로 객체 단위의 비교가 가능
+					2.제네릭타입의 배열생성의 경우 타입 파라미터는 아예 제거하고 생성해야한다
+						: 일단 사이즈를 확보한 후 요소를 집어넣을 수 있게 됬을땐 제네릭타입의 생성자를 이용하여 집어넣는다
+
+				: 제네릭 타입의 상속, 구현
+					case1 . extends 할때부터 파라미터 타입을 확정함  
+						: 그럼 걍 T 자리를 확정한 타입으로 대체해서 오버라이드하기만 하면 됨
+	
+					case2 . 따로 파라미터 타입 확정 없이 그대로 파라미터 타입으로 가져옴
+						: 일단 필수적으로 해당 제네릭 타입을 구현,상속하는 클래스는 해당 타입 파라미터와 함께 선언되어야함 << 그러니까 자식, 구현 클래스도 제네릭 타입이 된다.
+						: 추가적인 타입 파라미터도 사용 가능하다
+	
+	
+			: Generic method		
+				: https://devlog-wjdrbs96.tistory.com/201
+				: type parameter와 함께 선언된 메서드.
+					: 리턴타입 '앞'에 선언된 type parameter 를 해당 메서드의 '리턴타입' 혹은 파라미터 부분에 사용 가능하다
+					: 주의) 
+						1.Generic class 와 Genric method 는 '전혀' 별개다
+							: 제너릭타입이 아닌 클래스 에서도 generic method 를 만들 수 있다
+							: 제너릭 타입인 클래스의 parameter type 명과 내부의 generic mehtod 의 parameter type 명이 같더라도 둘은 별개이다.  
+								: 제너릭 타입에 쓰인 parameter type 은 전역변수 느낌이고, 제너릭 메서드에 쓰인 parameter type 은 지역 변수 느낌이다. 그래서 제너릭 타입과 제너릭 메서드의 parameter type 이 겹쳐도 상관 없는거고, 겹친다면 제너릭 메서드 내부에서는 제너릭 메서드에서 선언된 parameter type 이 우선시 된다.
+ 
+						2. static 타입의 generic method 는 """"가능""""하다
+							: 제너릭 메서드의 경우 호출시에 parameter type 을 지정하게 되어있기 때문이다	
+
+r 
+				: 선언 형식
+					접근제한자 typeparameter 리턴타입 메서드명(파라미터1, ...){  
+						....
+					}
+
+					: 대개 파라미터, 리턴타입 은  type parameter 를 활용한 타입으로 선언된다.
+						: 리턴 타입은 솔직히 뭘 하건 상관 없는데(void 도 괜찮고 아예 String , int 같이 특정 타입으로 확정지어도 됨), 파라미터 만큼은 type parameter 를 활용하여 선언되어야한다
+							: 안그럼 
+
+				: 왜 필요할까
+					: 다양한 타입의 값을 arg 로 할 수 있게 하되 형변환으로 인한 에러 방지 차원에서 그러는 것이다.
+				: 활용 방법
+					1. 제너릭 메서드를 포함하는 클래스를 선언
+					2. 그 클래스를 대상으로 제너릭 메서드를 호출
+						sol1 >> 명시적 호출
+							: 제너릭 메서드의 parameter type 을 명시하여 호출
+							: ex ) Car.<Integer>sold(199);
+						sol2 >> 암묵적 호출
+							: 제너릭 메서드의 parmeter type 표시 자첼 생략하여 호출
+								: arg 로 들어온 값의 타입으로 자동 설정된다.
+							: ex ) Car.sold(199);
+
+
+	: 제네릭 타입의 타입 파라미터의 경우 기본적으로 공변성이 적용되지않는다 
+		: 그러니까 타입 파라미터가 상속 관계라고해서 해당 제네릭타입의 객체끼리 자동형변환이 일어나진 않는다는거다.
+		: 주의해야할 것은 제네릭 타입에서 타입 파라미터를 제외한 나머지부분(클래스명, 인터페이스명 부분)에는 공변성이 적용되고, 원한다면 반공변성도 구현 가능하다(직접 강제형변환 가능하다)
+			: ex) Collection<Integer> colFWk = new ArrayList<>( );  는 가능하지만, ArrayList<Object> al = new ArrayList<Integer>( ); 는 불가하다 
+
+		: 이로인한 문제점 >> 메서드에서 일반적인 제너릭 타입의 parameter로는 딱 그 타입 파라미터값을 타입 파라미터로 하는 제네릭 타입 객체밖에 arg로 못 받는다.
+			: 이에 비해 일반적인 클래스 타입의 parameter 로는 공변성을 이용하여 여러 자식객체를 arg 로 받을 수 있기에 효율적인거다 
+		
+		: 이에 대한 해결 방안 >> 제네릭 와일드 카드
+
+	: 제네릭 와일드 카드
+		: 어떤 타입이든 될 수 있는 타입 파라미터 '값'
+			: 타입 파라미터 정의 부분에는 오지 못하고, 활용할떄 타입 파라미터의 값으로 대입 가능하다
+				: 물론 매개변수의 타입으로 쓰일 수 있다. ( 그건 별도로 타입 파라미터를 선언하는게 아니니까)
+		: 참고 >> 와일드 카드란? : 카드 게임에서 어떤 용도로도 쓰일 수 있는 카드.
+		: 와일드 카드의 형식 >> '?'
+		: 제네릭 메서드의 <T>  와 제네릭 와일드 카드의 <?> 의 비교
+			:  https://stackoverflow.com/questions/18176594/when-to-use-generic-methods-and-when-to-use-wild-card
+				: 윗 사이트에서 두번째 답변이 하이라이ㅡㅌ임
+
+			: 요약 >> 와일드 카드를 사용할 수 있으면 와일드 카드를 사용햐라. (제네릭 메서드의 타입 파라미터로 extends 키워드 쓰지 말고)
+				: 더 다양한 자식 객체에 대해 공변성을 구현할 수 있고, 코드의 가독성이 좋다. 
+
+			: <T>
+				: 사용이전엔 타입이 미정이지만, 사용시 특정 타입으로 확정되어 사용된다.
+					: 제네릭 타입 정의할떄 같이 정의하는 타입 파라미터이다. 
+				: 상한 경계만 지정 가능하다 ( super 키워드 없다. )
+					<T extends 대상>
+						: 특정 클래스를 확장한 클래스 혹은 특정 인터페이스를 구현한 클래스중 하나로 확정되어 쓰인다
+						: ex) 
+interface Fruit{ }
+class Apple implements Fruit{}
+class Pear implements Fruit{}
+class Tomato implements Fruit{}
+인상황에서
+
+class Collections {
+    public static <T, S extends T> void copy(List<T> dest, List<S> src) { ... }
+}
+
+일떄 Main 클래스에선
+
+List<Apple> basket = new ArrayList<>();
+basket.add(new Apple());
+basket.add(new Apple());
+basket.add(new Apple());
+List<Fruit> fridge = new ArrayList<Fruit>();
+
+Collections.copy(fridge, basket); 
+
+와 같이 Fruit 인터페이스의 구현 클래스 중 오직 Apple 클래스타입의 요소만 받을 수 있다.
+
+			: <?>
+				: 타입을 확정하지 않는다.
+					: 제네릭 타입을 활용할떄 타입 파라미터의 타입값으로 넣는 타입값 느낌이다
+						: 제네릭 메서드를 정의할떄 타입파라미터 정의 자리에 적을 순 없다								: 제네릭 타입을 활용할 때 타입 파라미터 값으로 넣을 수 있따.
+						: 제네릭 메서드든 일반 메서드든 param 의 타입으로 할 수 있다
+
+				: 상한, 하한 경계 모두 지정 가능하다
+					: <? extends 대상> 
+						: 특정 클래스를 확장한 클래스거나, 인터페이스를 구현한 클래스이면 다 올 수 있다. 
+						: ex) 
+
+interface Fruit{ }
+class Apple implements Fruit{}
+class Pear implements Fruit{}
+class Tomato implements Fruit{}
+인상황에서
+
+class Collections {
+    public static <T > void copy(List<T> dest, List<? extends T> src) { ... }
+}
+
+일떄 Main 클래스에선
+
+List<? extends Fruit> basket = new ArrayList<>();
+basket.add(new Apple());
+basket.add(new Pear());
+basket.add(new Tomato());
+List<Fruit> fridge = new ArrayList<Fruit>();
+
+Collections.copy(fridge, basket); 
+
+와 같이 특정 자식 타입 하나에 한정되지 않고, 자식 타입이기만 하면 여러개 넣을 수 있따.
+
+					: <? super 대상> 
+						: 이건 별로 안헷갈리므로 여기 안적음. 밑에를 참고할것.
+
+		: 종류	
+			1. <?> 
+				: 비한정적 와일드 카드 Unbounded wildcards
+				: 모든 타입을 값으로 할 수 있다
+				: <? extends Object > 의 줄임말
+
+			2. <? extends U>
+				: 상한경계 와일드 카드 Upper Bounded Wildcards
+				: U와 그 자손 타입들만 값으로 할 수 있다
+					: Upper Bounded 이므로 위쪽 타입이 오는걸 막았단 얘기다
+				: 공변성을 구현 가능하게 해준다
+				: 제한된 타입파라미터( < T extends 부모> )와 upper bounded wildcard( < ? extends 부모>)의 차이점
+					: 일단 
+					: 일반적인 메서드의 파라미터를 와일드카드 타입으로 하여 받는것, 제네릭 메서드의 타입파라미터에 extends 로 boudary 치는것의 차이는 일단 지금 봤을때 파라미터의 타입을 와일드 카드로 하는 것은 arg 에 대한 다형성을 구현하겠단 소리 같고, 제네릭 메서드의 타입 파라미터에 extends 쓰는 것은 메서드 활용 시점에 결정해야하는 타입  파라미터 값에 대하여 다형성을 구현하겠단 소리 같다.
+
+
+			3. <? super U >
+				: 하한 경계 와일드 카드 Lower Bounded Wildcards
+				: U와 그 조상 타입들만 값으로 할 수 있다
+					: Lower Bounded 이므로 아래쪽 타입이 오는걸 막았단 말이다.
+				: 반공변성을 구현 가능하게 해준다.
+					: 그러니까 특정 클래스를 기준으로 그 이상 타입의 클래스를 받게 된다는 얘기다
+				: 예상치 못한 tip
+					: 특정 자식 클래스의 객체를 콕 찝어서 반드시 넣고 싶은 경우에는<? extends 부모>가 아닌 <? super 부모>를 쓰면 된다.
+					: <? extends 부모> 의 경우엔 ? 자리에 자기 지신 타입 혹은 자식 타입들 중 하나 올 것이라는 걸 확신할 순 있지만 '?' 에 내가 원하는 자식 타입이 오거나, 그 자식 타입 이상의 타입이 온다고 확신할 수 없다. 그래서 공변성을 구현하지 못할 수도 있다.
+
+
+
+
+
+
+변성 Variance
+	: 서로 다른 타입의 객체들간의 상속 관련 관계를 나타내는 지표
+	: https://velog.io/@hwhyeons/Java-%EC%A0%9C%EB%84%A4%EB%A6%AD%EA%B3%BC-%EA%B3%B5%EB%B3%80%EC%84%B1-%EC%99%80%EC%9D%BC%EB%93%9C%EC%B9%B4%EB%93%9C-%ED%83%80%EC%9E%85	
+	: https://inpa.tistory.com/entry/JAVA-%E2%98%95-%EC%A0%9C%EB%84%A4%EB%A6%AD-%EC%99%80%EC%9D%BC%EB%93%9C-%EC%B9%B4%EB%93%9C-extends-super-T-%EC%99%84%EB%B2%BD-%EC%9D%B4%ED%95%B4
+
+
+	1.공변성 Covariance
+		: 부모 - 자식 클래스 각각을 활용하여 만들어진 객체  사이에서도 동일하게 부모-자식 관계가 유지될때
+		: 자동형변환이 이에 해당한다
+		: 대표 케이스
+			 >> 배열
+				: ex) Object[ ] ary = new Integer[ 10 ];
+
+	2. 반공변성 Contravariance
+		: 부모 - 자식 클래스 각각을 활용하여 객체  사이에서 반대로 자식-부모 관계가 형성될때
+			: 공변성의 반대
+		: 강제형변환이 이에 해당한다
+		: 대표 케이스
+			 >> 배열
+				: ex) Integer[ ] ary = (Integer[ ] ) new Object[ ] ;  
+
+
+
+
+	3. 무공변성, 불공변성 
+		: 서로 아무런 상속 관계가 없는 객체.
+		: 대표케이스 >> 제네릭의 타입 파라미터
+			: 제네릭의 "타입파라미터"는 기본적으론 무공변이다. 타입 파라미터 값이 Child타입이고,  타입 파라미터 값이 Parent타입인 객체간의 강제, 자동형변환은 불가하다
+				: ex) ArrayList<Object> aryList = new ArrayList<Integer>( ); 하면 에러 난다. 
+			: 주의) 타입 파라미터 끼리의 상속 관계를 활용 못한다는거지, 타입 파라미터를 가지는 클래스라고 상속관계를 가질 수 없단 말이 아니다
+				: 컬렉션 프레임워크 같은 경우도 Collectioin , List, ArrayList 끼리 캐스팅 가능하다
+				: ex) Collection<Integer> colFWk = new ArrayList<>( ); 
+
+	
+			
+
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+	: 자바에서 일반적인 값의 강제형변환은 큰 쪽에서 작은 쪽으로 커팅될때 일어나는거고, 객체에서의 강제 형변환은 부모 클래스에서 자식 클래스로 좁혀질때 일어나는거다
+
+	: instanceof 연산자
+		객체 instanceof 클래스||인터페이스
+			: 해당 객체가 특정 클래스||인터페이스 타입으로 형변환 가능한지 알아내기 위해 사용
+				: 보통 부모타입으로 자동형변환됬던 객체를 자식 클래스타입으로 되돌리기 전에 확인차 쓰임(부모 클래스도 확인 가능하지만 굳이? 어차피 걍 자동형변환되는데?)
+
+-----------------------------------------------------------------------------
+
+파일 끝까지 읽는 tip	
+		: count 를 사용하여 평소엔 읽어온 값ㅇ의 개수 저장하다 eof 에서 -1 입력 받음 종료함
+
+			int count = 0 ;
+			while(  (count = 스트림객체.read( 어쩌구) ) != -1 ) {
+
+			
+			}
+
+
+		: close( )를 제외한 입력 스트림의 메서드는 모두( 바이트 스트림이건 문자 스트림이건) 
+			: 메서드 종류 
+				: ( close( ) 제외하고 )  죄다 read( 어쩌구 ) 꼴
+					: flush( ) 가 없다 
+
+			: 반환
+				: 반환 타입 ) int 형이다
+				: 반환값
+					1. eof 에 도달하면 -1 을 반환한다
+					2. eof 가 아니면 
+						(1) arg 가 없는 read ( ) 를 제외하곤 읽는데 성공한 값의 개수를 반환한다 << 주로 conunt 변수로 이를 저장해둔다
+						(2) arg 가 없는 read( ) 의 경우 읽은 값을 반환한다 (int 형으로)
+
+		: 출력 스트림의 메서드  <<반환 타입이 죄다 void 이다
+			: 메서드의 종류
+				1. write ( 어쩌구 ) 꼴
+					: 어쩌구 << 스트림따라 char타입값 혹은 byte타입값
+				2. close ( )
+				3. flush( )
+
+ 
+			: 
+			
+-----------------------------------------------------------------------------
+				b= new byte[1000];
+				try(InputStream fis = new FileInputStream("C:/SelfStudyJava/chap14/binarytest.db")){ // try 문 종료시 자동으로 .close() 실행됨 
+				
+					int n ; // 몇개 읽었는지 저장하는 변수
+					
+					while((n= fis.read(b)) != -1) { // 배열크기단위로 읽어온다 && 파일의 끝을 만나면 종료한다
+						System.out.println("한번에 읽어온 데이터 수: "+(n));
+						for(int j =0 ;j < n ; j++) { // 읽어온 데이터 개수 만큼 반복문 반복하며 값 뽑는다
+							System.out.print((char)b[j]);
+						}
+					}
+					
+					
+				}catch(IOException e){
+					e.printStackTrace();
+				}
+-----------------------------------------------------------------------------
+
+public class Activate {
+	public static void main(String[] args) {
+		long startTime = System.currentTimeMillis();
+		try(Reader fr = new FileReader("c:/DailyJava2/song.txt");BufferedReader br= new BufferedReader(fr) ){
+			String line; 
+			while(( line= br.readLine()) != null) {
+				System.out.print(line);
+			}
+		}catch(IOException e) {}
+		
+	}
+}
+
+-----------------------------------------------------------------------------
+
+ex) OutputStream fos = new  FileOutputStream(경로); Writer osw = new OutputStreamWriter( fos ); 
+
+-----------------------------------------------------------------------------
+
+(1) 기반 스트림
+	1. 바이트 기반 스트림
+		]: 바이너리 데이터를 읽고 출력할 때 사용 << 데이터 형태 그대로 저장
+		: 세부 종류
+			(1) (바이트)입력스트림
+				: 최상위 클래스 ) InputStream
+					: 추상클래스다
+						: 메서드종류
+							int read( )
+								: 1 바이트를 읽고, 읽은 값의 int 타입버전값 혹은 -1을 리턴
+									: -1 == EOF 나타내는 값
+									: 이거 이용해서 파일 끝까지 읽을 수 있다
+
+
+							int read(byte[ ] b)
+								: 읽은 값은 "매개값으로 주어진 배열"에 저장하고, 읽은 바이트 수를 "반환"한다
+											
+					: 하위 클래스
+						: InputStream 의 구현 클래스들
+							FileInputStream
+							BufferedInputStream
+							DataInputStream
+
+									
+									
+
+
+			(2) (바이트)출력스트림	
+				: 최상위 클래스 ) OutputStream
+					: 추상 클래스
+					: 메서드
+						1. abstract void write( int b )
+						2. void write( byte[ ] b)
+							: 매개값으로 주어진 배열 b 의 "전체"를 "한번에" 출력한다
+								: 배열이 끝까지 채워져있던 말건간에(null 값이던 아니던) 배열 전체 사이즈를 출력하는거 주의  
+
+						3.  void write( byte[ ] b , int off , int len)
+								: 매개값으로 주어진 배열 b에서 b[off] 부터 len 개의 내용을 출력한다(배열의 일부를 출력한다)
+
+						4. void flush( )
+							: 출력 버퍼가 다 차지 않아도 잔류하는 모든 바이트를 출력한다
+
+
+						5. close ( )
+							: 출력 스트림을 닫는다 + flush 기능 수행한다
+											
+				: 하위 클래스
+					FileOutputStream
+					PrintStream
+										
+
+		2. 문자 기반 스트림
+			: 텍스트 데이터를 주고 받을 때 사용
+
+			: 세부 종류
+				(1) (텍스트)입력스트림
+					: 최상위클래스 ) Reader
+						: 추상클래스
+						: 메서드)
+							: 문자 배열 단위로 불러올 순 있어도 문자열 단위론 못불러옴 << 문장 단위로 받아오고 싶다묜 보조스트림 사용
+							int read( ) 
+								: 1개의 문자를 읽고 이를 int 타입으로 리턴
+								: 반환값이 읽은값임에도 불구하고 char 타입이 아니라 int 타입인거 주의. 읽은 값을 문자로 사용하고 싶음 강제형변환 해줘야됨
+
+												
+							int read(char[ ] cbuf)
+								: 매개변수로 주어진 문자배열의 사이즈 갯수만큼 문자를 입력받아 저장하고, 입력성공한 개수 혹은 -1  (eof) 을 반환함
+										
+					: 하위 클래스)
+						FileReader
+						BufferedReader
+						InputStreamReader
+
+
+				(2) (텍스트)출력스트림
+					: 최상위클래스 ) Writer
+						: 추상 클래스
+						: 주요 메서드
+							: param으로 String 타입도 가능
+								void write( int c )
+										
+								void write( char[ ] cbuf )
+									
+								void write(String str)
+									: 매개값으로 주어진 문자열을 한번에 보냄
+
+								void write( char[ ] cbuf, int off , int len )
+									: 매개값으로 주어진 문자배열에서 시작 인덱스와 보낼 값의 개수를 지정하여 출력함
+										
+
+								void flush( )
+									: 버퍼에 잔류하는 모든 문자를 출력
+
+								void close( )
+									: 출력 스트림을 닫음  
+
+					: 하위클래스
+						FileWrite
+						BufferedWriter
+						PrintWriter
+						OutputStreamWriter
+
+
+
+
+	(2)보조스트림
+		: 기본 스트림 없이 혼자선 못씀 
+		: 기본 스트림만 존재한다면 한번에 여러개의 보조 스트림을 사용 가능
+
+		: 보조 기능
+			1. 데이터 타입 변환해서 입출력
+				: 보조스트림명 == 원래스트림의최상위클래스명+바꾸자하는스트림의최상위클래스명
+					: 최상위클래스의 하위 클래스중 어떤 하위 클래슨지는 param 으로 대입되는 객체로 자동으로 추론해서 하위 클래스명은 생략하게 한 것 같다
+						ex) OutputStream fos = new  FileOutputStream(경로); Writer osw = new OutputStreamWriter( fos ); 
+
+								
+			2. 입출력 성능을 향상 (버퍼 관련)
+				1. 바이트 기반 스트림
+					(1) BufferedInputStream
+					(2) BufferedOutputStream
+
+
+				2. 문자 기반 스트림
+					](1) BufferedReader
+							: 생성자
+								BufferedReader(Reader rd)
+									: 주의해야될것은 BufferedReader 는 (InputStream 을 Reader 로 바꾸고자 쓰는게 아니라) BufferedReader 만의 메서드인 readLine( ) 을 쓰기 위해 사용하는 보조 스트림이기 때문에 BufferedReader 로 생성한 객체는 BufferedReader 타입의 변수로 받아야된다(아니면 굳이 쓴 이유가 없다)
+
+							: String readLine( ) 메서드 제공 
+									: 라인 단위(엔터단위)로 문자열을 읽음 << 문장 읽어야되는 상황이면 개유용(기본 스트림의 read( )차원에선 문자 배열 혹은 문자 단위로 밖에 못가져옴)
+										: 엔터를 포함하여 버퍼에서 가져오되 엔터는 버림 (엔터 이전 까지의 내용만 실제로 저장함)
+											: 엔터 버리고 저장하는거 진짜 주의
+											: 라인 단위 == 줄바꿈 == 엔터 == '\r'+'\n'
+									: 더이상 읽어올 문자열이 없으면 null 을 리턴
