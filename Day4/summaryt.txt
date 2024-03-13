@@ -1,1 +1,425 @@
 
+@Configuration
+public class ApplicationConfig {
+
+// 빈 등록을 시키는게 목적이다 > 메소드를 만든다. 반환 타입을 해당 빈 객체의 타입으로 항서	
+	@Bean 
+	public Pet myPet() { 	
+		Pet myPet = new Pet("라이언","톰");
+		 myPet.setFish("우럭");
+		 myPet.setDuck("훈제오리");
+		return myPet;
+	}
+	
+	@Bean(name="petService") // 그런데 ㅇ이름을 직접 부여할 수도 있따
+	public PetService myPetService() {
+		PetService petService = new PetService(myPet());
+		return petService;
+	}
+	
+	
+	
+}
+
+
+
+---------------------------------------------------------------------------------------------
+
+
+	<bean id="member" class="com.spring.di03.Member">
+		<constructor-arg name="id" value="honghong"/>
+		<constructor-arg name="pw" value="1234"/>
+		<property name="name" value="홍길동"></property>
+		<property name="age" value="18"></property>
+	</bean>
+
+
+---------------------------------------------------------------------------------------------
+
+ref 로 bean 주고 싶을떈bean 속성을 사용ㅎ나다.
+
+		<property name = "student" ref="student"/>
+
+는
+
+		<property name="student">
+					<ref bean ="student"/> 
+		</property>
+와
+같은 소리다
+
+
+
+
+property 태그>> bean 을 생성할떄 해당 클래스의 setter 계열 메서드를 사용하여 필드값을 채워주는거다.
+	: bean 태그의 자식 태그로 쓰인다
+		: 얘는 속성으로 그냥 퉁 못친다
+
+	: 속성
+		1. name >> 해당 객체의 인스턴스 필드명
+			: setter 메서드를 이용하는 원리이므로 반드시 해당 클래스에 setter 메서드를 생성해놔야된다
+
+		2. value 혹은 ref
+			: 사실 value 나 ref 는 property, constructor-arg 의 자식 태그들로 따로 명시해서 써야되는건데.   특이하게도 이렇게 속성화 시켜서 쓸 수 있는거다
+				: 그러니까 
+				
+					<property name="name"> 
+						<ref bean="student"></ref> 
+					</property>
+				
+				랑
+					<property name="name" ref="student" /> 
+
+				랑 같은 소린거다 	
+
+			: 주의 ) 일반타입값(value) , 빈객체(ref)를 제외한 다른 값과 관련한 자식 태그들은 속성으로 퉁 못치고 실제로 자식 태그로써 써야한다
+
+			: value  >> set 하려는 필드가 일반 타입 혹은 String 타입일 경우 이 속성에 값을 할당하여 표기한다
+				: String 까지 일반 타입으로 퉁쳐주는거 주의(ref 로 하는게 아님)
+				: 만약 이걸 따로 자식 태그로써 쓰고 싶으면 시작-끝 태그 사이에 해당 값을 쓰면 된다
+				: ex) <value>19</value> 
+
+
+			: ref >> set 하려는 필드가 빈객체타입일 경우 이 속성에 값을 할당하여 표기한다
+				: 만약 이걸 따로 자식태그로써 쓰고 싶으면 bean 속성에 해당 bean 객체명을 할당하면된다
+					: 시작- 끝 태그 사이에 딱히 뭘 적진 않는다
+				: ex) <ref bean="student"/> 
+
+
+			: 기타 컬렉션 프레임 관련
+				: https://kdg-is.tistory.com/entry/Spring-XML-Collection-List-Set-Map-Property-%EC%82%AC%EC%9A%A9-%EB%B0%A9%EB%B2%95
+
+		<!--  리스트 넣기 -->
+		<property name = "circles" >
+			<list>
+				<value>밴드</value>
+				<value>축구</value>
+				<value>사진</value>
+				<value>독서</value>
+			</list>
+		</property>
+
+		
+
+	: constructor-arg 와 동시에 사용이 가능하다
+
+property 태그건, constructor-arg 태그건 일반타입값을 넣을때는 value 를 쓰고, 레퍼런스값을 넣을떄는 ref 속성을 쓴다   
+
+
+
+개꿀팁
+	: id 의 경우 내가 직접 맘대로 적어도 되는거고
+	: name 의 경우 이미 있는 필드 명 같은걸 사용하는거라 정확히 사용해야한다
+	: 대부분 자식 클래스 태그를 부모 태그의 속성명으로 간단화 하여 쓸 수 있는 것 같다
+	: 
+
+
+
+어엇 그런데 이게 해당 클래스의 생성자부분에서만 가능한것 같디! 기본 생성자가 없으므로 prameter 만 못쓴다고 하는거 보면
+
+헷갈리는거
+
+attribute
+property
+parameter
+
+
+
+
+
+스프링은 기본적으로 객체들을 싱글톤화 시켜서 관리해준다
+	: 싱글톤 -- 조회할때마다 클라이언트에게 같은 빈을 반환해준다.
+
+
+
+조회할때마다 다른 빈을 얻고 싶다고 하면 설정 파일에서 해당 bean 을 생성하는 태그에서 scope 를 "prototype" 로 설정하면 된다
+	: 근데 쓸일 별로 없다.
+	: 참고로
+
+
+
+
+
+
+// 스프링 설정 파일로 둥록 시키기 
+// 스프링 IoC 컨테이너가 해당 클래스 파일을 
+// 스프링 설정파일로 인식하여 사용할 수 있도록 해당 클래스 위에 @Configuratoin 어노테이션을 붙여준다
+	// 느낌이 jsp 에서 해당 페이지를 에러 페이지로 등록 시키는거랑 비슷한 느낑미다
+public class ApplicationConfig {
+	
+
+}
+
+: configuration 처리할 클래스 파일은 따로 java 파일로 만든다.
+: 주의) 어노테이션도 import 해줘얗된다.
+
+	// 빈 등록을 시키는게 목적이다 > 메소드를 만든다. 반환 타입을 해당 빈 객체의 타입으로 한다.
+	// 그리고 bean 을 생ㅅㅇ하는 메서드 위에는 @Bean 태그를 단다 << 얘도 마찬가지로 import ㅍ;ㄹ요
+		// 스프링이 관리하는 빈 객체로 등록하는 것
+	
+
+
+// 다른 bean 객체를 arg 로 하는 경우 이미 해당 bean 객체를 생성하는 메소드가 정의되어ㅓ있으니 걍 그거 호출한다
+	@Bean
+	public PetService myPetService() {
+		PetService petService = new PetService(myPet());
+		return petService;
+	}
+
+
+
+	// 생성자 부분에 해당 config 파일을 적는다
+	AnnotationConfigApplicationContext context 
+	= new AnnotationConfigApplicationContext(ApplicationConfig.class);
+	
+	Pet pet = context.getBean("myPet",Pet.class); // 메서드의 이름으로 등록이 되어진다. .java 를 이용한 설정에선
+
+
+	@Bean(name="petService") // 그런데 직접 이름을 설정할 수도 잏ㅆ따.
+
+
+근데 쓸꺼면 xml 을 쓰지, 딱히 java 를 쓰진 않는다.
+
+
+c:생성자의 name sapce
+p: property 의 namespace
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------
+
+의존자동주입 @Autowired
+
+Setter 메소드와 생성자를 통해서 의존성을 주입을 컨테이너에서 직접 할 수 있지만, 의존 자동주입 기능이 있다.
+ 자동 주입 기능을 사용하면 스프링이 알아서 의존 객체를 찾아서 주입한다. 의존 주입 대상에 @Autowired 어노테이션을 사용하여 주입할 수 있다.
+@Autowired 는 필요한 의존 객체의 "“타입“"" 에 해당하는 빈을 찾아 주입한다.
+	: (필드, 생성자, setter 메소드) 주입이 있다
+
+씨발 근데 이전에 컨테이너도 스프링 쪽에서 직접 넣어준다고 하는거 아녔나? 그것도 DI 아녔어 ?
+
+
+스프링 설정 파일 >> 기본적으론 xml 이라고 봄 된다. 쓸꺼면 보통 xml 을 쓰지 자바를 쓰진 않는다
+
+
+<context:annotation-config/>
+	: 설정 파일에 쓰는거다
+	: 스프링 컨테이너에 등록된 bean에 대해서 Annotation을 활성화해주는 태그이다.
+	: @Autowired 및 @Qualifier Annotation을 해석해서 자동 주입을 하도록 한다.
+	: 당연히 자동 주입은 스프링 컨테이너에 등록된 bean 객체에 한해서 가능한거다.
+	: xml 파일의 namespacee 에서 context 를 체크 하고서 쓸 수 있다.
+	: beans 태그 내부에 쓴다 (bean  태그들과 같은 수준으로)
+	: 컨테이너에 생성되어 저장된 bean 객체들에 대해  @autowired 와 @Qulifier 를 인식할 수 있도록 해주는 스캔 명령. 그러니까 활성화 시켜주는 명령어.
+
+
+
+
+@Autowired 생성자 주입
+	: , 권고되는 방법 
+	: 해당하는 빈객체 없이 인스턴스를 만들지 못하도록 강제한다.
+	: Spring 4.3 이상부터 생성자가 하나일때 @Autowired를 사용하지 않아도 된다.
+		: 근데 우린 Spring3 이용하고 있으니 우리한텐 적용 안되는거다
+	: 의존성 주입 대상의 필드를 final 로 선언할 수 있다.
+	: 주의 ) 순환 참조로 주입을 할 경우는 생성자 주입으로 해결하기 어렵기 때문에 이러한 경우에는 나머지 주입 방법 중에 하나를 사용한다.
+
+
+@Autowired 필드 주입
+	: 가장 간단한 선언 방식
+	: 필드주입은 멤버필드에 @Autowired 어노테이션을 선언하여 주입받는 방법이다.
+	: 하지만 의존 관계가 보이지 않아 추상적이고, 이로 인해 의존성 관계가 복잡해질수 있다. 
+	: 또한 의존성 주입 대상 필드에 final 선언이 불가능하다
+
+@Autowired 메소드 주입
+	: 메소드 주입은 메소드에 @Autowired 어노테이션을 선언하여 주입받는 방법이다.
+	: 의존성이 선택적으로 필요한 경우에 사용한다.
+	: 의존성 주입대상을 선택적으로 나눠서 주입 할 수 있게 부담을 덜어준다.
+	: 의존성 주입 대상 필드가 final 선언 불가능하다. 따라거 생성자 주입 방법과 Setter 주입 방법을 적절하게 상황에 맞게 분배하여 사용하도록 한다.
+
+
+
+아래처럼 다른 빈 개게를 property , constructor arg 를 굳이 안해도 되게 해주는걸 ㄷ동 주입이라고 한다 
+
+	<bean id="loginInfo2" class="com.spring.di05.LoginInfo">
+		<!--  -->
+		<constructor-arg name="member">
+			<ref bean="member"></ref>
+		</constructor-arg>		
+	</bean>
+
+
+
+	// @Autowired >> 객체를 자동 주입할떄 사용하는 어노테이션
+		//의존 객체의 "타입"에 해당하는 빈을 찾아 주입한다
+		// 종류로는 필드, 생성자, 메서드 주입이 있따.
+		// 필드 주입은 걍 bean 객체를 할당 받을 필드 선언부 위에 적는거다
+		// 생성자 주입은 걍 bean 객체를 할당 받을 생성자 위에 적는거다
+	// 그러니까 정리하자면 귀에 걸면 귀걸이고 코에 걸면 코걸이다
+
+
+만약에 빈 객체가 등록 안되어있는데 @Autowired 어노테이션 을 쓰면 에러 난다. >>그냥 쓰면 굉장히 위험한 방식 인거다. 
+
+위처럼 에러 발생 시키고 싶지 않으면 	@Autowired(required = false) 처럼 쓰면, 예외 발생시키지 않고 처리 가능하다 (그냥 기본값인 null 값이 넣어지고 끝난다.ㄴ)
+
+
+
+
+만약에 같은 타입의 빈 객체가 여러개 있으면 id 를 기준으로 @Qualifier 를 명시해주어야한다
+	: 안그럼 애러 난다
+		: 근데 또 특이하게 애러가 안나는 경우도 있긴 하다 (member1, member2, ... )
+	@Autowired(required = false)
+	@Qualifier("member2")
+
+ㅆ:빌 왜 나는 명시 안해줘도 잘 되는 거임
+	@Qualifier("member2")
+
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+AOP (Aspect Oriented Programming) 관점 지향 프로그래밍
+	: 어떤 로직을 기준으로 핵심적인 관점, 부가적인 관점으로 나누어서  모듈화를 한다
+		: 핵심적인 관점은 우리가 실제로 적용하고자 하는 비즈니스 로직
+		: 부가적인 관점은 핵심 로직을 실행할 때 로깅, 트랜잭션, 파일 입출력 등이 될 수 있다
+		: 모듈화 >> 거대한 문제를 작은 조각의 문제로 나누어 다루기 쉽도록 하는 과정
+
+
+소스 코드상에서 계속 반복해서 쓰는 코드들을 발견할 수 있는데 이것을 흩어진 관심사 (Crosscutting Concerns)라 부른다.
+
+AOP 관련 용어
+	Aspect : 공통 기능을 모아둔 "객체"를 의미한다. (공통기능을 모듈화함)
+	Advice : Aspect 안에 있는 공통 기능 각각의 로직을 의미한다. 실질적인 부가기능을 담은 구현체이다.
+		: 공통기능==부가 기능 . 그러니까 부가 기능은 여러 군데에 쓰이니까. 
+
+	JointPoint :  Advice가 적용될 특정한 포인트 (메소드 실행 시점)
+		: 걍 메서드임.
+
+	PointCut : 포인트 컷은 조인 포인트(JoinPoint)의 한 부분이다. 표현 식으로 JointPoint 의 상세한 내용을 지정한다.
+		: 
+
+	Weaving: 공통 기능을 적용 하는 행위를 뜻한다
+		: weaving 한다고 표현 한다
+
+
+
+Advice 동작 시점
+
+Before >>  메소드 실행전에 동작
+After>>  메소드 실행 "후" (Exception에 상관없이) 동작 
+	: fianlly 느낌?
+After-returning >> "정상적"으로 메소드 실행 후에 동작
+After-throwing >>  메소드 실행 중 "Exception 발생시" 동작
+	: catch 느낌
+Around >> 메소드 실행 전과 후, 예외발생 등 "모든 시점"에서 동작
+	: 가장 많이 사용
+
+
+스프링 AOP 특징
+	1. 프록시(proxy) 패턴 기반의 AOP 구현체이다.
+		: 프록시 >> 대행자.
+			: 그러니까 우리가 메서드 호출하면 프록시가 그걸 가로채서 필요한 전처리 시키고 , 그다음에 프록시가 메서드를 호출 시키고서, 그 메서드의 결과를 프록시가 받고, 프록시가 필요한 후처리 한뒤 , 최종적으로 이걸 우리한테 돌려준다는거다
+
+	*** 2. 프록시를 사용하여 AOP가 구현되므로 메소드 호출에 대해서만 적용된다.
+	3. 스프링이 관리하는 빈(Bean)에만 AOP 적용이 가능하다.
+
+Spring AOP 구현방식
+	: XML 기반의 POJO 클래스를 이용한 AOP 구현
+		: XML 파일에 <aop:config>를 사용하여 설정 
+	: @Aspect 어노테이션을 사용한 AOP 구현
+		: 부가기능을 제공하는 Aspect 클래스를 작성
+
+AOP 라이브러리 설정
+	: 스프링 AOP는 내부적으로 AspectJ 라이브러리를 사용해 AOP 기능을 구현한다. 
+		: Maven 에서  aspectjweaver ctrl c 하고 pom.xml 에 ctrl v 한다
+	: pom.xml 에 다음과 같이 의존 설정을 하도록 한다.
+
+	: 왜 그런지 모르겠는데     <!-- <scope>runtime</scope> -->
+ 는 주석 처리 한다
+
+
+	: 있다가 쑥 들어간다는  느낑이라 한다
+
+핵심기능과 공통기능이 결합되어있으면(==분리되어있지  않으면) 공통 기능을 핵심 기능마다 일일이 적용해야 하므로 굉장히 귀찮다. 또한 공통 기능 부분에 수정 사항 (추가, 변경 등)이 있을 경우 일일이 수정 작업을 해야되게 된다 (유지 보수가 어렵다.) >> 그래서 공통 기능을 모아둔 객체를 생성하고, 그 객체를 핵심 기능에서 활용하겠다.
+
+
+
+Logger 클래스
+	: 자바에서 제공해주는 가장 기본적인 로그 클래스
+	private static final Logger LOG = Logger.getGlobal(); 
+
+	: 다음과 같이 우리가 직접 로그에 집어넣을 수 있음
+		LOG.info("deposit method 시작"); // LOG >> 우리가 생성한 객체
+
+	: 파일에 출력할 수도 있따 >> FileHandler 를 이용한다
+	FileHandler fh;
+		try {
+			// 이름, 크기, 개수 , append여부
+				// 존재하지 않는 파일 씀 자동 생성 시켜준다
+			fh = new FileHandler("c:/example/myLog%g.txt", 2000 , 1000 , true); // %g == 로그의 로테이션을 식별하는 생성번호
+
+		// Level, Format 은 필수는 아니나 있으면 좋다
+			fh.setLevel(Level.ALL); // Level 클래스 >> 디폴트 레벨을 지정한다 . 근데 기본적으론 ALL 이다
+			fh.setFormatter(new SimpleFormatter());
+			LOG.addHandler(fh); // 설정 마친 FileHandeler 겍ㅔ를 Logger 객체의 handler 로 추가한다
+
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+
+
+
+-------------------------
+
+public class LogAop { //Aspect 클래스 인거임 >> 공통기능 모아둔 클래스
+	private final static Logger LOG = Logger.getGlobal();
+	
+	public void beforeLog() {
+		LOG.info("메서드 시작");
+		
+	}
+	
+	public void afterLog() {
+		LOG.info("메서드 끝");
+	}
+}
+
+로 일단 Aop 용 클래스 만들고
+
+xml 에서 해당 aop 클래스의 객체 만들고
+Namespace 에서 Aop 체크해준다 >> aop 태그 사용할수 있게 된다
+
+
+PointCut 은 다양한 명시자(지시자) 를 이용할 수 있다.
+within 특정 타입(==클래스) 패턴에 속하는 모든 메서드를 포인트 컷으로 설정
+
+
+	<aop:config> <!--  aop 전체 설정 하는 테그 -->
+		<aop:aspect id="logger" ref="logAop"><!-- apect >> 공통 기능 보유 객체 -->
+			<aop:pointcut expression="within(com.spring.aop02.Bank)" id="bankPoint"/><!-- 공통 적용 대상을 지정한다 -->
+			<aop:before method="beforeLog" pointcut-ref="bankPoint"/> <!--  핵심 기능 실행 이전에 실행할 메서드 명시  -->
+			<aop:after method="afterLog" pointcut-ref="bankPoint"/> <!--  핵심 기능 실행 이후에 실행할 메서드 명시  -->
+		</aop:aspect>
+	</aop:config>
+
+
+
+
+다 한 후에 
+		GenericXmlApplicationContext context = new GenericXmlApplicationContext("classpath:aopConfig01.xml");
+		
+		Bank bank = context.getBean("bank", Bank.class);
+		bank.deposit();
+		System.out.println();
+		bank.withdraw();
+
+
+와 같이 가져와서 쓴ㄴ디
+
+이후에 공통 부분을 수정하고 싶으면 걍 Aspect 클래스만 수정함 된다.
+
+------------------------------------------------------------------------------
+스프링은 설정이 반이다
+
+
+다음주 금요일 보강
+
+주석 푸는 방법 ?
+
+
+
