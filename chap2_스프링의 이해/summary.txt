@@ -1,0 +1,177 @@
+라이브러리, API , 프레임워크 차이
+	: https://m.blog.naver.com/dodi258/222069825a412
+	: API Application Programming Interface 
+		: 서로 다른 컴포넌트 간 상호작용할 수 있도록 연결해주는 매개채 혹은 통신규칙
+		: 그러니까 음식점, 손님이 컴포넌트 라고 하면 종업원이 API 이다.
+			: API 를 사용하여 요청하면 해당 사이트나 라이브러리에서 원한는 기능을 구현해준다.
+
+		: 대표적인 API ) Kakao API
+
+	모듈 Module
+		: 프로그램 내부를 기능별 단위로 분할한 것.
+			: 하나의 기능만을 제공하는거다 
+		: 모듈 여러개를 비슷한것끼리 모아둔게 라이브러리다.
+
+	(소프트웨어) 컴포넌트 Component
+		: 독립적인(==재사용이 가능한 ) 모듈 .
+			: 특정 프로그램에 종속적이지 않은, 다른 모듈과의 호환이 잘 되는 독립적인 모듈이다. 
+		: 객체지향언어에서는 이를 Interface 로 제공한다.
+			: 규격화된 메서드 환경에서 솦웨어를 개발할 수 있는 환경을 제공
+
+
+	: 라이브러리
+		: 개발자들이 자주 사용하는 모듈(코드)들의 묶음이다. 
+		: 개발자가 필요한 것만 뽑아서 쓰는거다. 즉, 개발자가 application 의 흐름을 제어한다
+		:  Pandas
+
+	: 프레임워크
+		: 개발자들이 자주 쓰는 '구조'를 제공한다. 
+		: 프레임워크는 보통 여러 컴포넌트와 라이브러리를 포함하며, 개발자가 특정 기능을 구현하기 위해 이를 조합하여 사용한다.
+		: 라이브러리가 이케아(가구파는곳) 이라면 프레임워크는 모델하우스(가구 배치가 다 되있는) 이다
+		: framework 가 application 의 흐름을 제어한다. 즉, inversion of control 이 일어난다.( 개발자가 컨트러롤 하는 것이 아닌 프로그램이 컨트롤 한다는 뜻) 
+		: 대표적인 프레임워크) 스프링 프레임워크
+
+------------------------------------------------------------------------------------------------------------------
+
+
+
+스프링 프레임워크 Spring Framework
+	: 일반적으론 줄여서 스프링이라고 함
+	: 자바 기반의 애플리케이션을 개발하기 위한 오픈소스 프레임워크
+	: 스프링의 구성
+		1. DB 관련
+			(1) JDBC Java DataBase Connectivity
+				: db 다룰 수 있도록 하는 java api
+			(2) ORM Object Relational Mapping
+				: 객체와 관계형 데이터베이스의 데이터를 자동으로 매핑해주는것
+			(3) OXM Object Xml Mapping
+				: 객체와 XML의 데이터를 자동으로 매핑해주는것
+			(4) JMS Java Message Service
+				: 네트워크 통해 데이터를 송수신하는 java api
+			(5) Transactions 
+				: 트랜잭션 >> db 에서 수행하는 작업 단위
+
+		2. MVC 관련 .Web 관련 
+			(1) web
+			(2) Servlet
+			(3) Portlet
+			(4) Struts
+
+		3. AOP Aspect Oriented Programming
+		4. Aspects
+		5. Instrumentation
+		6. Core Container : 스프링 핵심/기본 모듈 . DI/IoC 제공
+			(1) Beans
+			(2) Core
+			(3) Context
+			(4) Expression Language
+		7. Test : test 관련 기능 제공
+
+	: 스프링은 필요한 모듈만 이용할 수 있는 경량 컨테이너.
+	
+
+스프링 모듈
+	: 스프링에서는 다양한 모듈을 제공
+	: 모듈을 사용하기 위해선 프로젝트에 모듈에 대한 '의존 설정'을 해야됨 << 3,4 장에서 함
+	: 대표적인 모듈
+		1. spring-core : DI , IoC 를 제공
+		2. spring-webmvc : 스프링 MVC 구현 기능제공 
+		3. spring-jdbc : 데이터베이스 다루는 기능제공
+		4. spring-tx : 트랜잭션 관련 기능 제공
+		5. spring-security : 보안 기능 제공
+
+		
+
+
+Dependency 의존 
+	: 한 객체를 활용할때 다른 객체를 필요로 하는 성질.
+		ex) A 객체의 어떤 메서드에선 B 객체를 활용한다
+	: 한 객체가 바뀌었을때 영향을 받는 객체의 성질.
+		ex) B 클래스를 수정했을때 A 객체의 어떤 메서드의 수행내용도 달라짐
+
+객체간의 결합도
+	: 다른 객체를 수정했을때 해당 객체를 얼마나 수정해야하는지의 '정도'
+	: 낮을 수록 유지보수성 좋은거임
+
+
+OOP ( 객체지향프로그래밍) 에서는 필요한 객체를 내부서 직접 생성하는 방식보단, 외부서 주입 받는 방식을 선호
+	: 객체간의 결합도를 낮추고 보다 유연성 있는 프로그램을 만들기 위함
+
+
+객체를 조립한다 == 객체를 "생성"하고 "주입"한다
+
+
+IoC Inversion Of Control 
+	: 제어의 역전
+	: 프로그램의 제어를 직접(==개발자가) 하는게 아니라 외부(==스프링)에서 하는 방식.
+
+
+DI Dependency Injection
+	: 의존성 주입
+	: 의존하는(==필요한) 객체를 직접(==개발자가) 생성하는게 아니라 외부(==스프링) 에서 주입해주는 것 
+	: IoC 구현 방식 중 하나가 DI 인거다 (DI ⊂ IoC)
+
+
+IoC 컨테이너
+	: Bean 을 관리하고 && DI 가 이뤄지는 공간 
+	    ***: 객체를 조립한다 == 객체를 "생성"하고 "주입"한다 == DI 한다
+		: Bean 빈
+			: IoC 컨테이너가 관리하는 객체들
+				: 그러니까 자바 클래스의 객체라고 다 Bean 인게 아니라 , IoC 컨테이너에 등록이 된 객체에 한해서 Bean 이라고 하는거다
+			: bean 은 모두 싱글턴 패턴으로 만들어진다.
+				: 한번 쓰고 버려지는게 아니라 재사용된다.
+			: https://chanhuiseok.github.io/posts/spring-4/
+
+	: 스프링에서 DI 는 bean에 한해서 가능하다
+
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+Calculator 구현 예제1 >> 내부에서 객체를 주입
+	: 불편한점 ) 내부서 메서드 별로 일일이 객체를 생성해서 사용해서 딱히 인터페이스를 통한 다형성 구현을 못함 
+	: 구조
+		1. Main :MyCalculator 객체 생성 후 활용
+		2. ICalculator : CalAdd , CalDiv , CalSub ...  가 공통적으로 구현하는 인터페이스	
+		3. CalAdd , CalDiv , CalSub ...  : 연산기능수행 클래스
+		4. MyCalculator 	
+			: CalAdd , CalDiv , CalSub ... 에 의존성을 가짐
+				:  MyCalculator 객체 내부적으로 CalAdd , CalDiv , CalSub ... 객체를 활용  
+			: 이번 예제의 경우 MyCalcultor 내부에서 직접   CalAdd , CalDiv , CalSub ... 객체를 생성시킴
+
+
+Calculator 구현 예제2 >> 외부(Main 클래스)에서 객체를 주입
+	: 편한점 ) 
+		1. 인터페이스를 통한 다형성 구현이 쉽다
+			: CalAdd , CalDiv , CalSub ...  등의 외부서 주입되는 객체들을 ICalculator 타입의 파라미터 하나로 다 받을  수 있다
+
+	: 구조
+		1. Main :
+			: MyCalculator 객체 생성 후 활용&& 여기서 직접  CalAdd , CalDiv , CalSub ... 객체를 생성하여 MyCalculator 에 주입시킴.
+		2. ICalculator  
+		3. CalAdd , CalDiv , CalSub ...  
+		4. MyCalculator 	
+			: CalAdd , CalDiv , CalSub ... 에 의존성을 가짐
+			: 이번 예제의 경우 MyCalcultor 외부에서 의존 객체가 주입되는거라서 ICalculator  타입의 파라미터 하나로 CalAdd , CalDiv , CalSub .. 객체 모두 대응하게 함
+
+
+Calculator 구현 예제3 >> 외부(IoC컨테이너)에서 객체를 주입 
+	: 편한점 ) 
+		1. 인터페이스를 통한 다형성 구현이 쉽다
+		2. 객체의 조립 전용 클래스가 따로 있다		
+
+	: 구조
+		1. Main :
+			: CalAssembler 객체를 생성하여 활용
+		2. ICalculator  
+		3. CalAdd , CalDiv , CalSub ...  
+		4. MyCalculator 	
+			: CalAdd , CalDiv , CalSub ... 에 의존성을 가짐
+			: IoC 컨테이너 (CalAssembler)에서 DI 당함
+		5. CalAssembler 
+			: IoC 컨테이너
+			: 이 클래스의 내부에서 MyCalculator를 쓰는데 필요한 CalAdd , CalDiv , CalSub ...  객체를 생성하고 , 주입함.
+
+
+
