@@ -1,0 +1,4 @@
+1. 생각보다 삼항연산자 많이 쓴다
+	public int doOperation(int fiNum, int seNum) {
+		return seNum!=0 ? fiNum/seNum:0;
+	}
