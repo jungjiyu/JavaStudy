@@ -1,0 +1,51 @@
+프레임워크
+	: 이미 구조가 다 짜여져있음. 그 구조를 파악하기만 하고 활용하면 됨
+	: 모델하우스 느낌
+
+비즈니스 로직이란 ? : model 에서 처리하는 작업. (눈에는 안보여도)내부적으로 처리되는 작업.
+
+
+스프링 MVC 
+	: 웹 어플리케이션을 개발하기 위한 전용 프레임워크
+	: 기본적으론 MVC 패턴을 따르고 있어서 전체적인 구조는 JSP MVC패턴 MODEL2 와 비슷
+		: 모델, 뷰, 컨트롤러를 스프링에 적용한 것.
+	: 설정이 반이다
+	: 비즈니스 로직의 흐름
+		1. 클라이언트로가 request 를 보냄
+			: 대부분 클라이언트 요청은 브라우져를 통해 이루어짐
+		2. 서버 쪽에서 DispatcherServlet 이 reqeuest를 받음
+		3. DispatcherServlet 이 Handler Mapping 객체에게 request를 위임
+		4. Handler Mapping 객체가 request 요청에 적합한 컨트롤러 객체를 DisaptcherServlet 에게 반환 
+		5.  DispatcherServlet 은 반환 받은 Controller 객체의 메서드를 직접 호출하지 않고, HandlerAdapter 객체에게 Controller 메서드의 호출을 위임함.
+		6. HandlerAdapter 객체는 Contoller객체의 메서드를 호출하고, 메서드로부터 ' ModelAndView객체 ' 혹은' Model 객체 와 View 객체 ' 를 반환 받음
+			: ModelAndView 객체는  '비즈니스로직 수행 결과 데이터' 와 'view 정보' 를 가짐.
+			: Model 객체는  '비즈니스로직 수행 결과 데이터' 를 가짐
+			: View 객체는  'view 정보' 를 가짐.
+
+		7. HandlerAdater 객체는 메서드로 부터 받은 ' ModelAndView객체 '혹은 ' Model 객체 와 View 객체 ' 를 DisaptcherServlet 에게 반환함
+
+	: 뷰 처리의 흐름
+		1. DispatcherServlet 이 HandlerAdapter 에게 받은 ModelAndView 객체(혹은 View 객체)를 이용하여 View Resolver 객체를 호출
+		2. ViewResolver 객체가 response 될 뷰를 생성하고, DispatcherServlet 에 view 정보를 반환.
+		3. DispatcherServlet 은 ViewResolver 객체가 보내준 View 정보를 이용해 View 객체를 준비.
+			: View 객체 >> 일반적으로 JSP 파일
+		4. JSP 파일이 클라이언트에게 respones 됨
+			: DispatcherServlet 이 직접 response 하는건 아님 주의
+		
+
+	: 주요 객체 정리
+		: 여기서 DispatcherServlet , Hanadler Mapping, HandlerAdapter 객체는 이미 스프링 MVC 프레임워크에 만들어져있음
+		1. DispatcherServlet
+			: Dispatcher 의 의미 >> 파견 관리자
+			: 애플리케이션의 전반적인 흐름을 제어
+				: 상황에 따라 Handler Mapping, HandlerAdapter, ViewResolver 를 호출
+		2. Handler Mapping  
+		3. Handler Adapter  
+			: Adapter 의 의미 >> 변환 장치.	
+		4. Controller 
+		5. Model
+		6. View
+		7. ModelAndView
+		8. ViewResolver
+			: 일반적으로 JSP 파일
+
