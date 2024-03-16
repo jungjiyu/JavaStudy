@@ -2,3 +2,9 @@
 	public int doOperation(int fiNum, int seNum) {
 		return seNum!=0 ? fiNum/seNum:0;
 	}
+
+2. 인터페이스 구현시키게 하면 좋은 경우
+	: 일단 인터페이스 구현 목적 자체가 다형성 구현
+	(1) 동일한 카테고리의 기능별 클래스들이 각각 상속하게 함
+		: ex) 연산카테고리의 substract , add ,  multiple, divide  클래스 각각이 calculable 인터페이스 상속하게함. 나중에 calculable 타입의 parameter 하나로 4가지의 객체 중 암거나 다 받을 수 있음.
+	
