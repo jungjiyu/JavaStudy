@@ -6,5 +6,5 @@
 2. 인터페이스 구현시키게 하면 좋은 경우 
 	: 다형성 구현하고 싶을때. 그러니까 변수 하나로 여러개의 객체 받을 수 있게 하고, 별도의 형변환 없이 메서드를 바로 실행시킬 수 있게 하고 싶을때
 	(1) 동일한 카테고리의 기능별 클래스들이 각각 상속하게 함
-		: ex) 연산카테고리의 substract , add ,  multiple, divide  클래스 각각이 calculable 인터페이스 상속하게함. 나중에 calculable 타입의 parameter 하나로 4가지의 객체 중 암거나 다 받을 수 있음.
+		: ex p.64 ) 연산카테고리의 substract , add ,  multiple, divide  클래스 각각이 calculable 인터페이스 상속하게함. 나중에 calculable 타입의 parameter 하나로 4가지의 객체 중 암거나 다 받을 수 있음.
 	
