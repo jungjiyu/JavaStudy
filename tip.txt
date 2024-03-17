@@ -23,4 +23,3 @@
 	: ex) @Autowired(required=false)
 
 
-6. 3장의 2절 부분(xml 파일 태그) 정리 나중에 하기
