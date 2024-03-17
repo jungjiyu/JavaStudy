@@ -1,1 +1,380 @@
 
+3. 스프링 맛보기
+
+도메인 구조 >> https://sudo-minz.tistory.com/13
+
+
+: 빌드 >> 애플리케이션 제작에 필요한 전반적인 과정(라이브러리 다운로드 및 연결, 컴파일, 링크, 패키징 등 )
+	: 컴파일, 링크, 패키징
+		: 컴파일 >> source code 파일(.java)을 Compiler 가 bytecode 파일(.class)로 변환하는 과정
+			: 컴파일 과정을 통해 생성된 클래스 파일은 JVM 에 의해 기계어로 바뀌어 컴터에서 실행됨
+		: 링크 >> 서로 다른 파일을 연결하는 과정
+			: 메서드의 호출 등의 업무가 가능해짐
+		: 패키징 >> 구현된 각 기능을 합쳐 실행 파일을 만드는 것
+
+	: 빌드툴의 종류
+		: 빌드는 개발자가 직접하지 않고, 빌드툴에 의해 모두 자동화되어있다
+		1. Ant >> 요즘에 잘 안씀
+		2. Maven >>예전에도 잘 쓰였고 요즘에도 잘 쓰임
+		3. Gradle >> 요즘에 인기 얻고 있음. Maven 보다 2배정도 빠름
+
+: Maven
+	: 생성하는 법
+		:  [New Maven Project] 창에서 Create a simple project(skip archetype selection) 체크하자
+			: archetype 뜻= 원형
+			: Create a simple project  >> 선택하지 않으면 이미 존재하는 프로젝트 타입의 선택이 가능하다
+				: 간단한 예제를 만드는 경우 걍 체크 해라 (== 제공되는 프로젝트 타입을 선택하지 않는다) 
+
+		: artifact 설정하는 란
+			: https://bongjava.tistory.com/entry/maven-GroupId-ArtifactId-Version
+			: Group id >> 프로젝트를 고유하게 식별하게 해주는 id
+				: 하나의 groupid 에 많은 하위 group을 만들 수 있다.
+					: 하위 group 의 경우 부모의 groupid 뒤에 새로운 식별자를 붙임 된다
+
+				: 일반적으로 회사 도메인을 거꾸로 해서 만든다
+					ex) 회사 도메인이 naver.com 이면 groupid 는 com.naver 로 한다
+					: 굳이 이렇게 하는건 서브 도메인이 루트 도메인 앞에 붙여지는 꼴로 URL 이 구성되기에 그런 것 같다
+						: ex) naver 의 mail 탭에 가면 도메인이 mail.naver.com 이다
+
+
+			: Artifact id >> 버전 정보를 생략한 jar 파일의 이름으로, 프로젝트의 이름이 된다.
+				: artifact == 소프트웨어의 산출물. 
+					: 자바의 경우 빌드를 완료하면 .jar 파일이 만들어지는데, 이를 artifact 라고 한다.
+					: 그러니까 artifact == 프로젝트, artifact id == 프로젝트 이름 이라고 생각함됨
+				: 일반적으로 소문자와 하이픈( - ) 을 이용해서 만든다
+					ex)  amazon-kinesis-client
+
+
+	: pom.xml  Project Object Model
+		: 직역하면 Maven 프로젝트의 다양한 정보를 처리하기 위한 객체 모델
+		: 스프링 라이브러리(.jar) 및 빌드 설정 하는 파일. 
+			: pom.xml 을 수정한 후에 해당 maven 프로젝틀 update 해줘야 pom,xml 의 내용이 반영된다.
+			: 스프링 라이브러리 설정 >> 네트워크를 이용해서 다운로드 받을 라이브러리(,jar)을 명시한다
+				: dependencies 태그의 "내부"에 사용할 모듈을 복붙한다
+					: mavenrepository 사이트에서 검색후 maven 탭의 텍스트 복붙한다
+						: mavenrepository 사이트 >> apache 재단에서 관리하는 곳이다. 다양한 라이브러리가 존재한다.
+					: 복붙되는 내용을 보면 각 모듈은 dependency 태그로 감싸져있다.
+
+				: 해당 모듈을 사용하는데 필요한 모듈들은 spring 이 알아서 추가적으로 깔아준다
+					: 이것도 네트워크를 통해 받는거라 인터넷 연결되있어야된다
+				: 다운로드한 라이브러리(.jar)는 로컬리파지토리(==개발자 컴퓨터)에 저장된다 
+					: 이미 다운로드된 모듈은 새로 다운로드 되지 않고, 다른 프로젝트에서도 필요한 경우 재활용한다
+
+				:  java.lang.UnsupportedClassVersionError
+					: 외부 라이브러리(.jar 파일) 을 추가해 사용하다보면 마주칠 수 있는 오류로, 해당 라이브러리가 현재 컴파일러의 버전을 지원하지 않기때문에 발생하는 오류이다
+						: 따라서 해당 컴파일러 버전을 지원하는 더 낮은 혹은 높은 버전의 라이브러리를 다운 받아야한다
+					: https://yourusername.tistory.com/402
+					
+
+			: 스프링 빌드 설정
+				: build 태그 내부에 , plugin"s" 태그 내부에 플러그인 관련한 설정을 직접 적는다
+					: pulgin 태그 ("s" 없는거임) 내부에 artifactId , version , Configurarion 관련 정보를 적는다.
+			
+ 	 <build>   
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>				
+				<configuration><!-- 자바컴파일러를 11버전으로 지정한다. -->
+					<source>11</source>
+					<target>11</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>  
+
+	
+	: Maven 프로젝트 구조
+		: Maven 프로젝트  >> 프로젝트 root
+			: src/main/java >> .java 파일 관리
+				: 직접 만드는 자바 파일들
+			: src/main/resources >> 자원관리
+				: 직접 만드는 xml 파일들
+
+
+	:  IoC컨테이너 역할의 xml 파일
+		: src/main/resources 경로에 .xml 확장자로 파일 생성
+			: 파일명은 applicatioinContext 이런식으로 짓는 편
+
+		: 빈 객체 생성 방법
+			<bean>태그
+				: <beans> 태그 내부에 작성
+				: jsp 에서의 <jsp:useBean> 태그와 존똑 		
+				: 속성 
+					(1) id : 빈객체의 이름 할당
+						: 맘대로 지음 됨 (이미 존재하는 이름을 할당하는게 아님)
+					(2) class : 객체 생성의 대상이 되는 클래스의 풀 클래스명	
+
+
+
+
+
+
+
+스프링 컨테이너 Spring Container	
+	: 참고	
+		: https://mslim8803.tistory.com/64
+		
+	: 빈(자바객체)의 생명주기 관리+DI 기능
+	: 스프링 설정파일( xml 혹은 어노테이션 기반의 자바 클래스)로 이미 존재하는 스프링 컨테이너에 빈을 등록 가능하다
+		: 스프링 설정파일이 스프링 컨테이너인것은 아니다
+
+
+	: 스프링 설정 파일
+		: https://atoz-develop.tistory.com/entry/Spring-%EC%8A%A4%ED%94%84%EB%A7%81-XML-%EC%84%A4%EC%A0%95-%ED%8C%8C%EC%9D%BC-%EC%9E%91%EC%84%B1-%EB%B0%A9%EB%B2%95-%EC%A0%95%EB%A6%AC
+		: xml 파일을 통한 설정 
+			: 직접 src/main/resources 디렉터리에 작성한다
+			: 파일명은 applicationContext.xml 이런식으로 짓는 편
+			: xml 에 등록된 bean 사용하는 방법 << 일단 bean을 xml 에 등록시키긴 해야됨
+				1. 자바 파일에서 직접 빈 객체를 꺼내 사용
+					: GenericXmlAppilcationContext 객체를 생성하고, 이를 대상으로하여 getBean( ) 사용
+				2. 자바 파일에서 특정 위치에 DI 시킴
+					: 일단 공통적으로 DI 시킬 bean 객체는 xml 파일에 생성해두어야한다
+
+					sol1: 어노테이션 사용 << 이거 하려면 해당 xml 파일에 <content:annotation-config/> 명시해야됨
+						@Autowired
+							: 생성자, 필드 , 메서드에 해당 위치에 DI 시키게 함
+								: DI 시키고 싶은 대상의 위에 명시해 줌 된다
+								: xml 파일에 등록되어있는 빈들중  (생성자, 필드 , 메서드가) 요구로하는 빈 객체가 DI 된다
+							: 어노테이션 기반 주입할꺼면 필수적으로 써줘야된다
+							: 속성 
+								 1. required 
+									: xml 파일에 주입 할 수 있는 bean 객체가 등록되어있지 않을 경우 에러를 발생시킬지의 여부를 결정한다
+									: 필수는 아니지만 쓰는걸 추천
+									: 할당 가능한 값 
+										(1) true << 디폴트
+											: 필수적으로 주입한다는 의미다.
+											: 그러니까 주입 가능한 bean 이 정의되어있지 않으면 에러를 발생시킨다
+										(2) false 
+											: 꼭 주입시키는건 아니란 의미이다
+											: 그러니까 주입 가능한 bean 이 정의되어있으면 그냥 주입하는거고, 주입 가능한 bean 객체가 정의 안되있다고 해서 에러를 발생시키진 않는다
+
+							 
+						@Qualifier
+							: xml에 같은 클래스 타입의 bean 객체가 여러개 등록되어있을경우 그 중 어떤 객체를 사용할지 "id"를 기반으로 결정해주는거다
+								: xml 에 해당 타입의 객체가 하나밖에 없으면 딱히 명시할 필요가 없지만, 만약에 여러개라면 필수적으로 해줘야된다.
+							: 속성을 별도로 적진 않고, 옆에 괄호 쓰고 바로 id명 박아버린다
+								ex) @Qualifier("member1")
+							: 보통 @Autowired 의 바로 밑줄에 써주는 편
+
+
+					sol2: xml 파일에서 특정 위치에 DI 되도록 설정함 
+						: xml 파일에서 <constructor-arg>혹은 <property> 태그를 사용힌디
+							: <constructor-arg>, <property> 태그 대한 설명은 아래에 적음
+							: 절차
+								1. 일단 DI 당할 bean 객체를 생성한다
+									: xml 파일에 <constructor-arg>혹은 <property> 을 자식 태그로 하는 bean 태그를 생성 
+								2. 
+						: 일단 이 방법을 사용하기 위해선 빈 객체를 생성시키는 클래스에 setter 메서드가 잘 정의되어있어야 한다
+		
+
+			: xml 파일 기본 형식
+				<?xml version="1.0" encoding="UTF-8"?>
+				<beans xmlns="http://www.springframework.org/schema/beans"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+				</beans>
+			: xml 에 작성 가능한 태그들 >> <beans> 태그 내부에 작성하게 된다
+				1. <bean> : 빈 객체를 생성 
+					:속성 
+						(1) id >> 해당 객체의 이름 (이미 존재하는게 아니라 새로 짓는거)
+						(2) class >> 대상이 될 클레스의 풀네임
+						(3) scope
+							: 할당 가능한 값 
+								1. singleton << 디폴트값
+								2. prototype 
+									:  getBean 호출될때마다 새로운 객체 만들고 싶을때 사용
+								3. request 
+								4. session
+
+							: 잘 안쓴다(빈은 대부분 싱글톤으로 관리)
+
+				2. <constructor-arg> ,  <property>
+					: 둘다 bean태그의 자식 태그이다. 둘이 같이 쓰일 수도 있다(일단 오버로딩된 생성자를 이용해서 빈객체를 생성시킨뒤 추가적으로 setter 메서드를 사용 가능하다)
+
+					
+					: <constructor-arg>
+						: bean객체를 생성할때, 오버로딩된 생성자에 arg 값을 넣어 bean 객체를 생성시킬 수 있게 해준다
+							: 그러니까 기본 생성자는 실행 안시킨다
+
+						:  <constructor-arg>만의 속성
+							(1) index
+								: 필수적이진 않다
+								: 동일한 타입의 arg 를 여러개 받는경우 어디에 배치할지 헷갈리니까, 해당 arg 가 몇번째에 들어가게 되는지 명시를 해주는데 쓰인다
+								: 0부터 시작한다
+								: ex)
+									 <constructor-arg index="0" value="10">
+									 <constructor-arg index="1" value="200">
+									 <constructor-arg index="2" value=:hello">
+
+					: <property>
+						: bean객체를 생성할때,  기본생성자로 객체를 생성시킨후 setter 메서드를 통하여 필드값을 초기화 가능하게 해준다
+							: 만약 해당 bean 태그 내부에  constructor-arg 를 이미 명시해둔 경우엔 딱히 기본 생성자를 호출 안하고 , constructor-arg 로 생성된 객체에 setter 메서드를 적용시킨다
+
+						:  <property>만의 속성
+							(1) name
+								: 필수이다
+								: 어떤 필드를 초기화할 것인지 명시한다
+									: 명시한 필드를 초기화 하는 setter 메서드를 통하여 초기화 하게 된다.
+
+
+					: <constructor-arg>,  <property>의 공통적인 속성 
+						: 속성으론 컬렉션 프레임워크 타입값 못넣는거 주의 >> 별도의 자식 태그 이용 필요 
+						: 사실  아래의 value, ref 속성의 경우 <constructor-arg>,  <property> 의 자식 태그로 써야되는데, 특별하게 속성으로 간단하게 쓸 수 있는거다
+							: value 속성을 실제로 자식 태그로 사용하려면 
+								:시작 태그와 끝 태그 사이에 값을 쓰면 된다
+								: 그리고 타입을 명시하고 싶은 경우 앞 태그 부분에 타입을 명시해준다
+								: ex) 
+									<property name="name"> 
+										<value type="java.lang.String">hehehehehe</value> 
+									</property> 랑
+
+							: ref 속성을 실제로 자식 태그로 사용하려면, bean '속성"에 객체명을 할당한다
+								: ref 태그가 아닌 속성으로 쓸떈 따로 bean 에 대한 직접적 언급없는거 주의
+								: ex) 
+									<property name="name"> 
+										<ref bean="student"></ref> 
+									</property> 
+
+
+						(1) value >> 자바의 기본적인 타입의 값을 할당하고자할때 사용한다
+							1. 원시타입값(int, boolean, char ..) 값을 arg 로 하는 경우
+							2. String 타입의 값을 arg 로 하는 경우 사용한다
+							3. 배열을 arg 로 하는 경우 사용한다 >> 단순히 값을 콤마로 구분하여 할당하면 된다
+								: ex) <property name="score" value="100,89,90,44,52" />  <!-- int[ ] score -->
+								: https://stackoverflow.com/questions/3610804/declaring-an-array-of-objects-in-a-spring-bean-context
+
+						(2) type
+							: value 에 할당할 값의 타입을 명시하는건데, 잘 안쓴다
+								: type 을 명시안해도 바인딩되는 생성자와 setter 메서드의 arg 타입으로써 타입을 자동으로 설정해준다 
+								: arg 가 다 똑같고 타입만 다른 생성자나 메서드가 오버로딩 되어있는 경우 String 타입을 우선적으로 인식하는데, 이를 피하고 싶은 경우에만 명시해주면 된다.
+
+						(3) ref >> 빈 객체를 할당하고자 할때 사용한다 
+							: 물론 할당하고자 하는 빈 객체는 bean 태그로 이미 생성된 상태여야된다
+							: ex ) <property name="student" value="student1" />
+
+
+					: <constructor-arg>,  <property>의 공통적인 자식 태그
+						: 컬렉션 프레임워크를 arg 로 넣게 해주는 태그들이다
+							: 이들의 요소들은 모두 value 자식태그/ ref 자식 태그/ bean 자식 태그 증 하나로 표현된다
+								1. value 자식 태그 >> basic 한 타입의 값을 요소로할때
+									: type 속성을 통하여 타입을 명시해줄 수도 있다. 근데 굳이? 차피 자동으로 인식할꼰대?
+								2. ref 자식 태그 >> "이미 생성한" 빈 객체를 할당할때
+									: bean 속성에 해당 객체명을 할당한다
+
+								3. bean 자식 태그 >> 빈 객체를 "새로" 생성하여 할당할때
+									: id 속성은 따로 명시해주지 않아도 된다<< ???????? 씨발 bean 객체는 싱글톤으로, 끝날떄까지 폐기 안된다메
+										: arg 로 투입만 되는거지, 계속 존재하는게 아니다 ? 
+
+
+						: 종류
+							(1) <list>
+								: java.util.List 타입 의 arg 를 넣어야 하는 경우 사용.
+								: ex)
+								 	<property name="developers">
+									 	<list>
+									 		<value>Cheney</value>
+									 		<value>Eloy</value>
+									 		<value>Jaspe.</value>
+									 		<value>Dillon</value>
+										 	<value>Kian</value>
+									 	</list>
+									 </property>
+
+
+
+				3.
+					: bean 객체를 생성힐때, 기본 생성자를 이용하여 생성하고( 오버로딩된 생성자로 생성하려면 constructor-arg 를 써야됨), 필드를 setter 계열의 메서드를 사용해서 초기화한다
+					:  bean 태그의 자식 태그이다. constructor-arg 와 함께 작성 가능하다
+
+				4. <content:annotation-config/>
+					: bean 에 대한 annotation 기능을 활성화해주는 태그
+						: 소스 파일에서 @Autowired, @Qualifier 을 사용 가능하게 해준다
+					: 일단 namespace 탭에서 context namespace 를 체크하고 추가 해야된다
+
+			
+
+	: BeanDefinition
+		: https://drcode-devblog.tistory.com/334
+		: 빈 설정 meta 정보
+			: "스프링 컨테이너"는 이 BeanDefintion 을 기반으로 스프링 빈을 생성한다다.
+		: BeanDefinition으로 추상화가 이뤄지기 떄문에, 스프링에서 다양한 설정 형식(xml, 어노테이션자바파일)을 지원 가능한거다.
+			: 각 설정파일을 XXXDefineitionReader 가 읽어 @Bean , <bean> 하나당 BeanDefinition을 생성
+				: AnnotationConfigApplicationContext 의 경우 AnnotationDefinitioinReader 를 사용해서 설정파일(.class)을 읽고 BeanDefinition 을 생성한다
+				: GenericXmlApplicationContext 의 경우 XmlBeanDefinitionReader 를 사용해서 설정파일(.xml) 을 읽고 BeanDefinition 을 생성한다
+
+
+	: 스프링은 기본적으로(별다른 설정 없으면) 빈을 모두 싱글톤으로 관리한다
+		:  https://beststar-1.tistory.com/39
+		: https://velog.io/@sorzzzzy/Spring-Boot2-5.-%EC%8B%B1%EA%B8%80%ED%86%A4-%EC%BB%A8%ED%85%8C%EC%9D%B4%EB%84%88
+
+
+		: 주의 ) 
+			: 설정 파일에서 class 가 같더라도 다른 id 로 생성한 빈 객체는 다른 객체이다
+				: 싱글톤으로 관리된단 말은 "같은 id" 로 getBean 을 호출하면 이미 생성됬던 얘가 또 반환된다는거다
+				: ex) 아래에서 stu1 == stu3 이지만 stu1 != stu2 이다
+					Student stu1 = context.getBean("student1",Student.class);
+					Student stu2 = context.getBean("student2",Student.class);
+					Student stu3 = context.getBean("student1",Student.class);
+
+
+		: 객체를 너무 많이 만들면 자원 소모가 크니까
+		: 스프링에서는 " 싱글톤 레지스트리 Singleton Registry " 기능을 제공한다
+			: 그래서 평범한 자바 클래스를 싱글톤으로 활용 가능하다
+				: 그러니까 bean 객체의 대상이 될 클래스가 생성자를 굳이 private 으로 가지지 않아도 된다는거다 
+		: 싱글톤 아니게 할 수도 있긴 한데 일반적으론 그렇게 잘 안한다
+		: 때문에 기본적으론 모든 클라이언트가 한 객체를 공유하게 되므로 stateless 하게 설계해야한다
+			: 그러니까 "가급적 읽기만 가능"해야한다
+				: 특정 클라이언트가 필드 값을 변경할 수 있으면 안된다
+			
+
+		
+	: 종류 
+		: 일단 왜 인터페이스인 얘들을 스프링 컨테이너라고 부르는질 모르겠다
+		: BeanFactory ,  ApplicationContext 를 구현한 다양한 클래스가 있고 , 그를 통하여 다양한 구성 정보를 제공 받을 수 있다
+
+		1. <interface> BeanFactory  << 잘 안쓴다
+			: 빈을 생성하고 관계를 설정하는 IoC의 기본 기능에 초점을 맞춘 스프링 컨테이너의 최상위 인터페이스
+			: lazy loading 방식이다 
+				: https://beststar-1.tistory.com/39
+				: (미리 만들어두는게 아니라) 직접적으로 빈 로딩 요청을 받으면 그제서야 인스턴스를 만들고 로딩하는 방법이다.
+					: 그러니까 단순 BeanFactory 객체를 생성했다고해서 arg 경로에 명시된 bean 객체들이 모두 생성되는게 아니라 , getBean( ) 을 통하여 직접 호출당해야 그때 생성된다
+					: ex)
+						 BeanFactory factory = new XmlBeanFactory(  new InputStreamResource( new FileInputStream("oraclejavacommunity.xml")));  // 아직 아무런 bean 개ㅐㄱ체가 생성되지 않았다
+						OracleJavaComm ojc = (OracleJavaComm)factory.getBean("oracleJavaBean");  // 이제 oracleJavaBean 빈 하나가 만들어졌다
+
+
+		2. <interface>  ApplicationContext << 주로 쓴다
+			: BeanFactory 를 상속받은, 확장한 인터페이스
+				: BeanFactory기능  + α	
+			: 별도의 정보를 참고하여 빈의 생성, 관계 설정 등의 제어의 총괄에 초점을 맞춘 것이다.	
+			: 대표적인 구현 클래스
+				(1) GenericXmlApplicationContext 
+					: xml 을 기반으로 구성 정보를 제공한다
+				(2) AnnotationConfigApplicationContext
+					: 어노테이션 기반으로 구성 저ㅓㅇ보를 제공한다
+
+			: pre-loading방식이다) 
+				: https://beststar-1.tistory.com/39
+				: 초반에 모든 빈 객체를 생성한다
+					: 그러니까 ApplicaionContext 객체를 생성할때, arg 경로에 명시된 bean 객체들이 모두 생성된다. ( 굳이 getBean( ) 을 호출하지 않아도) 
+					: ex)
+						ApplicationContext context = new ClassPathXmlApplicationContext("oraclejavacommunity.xml"); // 이 라인만 실행해도 모든 빈 객체가 생성된다
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+연습
+	: 과정
+		1. Main 에서 TransportationWalk 객체 생성
+		2. TransportationWalk 객체의 move( ) 메서드 호출
+		3. move( ) 호출 시 콘솔 창에 해당하는 이동수단을 출력
+
+		 
+				 
