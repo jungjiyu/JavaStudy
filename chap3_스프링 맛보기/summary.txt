@@ -1,4 +1,3 @@
-
 3. 스프링 맛보기
 
 도메인 구조 >> https://sudo-minz.tistory.com/13
@@ -49,22 +48,28 @@
 		: 직역하면 Maven 프로젝트의 다양한 정보를 처리하기 위한 객체 모델
 		: 스프링 라이브러리(.jar) 및 빌드 설정 하는 파일. 
 			: pom.xml 을 수정한 후에 해당 maven 프로젝틀 update 해줘야 pom,xml 의 내용이 반영된다.
+
 			: 스프링 라이브러리 설정 >> 네트워크를 이용해서 다운로드 받을 라이브러리(,jar)을 명시한다
 				: dependencies 태그의 "내부"에 사용할 모듈을 복붙한다
 					: mavenrepository 사이트에서 검색후 maven 탭의 텍스트 복붙한다
 						: mavenrepository 사이트 >> apache 재단에서 관리하는 곳이다. 다양한 라이브러리가 존재한다.
 					: 복붙되는 내용을 보면 각 모듈은 dependency 태그로 감싸져있다.
 
-				: 해당 모듈을 사용하는데 필요한 모듈들은 spring 이 알아서 추가적으로 깔아준다
+				: 해당 모듈을 사용하는데 필요한(==의존하는) 추가적인 모듈들은 spring 이 알아서 추가적으로 깔아준다
 					: 이것도 네트워크를 통해 받는거라 인터넷 연결되있어야된다
-				: 다운로드한 라이브러리(.jar)는 로컬리파지토리(==개발자 컴퓨터)에 저장된다 
+
+
+				: 다운로드한 라이브러리(.jar)는 로컬리파지토리(==개발자 컴퓨터==c:/users/사용자/.m2/repository/ )에 저장된다 
 					: 이미 다운로드된 모듈은 새로 다운로드 되지 않고, 다른 프로젝트에서도 필요한 경우 재활용한다
+					: 만약 로컬 리파지토리의 모듈에 문제가 생기는 경우(<-- 모듈 자체의 문제는 아니고 모듈과 모듈끼리 버전 같은거 안맞아서 그러는 거임) 걍 c:/users/사용자/.m2/repository/ 를 삭제하면 된다 (== repository 디렉터릴 삭제해라)
+					: 참고로 spring-context 라이브러리는  c:/users/사용자/.m2/repository/org/springframework 까지 들어가면 보인다
 
 				:  java.lang.UnsupportedClassVersionError
 					: 외부 라이브러리(.jar 파일) 을 추가해 사용하다보면 마주칠 수 있는 오류로, 해당 라이브러리가 현재 컴파일러의 버전을 지원하지 않기때문에 발생하는 오류이다
 						: 따라서 해당 컴파일러 버전을 지원하는 더 낮은 혹은 높은 버전의 라이브러리를 다운 받아야한다
 					: https://yourusername.tistory.com/402
 					
+				: 참고로 스프링에서는 모듈 하나를 artifact 단위로 관리한다.
 
 			: 스프링 빌드 설정
 				: build 태그 내부에 , plugin"s" 태그 내부에 플러그인 관련한 설정을 직접 적는다
@@ -93,23 +98,6 @@
 				: 직접 만드는 xml 파일들
 
 
-	:  IoC컨테이너 역할의 xml 파일
-		: src/main/resources 경로에 .xml 확장자로 파일 생성
-			: 파일명은 applicatioinContext 이런식으로 짓는 편
-
-		: 빈 객체 생성 방법
-			<bean>태그
-				: <beans> 태그 내부에 작성
-				: jsp 에서의 <jsp:useBean> 태그와 존똑 		
-				: 속성 
-					(1) id : 빈객체의 이름 할당
-						: 맘대로 지음 됨 (이미 존재하는 이름을 할당하는게 아님)
-					(2) class : 객체 생성의 대상이 되는 클래스의 풀 클래스명	
-
-
-
-
-
 
 
 스프링 컨테이너 Spring Container	
@@ -130,9 +118,14 @@
 				1. 자바 파일에서 직접 빈 객체를 꺼내 사용
 					: GenericXmlAppilcationContext 객체를 생성하고, 이를 대상으로하여 getBean( ) 사용
 				2. 자바 파일에서 특정 위치에 DI 시킴
-					: 일단 공통적으로 DI 시킬 bean 객체는 xml 파일에 생성해두어야한다
+					: 일단 공통적으로 "DI 당할 bean 객체" 와 "DI 를 이용할 bean 객체"는 xml 파일에 생성해두는거다. 차이점은 DI 시키겠다고 정의하는 위치이다.
+						: 어노테이션을 사용하는건 >>  DI를 이용할 클래스( "DI 를 이용할 bean 객체"의 기반이 되는 클래스)에 어노테이션으로 밝혀두는거고
+						: xml 파일에서 설정하는건 >>   xml 내에서 "DI 를 이용할 bean 객체" 를 생성하는 부분에서 그 내부에 직접 constructor-arg , property 와 같은 자식 태그로 DI 하겠다고 밝히는거다
 
-					sol1: 어노테이션 사용 << 이거 하려면 해당 xml 파일에 <content:annotation-config/> 명시해야됨
+					
+					sol1: 어노테이션 사용 
+						: 이거 하려면 해당 xml 파일에 <content:annotation-config/> 명시해야됨
+						: 이걸로 DI 시킬꺼면 따로 constructor-arg , property 같은 태그 안쓴다
 						@Autowired
 							: 생성자, 필드 , 메서드에 해당 위치에 DI 시키게 함
 								: DI 시키고 싶은 대상의 위에 명시해 줌 된다
@@ -161,12 +154,7 @@
 
 					sol2: xml 파일에서 특정 위치에 DI 되도록 설정함 
 						: xml 파일에서 <constructor-arg>혹은 <property> 태그를 사용힌디
-							: <constructor-arg>, <property> 태그 대한 설명은 아래에 적음
-							: 절차
-								1. 일단 DI 당할 bean 객체를 생성한다
-									: xml 파일에 <constructor-arg>혹은 <property> 을 자식 태그로 하는 bean 태그를 생성 
-								2. 
-						: 일단 이 방법을 사용하기 위해선 빈 객체를 생성시키는 클래스에 setter 메서드가 잘 정의되어있어야 한다
+					
 		
 
 			: xml 파일 기본 형식
@@ -178,6 +166,7 @@
 				</beans>
 			: xml 에 작성 가능한 태그들 >> <beans> 태그 내부에 작성하게 된다
 				1. <bean> : 빈 객체를 생성 
+					: jsp 에서의 <jsp:useBean> 태그와 존똑 		
 					:속성 
 						(1) id >> 해당 객체의 이름 (이미 존재하는게 아니라 새로 짓는거)
 						(2) class >> 대상이 될 클레스의 풀네임
@@ -264,10 +253,12 @@
 								2. ref 자식 태그 >> "이미 생성한" 빈 객체를 할당할때
 									: bean 속성에 해당 객체명을 할당한다
 
-								3. bean 자식 태그 >> 빈 객체를 "새로" 생성하여 할당할때
-									: id 속성은 따로 명시해주지 않아도 된다<< ???????? 씨발 bean 객체는 싱글톤으로, 끝날떄까지 폐기 안된다메
-										: arg 로 투입만 되는거지, 계속 존재하는게 아니다 ? 
+								3. bean 자식 태그 >> 빈 객체를 당장 "새로" 생성하여 할당할때
+									: 다른 bean 태그 내부에서 생성하는 bean 태그의 경우 반드시 ( 반드시 class는 명시해주어야하지만)  따로 id 는 명시해주지 않아도 된다 
+										: 어차피 외부에서 해당 id 로 getBean 못써서 그런 것 같다
 
+									: 이렇게 생성된 bean 객체도 싱글톤으로 생성되어 재사용된다. 하지만 일반적인 bean 객체(그냥 beans 태그 바로 내부서 선언된 bean)와는 다르게 getBean( ) 을 통하여 바로 꺼내진 못하고, 해당 객체를 요소로하는 컬렉션 타입 필드를 가진 Bean 객체를 통하여서만 얻을 수 있다. 
+									: 해당 설정파일의 bean graph 를 봐도 다른 bean 객체의 내부에서 생성된 bean 객체의 경우, 다른 bean 객체 내부에 포함되있음을 볼 수 있다. 
 
 						: 종류
 							(1) <list>
@@ -283,13 +274,63 @@
 									 	</list>
 									 </property>
 
+							(2) <set>
+								: java.util.Set 타입의 arg 를 넣어야 하는 경우 사용
+								: 주의 )
+									: set 타입 특성상 중복된 값을 허용하지 않기떄문에, 같은 bean명으로 빈 객체를 요소로써 여러개 넣어도 (에러는 안나지만) 그 중 딱 하나만 들어간다 ( 아무리 type="prototype" 으로 설정된 bean 객체라도 당장 해당 xml 파일에서는 그게 적용이 안되는것 같다 ). bean 객체를 여러개 넣고 싶다면 아예 내부에서 bean 객체를 생성하는 것도 방법이다
+									: 이건 딱히 빈과 관련 있는건 아니지만 , set 타입 특성상 바로 get(i) 같은걸로 값 못뽑아내고 iterator( ) 로 Iterator 객체 뽑아내고 그걸로 값 뽑아내야 되는거 잊지 말자
+										: ex)  
+								Iterator<Student> iterator =student.getStudentSet().iterator();
+								while(iterator.hasNext()) {
+									Student stu = iterator.next();
+									System.out.print(stu.getName()+","+stu.getAge()+"	");
+								}
+				
+
+								: ex) 
+									<property name="studentSet">
+										<set>
+										<ref bean="student1"></ref>
+										<ref bean="student2"></ref>
+										<bean id="ii" class="question1.Student"></bean>
+										</set>
+									</property>
+
+							(3) <map>
+								: java.util.Map 타입의 arg 를 넣어야하는 경우 사용
+								: 주의 )
+									: Map 타입 특성상 키와 값이 하나의 쌍으로 들어가기 때문에, <map> 태그 내부에 단순 <value>,<ref>,<bean> 태그가 들어가지 않는다. 반드시 entry 라는 별도의 태그를 이용하여 key 값을 설정하고, entry 태그의 속성으로써 value, ref 값을 넣든지 entry 의 자식 태그로써 <value> , <ref> ... 같은 태그를 쓰던지 해야한다
+										: <entry> 태그 
+											: 속성으로 key 를 가져 key값을 설정할 수 있다
+											:<value>,<ref>,<bean> 태그 등 다양한 태그( <list> 같은것도 됨) 를 자식 태그로 할 수 있고, <value> 와 <ref> 같은 경우 굳이 자식 태그로 안쓰고 value, ref 속성으로 대체 가능하다
+											: ex) <entry key="a4" vlaue="4"/>
+						
+								: ex ) 
+								<property name="map1">
+								<map>
+									<entry key="a1" value="문자"/>
+									<entry key="a3">
+										<bean class="kr.co.softcampus.beans.DataBean2"/>
+									</entry>
+									<entry key="a4">
+										<list>
+											<value>list1</value>
+											<value>list2</value>
+											<value>list3</value>
+										</list>
+									</entry>
+								</map>
+								</property>	
 
 
-				3.
-					: bean 객체를 생성힐때, 기본 생성자를 이용하여 생성하고( 오버로딩된 생성자로 생성하려면 constructor-arg 를 써야됨), 필드를 setter 계열의 메서드를 사용해서 초기화한다
-					:  bean 태그의 자식 태그이다. constructor-arg 와 함께 작성 가능하다
+							(3) props 태그
+								: properties 타입 arg 를 대신한다는데 도대체 properties 타입이 뭔지 모르겠다
 
-				4. <content:annotation-config/>
+
+
+
+
+				3. <content:annotation-config/>
 					: bean 에 대한 annotation 기능을 활성화해주는 태그
 						: 소스 파일에서 @Autowired, @Qualifier 을 사용 가능하게 해준다
 					: 일단 namespace 탭에서 context namespace 를 체크하고 추가 해야된다
