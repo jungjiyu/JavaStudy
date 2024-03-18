@@ -1,0 +1,330 @@
+이번주 금욜에 보강
+
+빈 태그 내부에 빈 태그로 생성하면 
+
+가장많이 생성하는건 around 이다 >> 메서드 실행 전 후 모든 시점에서 동작
+
+명시자 >> 보통 execution 을 사용 . Advice 를 ㅓㅈ굥ㅇ할 메서드를 명시할떄 사용
+	: bean 은 거의 안씀
+	ㅣ witin 은 가끔ㅁ ㅆㅁ
+
+
+
+
+Around 어드바이스 는 다른 Adivce 와는 다르게 반드시 Proceeding joinpoing 객체를 매개 변수로 받아야한다
+---------------------------------------------------------------------------------------------------
+Aspect >>  공통 기능(==Advice)을 모아둔 객체, 클래스 를 의미한다. (공통기능을 모듈화함)
+
+---------------------------------------------------------------------------------------------------
+Advice >> Aspect 에 정의된 공통 기능 각각의 로직을 의미한다.(==메서드)
+
+
+---------------------------------------------------------------------------------------------------
+JointPoint >> Advice (메서드) 호출 시점 결정
+	Before ) Advice 실행전에 동작
+	After ) Advice 실행 후 (Exception에 상관없이) 동작
+	After-returning ) 정상적으로 Advice 실행 후에 동작
+	After-throwing)  Advice 실행 중 Exception 발생시 동작
+	**** Around ) Advice  실행 전과 후, 예외발생 등 모든 시점에서 동작
+
+
+	Object obj = joinPoint.proceed( ); >>proceed 메서드를 호출하면 타겟(== 핵심기능) 메서드가 동작
+		: ProceedingJoinPoint joinPoint 인거다
+		: 프록시 기반 >> 핵심 기능을  호출하면 대리자가 중간에 끼워서 대신 호출해주고, 돌려 받는다
+ 			proceed 메서드를 호출하면 타겟(== 핵심기능) 메서드가 동작
+			// 반환되는 값이 있으면 Object 타입 값을 반환한다 . 반환 값 없음 걍 null 값
+
+
+---------------------------------------------------------------------------------------------------
+PointCut >> 포인트 컷은 JoinPoint의 한 부분이다. 표현 식으로 JointPoint 의 상세한 내용을 지정한다.
+	: 지시자(리턴타입 패키지 클래스 메소드(매개변수))  의 꼴로 쓰고 , 와일드 카드를 통해 다양한 상황에 대비 가능하다
+	명시자(지시자) 
+		: execution >>  Advice를 적용할 메서드를 명시할 때 사용(가장 정교한 포인트컷을 만들 수 있음)
+		: within >> 특정 타입 패턴에 속하는 모든 메서드를 포인트 컷으로 설정
+		: bean >> 빈의 이름으로 포인트컷을 설정
+
+	와일드 카드
+	*
+		: 기본적으로 임의의 문자열을 의미 << 어떤 리턴 타입이던지 상관 없다
+			: 패키지를 표현할때는 임의의 패키지 1개 계층을 의미
+			: 메소드의 매개변수를 표현할 때는 임의의 매개변수 1개를 의미
+	
+
+	..
+		: 패키지를 표현할때는 임의의 패키지 0개이상 계층을 의미
+		: 메소드의 매개변수를 표현할 때는 임의의 매개변수 0개 이상을 의미
+
+	+
+		: 클래스명 뒤에 쓰이며, 해당 클래스와 해당클래스의 서브클래스, 혹은 구현클래스 모두를 의미
+
+	예시 
+	execution(* com.spring.aop.*Aop.*Service(..))”
+		: *Aop == ~~Aop 이름을 가진 클래스 모두를 가리킴
+		: *Service(..) == ~~Service 이름의 메서드 모두를 가리키고, 내부 arg 는 0개 이상 암거나 다 됨 
+
+---------------------------------------------------------------------------------------------------
+
+ Weaving >> 공통 기능을 적용 하는 행위를 뜻한다.
+---------------------------------------------------------------------------------------------------
+	<aop:config> <!--  aop 전체 설정 하는 테그 -->
+		<aop:aspect id="logger" ref="logAop"><!-- apect >> 공통 기능 보유 객체 -->
+			<aop:pointcut expression="within(com.spring.aop02.Bank)" id="bankPoint"/><!-- 공통 적용 대상을 지정한다 -->
+			<aop:before method="beforeLog" pointcut-ref="bankPoint"/> <!--  핵심 기능 실행 이전에 실행할 메서드 명시  -->
+			<aop:after method="afterLog" pointcut-ref="bankPoint"/> <!--  핵심 기능 실행 이후에 실행할 메서드 명시  -->
+			<aop:around method="aroundAop" pointcut-ref="bankPoint"/>
+		</aop:aspect>
+	</aop:config>
+
+
+
+-----------------------------------------------------------------------------------------------------
+
+Spring AOP 구현방식
+XML 기반의 POJO 클래스를 이용한 AOP 구현 >> XML 파일에 <aop:config>를 사용하여 설정
+
+ 
+@Aspect 어노테이션을 사용한 AOP 구현 >> 부가기능을 제공하는 Aspect 클래스를 작성
+	: @Aspect
+		: Aspect 클래스 위에 써서, 해당 클래스가 Aspect 클래스임을 명시하게 해준다.
+	 
+	: @Pointcut
+		: 포인트컷 식별용으로써, 따로 구현로직이 없는(==빈) 메서드를 만들어 해당 메서드 위에 어노테이션을 사용하여 pointcut 을 설정
+		: ex) 
+			@Pointcut("execution(* com.spring.aop03.Bank.*(..))") 		// 해석 >> 모든 리턴 타입의 com.spring.aop3 패키지의 Bank 클래스의 모든 메서드
+
+			private void pointCutMethod() {}
+
+	: @Before
+		@Before("pointCutMethod()")
+			: 참조할 포인트컷은 걍 식별용 메서드를 대입함 된다
+			: 실행시점 이전에 호츌할 메서드 위에 쓴다 
+	: @After
+		@After("pointCutMethod()")
+			: 참조할 포인트컷은 걍 식별용 메서드를 대입함 된다
+			: 실행시점 이후에 호츌할 메서드 위에 쓴다 
+	: @Around
+		@Around("pointCutMethod()")
+			: 참조할 포인트컷은 걍 식별용 메서드를 대입함 된다
+			: 언제든 호츌할 메서드 위에 쓴다 
+
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+<aop:aspectj-autoproxy></aop:aspectj-autoproxy> 
+	: 스프링에 생성되어진 빈 객체들에 대해 어노테이션으로 AOP 설정을 하기 위한 스캔 명령 
+		: 스캔 명령 -- 인식을 가능하게 해주는 명령
+
+
+pointcut 을 직접 써도 되긴 하는데 대부분 pointcut-ref 쓴다고 한다
+
+
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+
+Spring MVC
+	: Spring에서 제공하는 웹 모듈로 Model, View, Controller 이 세가지 요소를 사용해 사용자의 다양한 요청을 처리하고 응답해주는 프레임워크 이다.
+	: 효과 >>뷰와 로직을 분리할 수 있다
+	: 구성 객체
+		: 모델(Model) >> 데이터베이스와 연동하여 CRUD 데이터를 처리하는 컴포넌트이다.
+		: 뷰(View) >> 모델이 처리한 데이터 결과를 가지고 사용자에게 보여줄 화면을 만드는 컴포넌트이다.
+		: 컨트롤러(Controller) >> 클라이언트의 요청을 받아서 요청에 대해  Model에게 작업 수행을 전달하고, 그 결과를  뷰에게 전달하는 컴포넌트이다.
+
+	: 구성 >> Controller 이전 부분(DispatcherServlet , Handler 어쩌구, ViewResolver)은 스프링이 알아서 다 해준다
+		: DispatcherServelt
+			: 클라이언트의 모든 request를 DispatcherServelt이 받는다. 가장 앞단의 Front Controller 로의 역할을 한다
+			: 받은  request 를 Handler Mapping 에게 위임하여 요청과 매칭되는 Controller 를 정보를 반환받는다
+			: 매칭되는 Controller 찾으면 request 를 Handler Adapter 에게 위임하여 해당 Controller 를 실제로 실행하여 비즈니스 로직을 수행한다
+			: Controller 로 부터 ModelAndView (==데이터)를 반환 받으면 그중에서 view Name 을 View Resolver 에게 전달한다
+			: View Resolver 로부터 View 를 반환 받으면 그걸 바탕으로 View 에게 응답화면을 포워딩을 통해 요청하여 , View 가 클라이언트에게 response 하게 한다
+
+			: Dispatcher >> 파견 관리인
+
+		: HandlerMapping
+			: request된 URL 과 매칭 되는 Controller 정보를 반환한다
+
+
+		:  Handler Adapter 
+			: request 된 Controller 를 실행시킨다
+
+		: Controller
+			: Service 클래스들을 통하여 비즈니스 로직을 수행하고, 그 결과를 ModelAndView 객체로 반환한다
+				: ModelAndView
+					: 비즈니스 로직의 수행 결과 데이터라고 봄 된다
+					: View Name + Model 을 통틀어 말하는 거다
+
+
+		: View Resolver
+			: View Name 을 전달받으면 그걸 바탕으로 View 를 반환한다
+
+		: View	
+			: 응답화면 request 를 받으면 해당 페이지를 client 에게 request 해준다
+
+-----------------------------------------------------------------------------------------------------
+스프링 레거시 프로젝트
+	: 템플릿은 Spring MVC Project 클릭 << 이 템플렛 때문에 이전에 고생했던거
+	: specify top-level package 
+		: com.sprig.mvc
+		: 이때 마지막 이름이 contextPath (위 경우 MVC)로 설정 되어진다
+			: 그러니까 접속했을떄 url 에 표시된단거다
+	: 
+	: 프로젝트 구조
+		: SpringMVC 프젝
+			: src/main/resources
+		: root-context.xml >>db 관련 설정 파일
+		: web.xml >> 설정파일
+
+
+	: pom.xml 
+		: properties >> 변수 설정 하는 부분
+		: 아래와 같은 경우
+			<properties>
+				<java-version>11</java-version>
+				<org.springframework-version>5.3.23</org.springframework-version>
+				<org.aspectj-version>1.6.10</org.aspectj-version>
+				<org.slf4j-version>1.6.6</org.slf4j-version>
+			</properties>
+
+			: java-version == 11 이되는거고, org.springframework-version == 5.3.23 이 되는거임
+			: 이렇게 변수 설정을 해놨기 떄문에, pom.xml 에서 el 표현식을 통하여 해당 변수로 값을 표현 가능하기에 값을 수정해야하는 경우 일일이 다 수정 안하고 , properties 부분만 변경하면 된다
+ 				: ex) dependencies 의 첫 자식 태그를 보면 el 표현식으로 ${org.springframework-version} 가 들어가 있는걸 볼 수 있다. 해당 부분엔 properties 부분에 정의해둔 org.springframework-version 값이 들어가게 된다
+					<!-- Spring -->
+					<dependency>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context</artifactId>
+						<version>${org.springframework-version}</version>
+						<exclusions>
+						<!-- Exclude Commons Logging in favor of SLF4j -->
+						<exclusion>
+							<groupId>commons-logging</groupId>
+							<artifactId>commons-logging</artifactId>
+						 </exclusion>
+					</exclusions>
+				</dependency>
+
+				: 물론 모든 값이 properties 부분에 정의되있는건 아니고, 정의해놓으면 편하다는 거다
+
+
+	: 수정해줘야할게 꽤 있다 
+		: Properties 부분 수정 >>  "자바 버전" 을 11 로 , "스프링 버전" 을 5.2.23 으로 변경
+			<properties>
+				<java-version>11</java-version>
+				<org.springframework-version>5.3.23</org.springframework-version>
+				<org.aspectj-version>1.6.10</org.aspectj-version>
+				<org.slf4j-version>1.6.6</org.slf4j-version>
+			</properties>
+
+		: Servlet  부분의 dependency 수정 >> artifactid 앞에 javax 붙이고, 버전을 4.0.1 로 변경
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>4.0.1</version>
+				<scope>provided</scope>
+			</dependency>
+
+		: 플러그인 부분도 설정 >>버전 3.8.1 로 바꾸고 &&  source, target 모두 11 로 변경
+      	  	    <plugin>
+         		      <groupId>org.apache.maven.plugins</groupId>
+            		    <artifactId>maven-compiler-plugin</artifactId>
+        	       	 <version>3.8.1</version>
+               	 <configuration>
+                    	<source>11</source>
+                   	 <target>11</target>
+                    	<compilerArgument>-Xlint:all</compilerArgument>
+                   		<showWarnings>true</showWarnings>
+                	    <showDeprecation>true</showDeprecation>
+      		       </configuration>
+      		  </plugin>
+
+	: 설정 파일 들
+	: web.xml
+		: 웹 어플리케이션 설정 위한 파일. 서버 설정 파일.
+		: src 폴더의 main 폴더의 webapp 폴더의 web-inf 폴더에 있다
+		: web.xml은 웹어플리케이션의 Deployment Descriptor (배포 설명자) 로써 XML형식의 파일이다. 모든 웹어플리케이션은 반드시 하나의 web.xml 파일을 가져야하고 위치는 WEB-INF폴더 아래에있다. web.xml 파일의 설정들은 웹어플리케이션 시작시 메모리에 로딩된다. 
+
+		: web.xml에 작성되는 내용
+			1. context-param 태그
+				: servletContext . 즉, 모든 서블릿이 공유하는 파라미터 저장
+			2. Servlet 매핑
+				: <servlet> vs <servlet-mapping>
+					: <servlet> >> 누가 request  받을지 설정
+						: <load-on-startup>1</load-on-startup>
+							: 최우선순위. 딱히 중요하진 않음
+
+					: <servlet-mapping> >> url 패턴 설정
+			3.  리스너 / 필터 설정 등
+				:Listener >> 모든 서블릿이 공유하는거. 공톡적으로 사용되는걸 잡아줌
+				: 필터 설정 >> 걍 web app 태그 내에만 작성함 되나
+					: 필터 == 정수기 필터
+					: 한글 인코딩 설정 위해 다음을 복붙한다
+						: 걸러준다. 요청과 응답이 오고갈때, 매번 해야하는 작업의 경우(인코딩 같은거) 매번 작업하는게 아니라 필터 기능으로 하고 ,  전달한다 (그러니까 서버쪽으로 request )
+
+<!-- 한글 인코딩 필터 설정 -->
+	<filter> 
+		<filter-name>encodingFilter</filter-name> 
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class> 
+		<init-param> 
+			<param-name>encoding</param-name> 
+			<param-value>UTF-8</param-value> 
+		</init-param> 
+		<init-param> 
+			<param-name>forceEncoding</param-name> 
+			<param-value>true</param-value> 
+		</init-param> 
+	</filter>
+	
+	<filter-mapping> 
+		<filter-name>encodingFilter</filter-name> 
+		<url-pattern>/*</url-pattern> 
+	</filter-mapping>
+
+	
+
+DispatcherServlet 서블릿 등록 설정이다.
+url 패턴을 / 로 지정하여 클라이언트의 모든 요청을 DispacherServlet 이 받는다.
+
+
+	: servlet-context.xml
+		: servlet-context.xml 은 요청과 관련된 객체를 정의한다.
+		: 웹 어플리케이션에서 클라이언트의 요청을 받기 위한 컨텍스트 설정이다.
+		: 뷰리졸버는 컨트롤러가 지정한 jsp 파일이름(논리적 이름)을 접두사와 접미사를 붙여주어 클라이언트에게 실제로 응답을 해줄 자원의 경로로 바꾸어 준다.
+		: <annotation-driven />
+			:handler , adapter 같은거 스캔 설정
+		: <resources>
+			: request(정적 파일 request) 같은 경우 dispatcher servlet 을 거치지 않고, 다이렉트로 이동해야한다. 따라서 컨트롤러로 거치지 않고 바로 이동하기 위해  resources 태그로 매핑해주는 것이다
+			: <resources mapping="/resources/**" location="/resources/" />
+				: mapping 속성 >> 요청 url.
+					: 위의 경우 하위 경로의 모든 url 을 의미
+				:  location >> 실제로 응답할 파일이 있는 위치
+
+		: <beans>
+			 : 뷰 리졸버 빈 등록 설정
+				: 컨트롤러가 지정한 jsp 파일을 접두사 , 접미사를 붙여 실제로 응답을 해ㄹ 경로를 바꿔준다.
+				:  뷰 리졸버 빈 설정
+		: 뷰 리졸버는 접두사와 접미사를 붙여주어서 클라이언트에게 실제로 응답을 해중 자원의 경로로 바꾸어준다
+			ex) "home" 반환 >>  /WEB-INF/views/" + "home"+".jsp" >> /WEB-INF/views/home.jsp
+
+		: context:component-scan
+			: 어노테이션통해 자동으로 빈 등록 설정 해주는 스캔 설정
+				: ex) @Component , @Service , @Repository , @Controller , ..
+
+			
+	: root-context.xml
+		: root-context.xml 은 모든 웹 구성 요소에 표시되는 공유 리소스를 정의한다.
+			: Repository(DAO), DB등 비즈니스 로직과 관련된 설정을 한다
+		:  Repository(DAO) , DB 등의 비즈니스 로직과 관련된 설정을 하는 파일 
+
+
+---------------------------------------------------------------------------------
+
+프로젝트에서 실행시키면 hello world 가 뜨는데 그 이유
+	: html 은 아닌 이유가 시간이 있음. 동적임
+	: web-inf 의 views 에서 home.jsp 가 있음
+	: home controller 가 home.jsp 를 불러주는거임
+		: @RequestMapping >> context path 다음에 해당하는 url의 요청 방식으로 요청이들어오면 메서드를 실행시켜준다
+			: 	@RequestMapping(value = "/", method = RequestMethod.GET) 같은 경우는 et 방식으로 들어옴 여기서 처리된다
+		: 리턴 타입이 보면 문자열인데, "home" 을 반환해주고 있음을 알 수 있따
+			: 문자열로 논리적 뷰 이름을 반환하면 그것을 디스패쳐 서블릿이 받아 뷰 리족버를 뷰 이름을 주면서 호출한다	
+			:   뷰 리졸벼는 클라이언트에게 실제로  응답해줄 자원의 경로로 바꿔준다.
+
+
+
