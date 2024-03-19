@@ -1,1 +1,372 @@
-s
+
+-----------------------------------------------------------------------------------------------------
+
+Spring MVC
+	: Spring에서 제공하는 웹 모듈로 Model, View, Controller 이 세가지 요소를 사용해 사용자의 다양한 요청을 처리하고 응답해주는 프레임워크 이다.
+	: 효과 >>뷰와 로직을 분리할 수 있다
+	: 구성 객체
+		: 모델(Model) >> 데이터베이스와 연동하여 CRUD 데이터를 처리하는 컴포넌트이다.
+		: 뷰(View) >> 모델이 처리한 데이터 결과를 가지고 사용자에게 보여줄 화면을 만드는 컴포넌트이다.
+		: 컨트롤러(Controller) >> 클라이언트의 요청을 받아서 요청에 대해  Model에게 작업 수행을 전달하고, 그 결과를  뷰에게 전달하는 컴포넌트이다.
+
+	: 구성 >> Controller 이전 부분(DispatcherServlet , Handler 어쩌구, ViewResolver)은 스프링이 알아서 다 해준다
+		: DispatcherServelt
+			: 클라이언트의 모든 request를 DispatcherServelt이 받는다. 가장 앞단의 Front Controller 로의 역할을 한다
+			: 받은  request 를 Handler Mapping 에게 위임하여 요청과 매칭되는 Controller 를 정보를 반환받는다
+			: 매칭되는 Controller 찾으면 request 를 Handler Adapter 에게 위임하여 해당 Controller 를 실제로 실행하여 비즈니스 로직을 수행한다
+			: Controller 로 부터 ModelAndView (==데이터)를 반환 받으면 그중에서 view Name 을 View Resolver 에게 전달한다
+			: View Resolver 로부터 View 를 반환 받으면 그걸 바탕으로 View 에게 응답화면을 포워딩을 통해 요청하여 , View 가 클라이언트에게 response 하게 한다
+
+			: Dispatcher >> 파견 관리인
+
+		: HandlerMapping
+			: request된 URL 과 매칭 되는 Controller 정보를 반환한다
+			: 내부 코드를 알 필욘 전혀 없다 
+ 
+		:  Handler Adapter 
+			: 요청 url 에 해당하는 Controller 를 실행시킨다
+			: 반환값까지 DispathcerServlet 에게 반환해주는건 아님을 주의
+
+		: Controller
+			: Service 클래스들을 통하여 비즈니스 로직을 수행하고, 그 결과를 ModelAndView 객체로 반환한다
+				: ModelAndView
+					: 비즈니스 로직의 수행 결과 데이터라고 봄 된다
+					: View Name 객체, Model 객체를 통틀어 말하는 거다
+
+
+		: View Resolver
+			: View Name 을 전달받으면 그걸 바탕으로 View 를 반환한다
+
+		: View	
+			: request 된 페이지를 client 에게 response 해준다
+			: .jsp 에 해당한다
+
+
+-----------------------------------------------------------------------------------------------------
+스프링 레거시 프로젝트
+	: 템플릿은 Spring MVC Project 클릭 << 이 템플렛 때문에 이전에 고생했던거
+	: specify top-level package 
+		: com.sprig.mvc
+		: 이때 마지막 이름이 contextPath (위 경우 MVC)로 설정 되어진다
+			: 그러니까 접속했을떄 url 에 표시된단거다
+	
+	: 프로젝트 구조
+		: SpringMVC 프젝
+			: src/main/resources
+		: root-context.xml >>db 관련 설정 파일
+		: web.xml >> 설정파일
+
+
+	: pom.xml 
+		: properties >> 변수 설정 하는 부분
+		: 아래와 같은 경우
+			<properties>
+				<java-version>11</java-version>
+				<org.springframework-version>5.3.23</org.springframework-version>
+				<org.aspectj-version>1.6.10</org.aspectj-version>
+				<org.slf4j-version>1.6.6</org.slf4j-version>
+			</properties>
+
+			: java-version == 11 이되는거고, org.springframework-version == 5.3.23 이 되는거임
+			: 이렇게 변수 설정을 해놨기 떄문에, pom.xml 에서 el 표현식을 통하여 해당 변수로 값을 표현 가능하기에 값을 수정해야하는 경우 일일이 다 수정 안하고 , properties 부분만 변경하면 된다
+ 				: ex) dependencies 의 첫 자식 태그를 보면 el 표현식으로 ${org.springframework-version} 가 들어가 있는걸 볼 수 있다. 해당 부분엔 properties 부분에 정의해둔 org.springframework-version 값이 들어가게 된다
+					<!-- Spring -->
+					<dependency>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context</artifactId>
+						<version>${org.springframework-version}</version>
+						<exclusions>
+						<!-- Exclude Commons Logging in favor of SLF4j -->
+						<exclusion>
+							<groupId>commons-logging</groupId>
+							<artifactId>commons-logging</artifactId>
+						 </exclusion>
+					</exclusions>
+				</dependency>
+
+				: 물론 모든 값이 properties 부분에 정의되있는건 아니고, 정의해놓으면 편하다는 거다
+
+
+	: 수정해줘야할게 꽤 있다 
+		: Properties 부분 수정 >>  "자바 버전" 을 11 로 , "스프링 버전" 을 5.2.23 으로 변경
+			<properties>
+				<java-version>11</java-version>
+				<org.springframework-version>5.3.23</org.springframework-version>
+				<org.aspectj-version>1.6.10</org.aspectj-version>
+				<org.slf4j-version>1.6.6</org.slf4j-version>
+			</properties>
+
+		: Servlet  부분의 dependency 수정 >> artifactid 앞에 javax 붙이고, 버전을 4.0.1 로 변경
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>4.0.1</version>
+				<scope>provided</scope>
+			</dependency>
+
+		: 플러그인 부분도 설정 >>버전 3.8.1 로 바꾸고 &&  source, target 모두 11 로 변경
+      	  	    <plugin>
+         		      <groupId>org.apache.maven.plugins</groupId>
+            		    <artifactId>maven-compiler-plugin</artifactId>
+        	       	 <version>3.8.1</version>
+               	 <configuration>
+                    	<source>11</source>
+                   	 <target>11</target>
+                    	<compilerArgument>-Xlint:all</compilerArgument>
+                   		<showWarnings>true</showWarnings>
+                	    <showDeprecation>true</showDeprecation>
+      		       </configuration>
+      		  </plugin>
+
+	: 설정 파일 들
+	: web.xml
+		: 웹 어플리케이션 설정 위한 파일. 서버 설정 파일.
+		: src 폴더의 main 폴더의 webapp 폴더의 web-inf 폴더에 있다
+		: web.xml은 웹어플리케이션의 Deployment Descriptor (배포 설명자) 로써 XML형식의 파일이다. 모든 웹어플리케이션은 반드시 하나의 web.xml 파일을 가져야하고 위치는 WEB-INF폴더 아래에있다. web.xml 파일의 설정들은 웹어플리케이션 시작시 메모리에 로딩된다. 
+
+		: web.xml에 작성되는 내용
+			1. context-param 태그
+				: servletContext . 즉, 모든 서블릿이 공유하는 파라미터 저장
+			2. Servlet 매핑
+				: <servlet> vs <servlet-mapping>
+					: <servlet> >> 누가 request  받을지 설정
+						: <load-on-startup>1</load-on-startup>
+							: 최우선순위. 딱히 중요하진 않음
+
+					: <servlet-mapping> >> url 패턴 설정
+			3.  리스너 / 필터 설정 등
+				:Listener >> 모든 서블릿이 공유하는거. 공톡적으로 사용되는걸 잡아줌
+				: 필터 설정 >> 걍 web app 태그 내에만 작성함 되나
+					: 필터 == 정수기 필터
+					: 한글 인코딩 설정 위해 다음을 복붙한다
+						: 걸러준다. 요청과 응답이 오고갈때, 매번 해야하는 작업의 경우(인코딩 같은거) 매번 작업하는게 아니라 필터 기능으로 하고 ,  전달한다 (그러니까 서버쪽으로 request )
+
+<!-- 한글 인코딩 필터 설정 -->
+	<filter> 
+		<filter-name>encodingFilter</filter-name> 
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class> 
+		<init-param> 
+			<param-name>encoding</param-name> 
+			<param-value>UTF-8</param-value> 
+		</init-param> 
+		<init-param> 
+			<param-name>forceEncoding</param-name> 
+			<param-value>true</param-value> 
+		</init-param> 
+	</filter>
+	
+	<filter-mapping> 
+		<filter-name>encodingFilter</filter-name> 
+		<url-pattern>/*</url-pattern> 
+	</filter-mapping>
+
+	
+
+DispatcherServlet 서블릿 등록 설정이다.
+url 패턴을 / 로 지정하여 클라이언트의 모든 요청을 DispacherServlet 이 받는다.
+
+
+	: servlet-context.xml
+		: servlet-context.xml 은 요청과 관련된 객체를 정의한다.
+		: 웹 어플리케이션에서 클라이언트의 요청을 받기 위한 컨텍스트 설정이다.
+		: 뷰리졸버는 컨트롤러가 지정한 jsp 파일이름(논리적 이름)을 접두사와 접미사를 붙여주어 클라이언트에게 실제로 응답을 해줄 자원의 경로로 바꾸어 준다.
+		: <annotation-driven />
+			:handler , adapter 같은거 스캔 설정
+		: <resources>
+			: request(정적 파일 request) 같은 경우 dispatcher servlet 을 거치지 않고, 다이렉트로 이동해야한다. 따라서 컨트롤러로 거치지 않고 바로 이동하기 위해  resources 태그로 매핑해주는 것이다
+			: <resources mapping="/resources/**" location="/resources/" />
+				: mapping 속성 >> 요청 url.
+					: 위의 경우 하위 경로의 모든 url 을 의미
+				:  location >> 실제로 응답할 파일이 있는 위치
+
+		: <beans>
+			 : 뷰 리졸버 빈 등록 설정
+				: 컨트롤러가 지정한 jsp 파일을 접두사 , 접미사를 붙여 실제로 응답을 해ㄹ 경로를 바꿔준다.
+				:  뷰 리졸버 빈 설정
+		: 뷰 리졸버는 접두사와 접미사를 붙여주어서 클라이언트에게 실제로 응답을 해중 자원의 경로로 바꾸어준다
+			ex) "home" 반환 >>  /WEB-INF/views/" + "home"+".jsp" >> /WEB-INF/views/home.jsp
+
+		: context:component-scan
+			: 어노테이션통해 자동으로 빈 등록 설정 해주는 스캔 설정
+				: ex) @Component , @Service , @Repository , @Controller , ..
+
+			
+	: root-context.xml
+		: root-context.xml 은 모든 웹 구성 요소에 표시되는 공유 리소스를 정의한다.
+			: Repository(DAO), DB등 비즈니스 로직과 관련된 설정을 한다
+		:  Repository(DAO) , DB 등의 비즈니스 로직과 관련된 설정을 하는 파일 
+
+
+---------------------------------------------------------------------------------
+
+프로젝트에서 실행시키면 hello world 가 뜨는데 그 이유
+	: html 은 아닌 이유가 시간이 있음. 동적임
+	: web-inf 의 views 에서 home.jsp 가 있음
+	: home controller 가 home.jsp 를 불러주는거임
+		: @RequestMapping >> context path 다음에 해당하는 url의 요청 방식으로 요청이들어오면 메서드를 실행시켜준다
+			: 	@RequestMapping(value = "/", method = RequestMethod.GET) 같은 경우는 et 방식으로 들어옴 여기서 처리된다
+		: 리턴 타입이 보면 문자열인데, "home" 을 반환해주고 있음을 알 수 있따
+			: 문자열로 논리적 뷰 이름을 반환하면 그것을 디스패쳐 서블릿이 받아 뷰 리족버를 뷰 이름을 주면서 호출한다	
+			:   뷰 리졸벼는 클라이언트에게 실제로  응답해줄 자원의 경로로 바꿔준다.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Spring (Annotation)
+	1. 빈 등록으로 사용되는 대표적인 어노테이션
+		@Component 
+			: 가장 기본.
+				: @Controller , @Service , @Repository 는 다 @Componet 로 부터 파생된거다 
+				: 솔직히 모든 빈은 @Component 로 퉁칠 수 있는데,  굳이 이렇게 세분화 시켜서 어노테이션을 붙이는 이유 >>  역할을 명시하기 위하여 .( 부장, 대리는 모두 한 회사의 직원이긴 하지만 엄연히 두 사람의 역할은 다르다)
+
+			: 해당 클래스를 스프링의 Bean으로 등록할 때 사용하는 어노테이션.
+			: 스프링은 해당 클래스를 스프링의 Bean으로 등록한다.
+
+		@Controller 
+			: 해당 클래스가 Controller의 역할을 한다고 명시하는 어노테이션
+			
+
+		@Service 
+			: 비지니스 로직이 들어가는 Service 역할을 한다고 명시하는 어노테이션
+
+		@Repository 
+			: DB연동 작업을 하는 DAO 역할을 한다고 명시하는 어노테이션
+
+
+	2. 클라이언트의 요청에 대해 해당 메소드와 연결시켜주는 어노테이션
+		: URL 표현 방법 ㅈㄴ 주의 
+			: 일단 알 수 있는 사실은 "/" 를 명시한다고 해서 그게 꼭 절대경로를 의미하는 URL 은 아니란 거고, "/" 를 명시하지 않는다고 해서 그게 꼭 상대경로를 의미하는 URL 이 아니란 거다
+
+			: 어노테이션에 매핑시킬 URL 은 contextPath 다음 url 이고 ,  "/" 로 시작한다
+				; 우리가 직접 ContextPath 까진 명시하지 않아 뭔가 상대경로처럼 느껴질지 모르겠지만, request 로 들어오는 전체 URL 은 사실 ".../contextPath/구체적위치"  으로 , 우리가 매핑시킬 URL 앞에 사실 "/contextPath " 가 붙어있는거고  ,우리는 그중 "/구체적위치" 를 조사하게 되는거다. >> 정리하자면 앞에 /contextPath 가 사실 있는거라 어노테이션 안에 "/" 를 명시하지만, ContextPath 은 적지 않는거다. 
+
+			:  view Name 은 WEB-INF/views/ 내부 jsp 파일의 URL 이고, "/" 로 시작하지 않는다
+				: servlet-context.xml 에 view name 을 해석하는 view Resolver 가 " WEB-INF/views/ " + viewName + ".jsp" 을 반환하게 설정되있어서 그렇다
+					: 그러니까 prefix 부분이 "/" 로 끝난다
+
+
+		@RequestMapping 
+			:클라이언트가 요청한 주소를 메소드와 연결시켜주는 어노테이션으로,  get 방식과 post 방식 모두 이걸로 받을 수 있다
+			: @GetMapping, @PostMapping 은 @RequestMapping 에서 파생된거다
+			
+			: get 혹은 post 특정 방식으로만 받게 하는 법 >> 근데 보통 그럴꺼면 @GetMapping 혹은 @PostMapping 을 쓴다
+				: value 속성을 명시하여 URL 문자열을 할당하고, 추가적으로 method 속성을 명시하여 RequesMethod.POST 혹은 RequestMethod.GET 을 할당한다
+ 				: ex) @RequestMapping(value="/page/write", method=RequestMethod.POST)
+ 				: ex) @RequestMapping(value="/page/write", method=RequestMethod.Get)
+
+			: get , post 방식 둘다 가리지 않고 받는 법
+				: method, value 속성을 다 명시하지 않고, 매핑된 URL 문자열만 명시한다
+				: ex) @RequestMapping("/page/form")
+
+			: 컨트롤러에 모든 메서드 공통 URL 이 있는 경우 위에 @RequestMapping("공통부분") 을 통하여 공통 부분을 일단 나타내고, 각 부분에서 해당 부분을 제외하고 표시할 수 있따
+				: ex ) 
+					@Controller
+					@RequestMapping("/page") // "/page" 로 시작되면 이 컨트롤러가 담당하게 된다
+
+
+
+
+	
+
+		@GetMapping 
+			: 요청방식이 GET 방식일때 클라이언트가 요청한 주소를 메소드와 연결시켜주는 어노테이션
+			: @GetMapping("/page/list") 이런 식으로 (ContextPath 뒤) url  만 명시해주면 된다 
+				:  @RequestMapping(value="/page/list", method=RequestMethod.Get) 와 같은 의미이다
+
+  
+		@PostMapping 
+			: 요청방식이 POST 방식일때 클라이언트가 요청한 주소를 메소드와 연결시켜주는 어노테이션
+			: @PostMapping("/page/list") 이런 식으로 (ContextPath 뒤) url  만 명시해주면 된다
+				:  @RequestMapping(value="/page/list", method=RequestMethod.POST) 와 같은 의미이다
+
+
+---------------------------------------------------------------------------------------------------------
+레거시 프로젝트만들면 기본적으로 만들어지는 HomeController
+	: 해당 클래스는 Controller 의 역할을 수행하는 클래스다. 라고 @Controller 어노테이션을 명시한다
+
+---------------------------------------------------------------------------------------------------------
+
+우리가 자바 파일 만들떄는, src/main/java 내에 생성되있는 패키지 내부에 새로운 패키지를 만들고, 거기에 작성해야된다
+	: src/main/java 내에 생성되있는 패키지는 디폴트 패키지로, 우리가 레거시 프로젝트 만들떄  specify top-level package  명시했던 패키지이다.
+	: 그러니까 이후 모든 패키지는  디폴트 패키지의 하위 패키지로 작성한단 말이다
+
+
+컨트롤러의 메서드가 반환하는 문자열 
+	: 문자열로 /WEB_INF/views 폴더 안에 있는 확장자를 제외한 jsp 파일의 경로를 반환하게되고, 이걸 View Name 이라고 한다
+	: 그걸 DisaptcherServlet 이 받아 View Resolver 를 호출하게 되고, View Resolver 는 클라이언트에게 실제로 응답을 해줄 자원의 경로로 바꿔준다
+	: 이게 가능한건 Servlet-context.xml 에서 뷰리졸버 관련 설정이 되있기 떄문이다
+		: 만약에 jsp 파일이 들어있는 기본 경로를 수정하고 싶으면 servlet-context.xml 을 건들면 된다. 
+			ex) 
+<!--  뷰 리졸버 빈 설정	: 뷰 리졸버는 접두사와 접미사를 붙여주어서 클라이언트에게 실제로 응답을 해중 자원의 경로로 바꾸어준다
+		ex) "home" 반환 >>  /WEB-INF/views/" + "home"+".jsp" >> /WEB-INF/views/home.jsp  -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+
+---------------------------------------------------------------------------------------------------------
+폼 데이터 받는 방법
+	: 일단 어케하더라도, 메소드의 return 은 view name 밖에 없는거다. 직접적으로 parameter 값이나 , model 을 넘겨주진 않는다
+	1. 컨트롤러의 메소드에 HttpServletRequest 매개변수를 작성하여 넘어온 데이터를 getParameter, getParameterValues 메소드를 사용하여 데이터를 받을 수 있다.
+		: 이 경우 내부에
+			request.setAttribute("name", name);
+			request.setAttribute("age", age);
+
+		같은거를 써서, 포워딩된 jsp 페이지에서도 ( ${name } , ${age } 같은걸로 ) 해당 값을 사용할 수 있게 해줘야된다 '
+			: 파라미터는 일시적인 값이니까
+
+	***2. @RequestParam을  사용해 직접 파라미터 값을 받는다
+		: @RequestParam 이 적용된 매개 변수에 해당 이름의 파라미터값을 자동으로 바인딩 해준다
+		: 주의 ) 
+			1. 그냥 @RequestParam("name")String name 과 같이 그냥 파라미터명만 명시해서 바인딩 되게 해도 되는데, 해당 파라미터가 존재하지 않는 경우 에러가 발생된다. 따라서 아예 값이 없는 경우 null 값을 받게 하되 에러는 발생시키지 않게 하기 위하여 required=false 를 명시해줘야된다(+ 속성을 한번 명시한 이상, 파라미터값도 띡 걍 씀 안되고 value 라는 속성에 할당하여야된다)
+				: @Autowired를 걍 @Autowired 로 안쓰고 @Autowired(required = false) 로 대개 쓰는것과 비슷한 맥락이다
+
+			2. required=false 로 설정하여서 에러는 발생시키지 않더라도, int 와 같이 원시 타입의 파라미터에 @RequestParam 을 적용하면 원시 타입에 null 이라는 값이 들어가는 꼴이라 여기서 에러가 나게 된다. 따라서 @RequestParam 적용되는 파라미터는 원시타입이 아닌 Wrapper 클래스인 Integer 같은걸 사용한다(물론 클래스인 String 은 상관 없다)
+
+		: 이 경우 request 객체를 따로 활용하는게 아니므로 request.setAttribute 같은걸 사용 못한다. 이와 비슷한 기능을 수행하는 것이 Model 객체이다. 이걸 쓰려면 단순히 Model 타입 객체를 파라미터로 함 된다. 그럼 Model 객체를 Spring 이 알아서 DI 시켜준다
+			: Model 객체 >> COntroller 에서 생성한 데이터를 담아서 view 로 전달할떄 사용된느 객체
+			: model객체.addAttribute ("key", value); 를 통하여 저장하면 포워딩된 jsp 에섣도 해당 값의 인식이 가능하다
+				
+		: ex) 	public String paramData2(@RequestParam(value="name", required=false)String name , @RequestParam(value="age", required=false)Integer age , Model model) throws Exception
+
+
+	
+
+---------------------------------------------------------------------------------------------------------
+
+ Request.GetContextPath ( )의 결과 == " / ContextPath명 "
+	: 끝에 "/"가 붙진 않는다
+
+
+
+: contextPath 가 바뀔것을 대비하여 이동 URL 을 작성하는 법 
+	sol1 : <%= %> 와 Request.getContextPath( ) 활용
+		: ex) 
+			<form action="<%=request.getContextPath()%>/page/write" method="post" > <!--  contextPath 가 바뀔것을 대비하여 /mvc/ 로 확정적으로 안쓴거다-->
+				<input type="submit" value="Post 전송">
+			</form>
+		
+	sol2 : jstl 사용
+
+
+: jsp 에서 다른 페이지로 이동해야할떄 직접적으로 .jsp 로 명시하는게 아니라 controller 를 거치게 action 에 url 을 할당해야된다
+
+
+---------------------------------------------------------------------------------------------------------------------------z
+
+
+
+HttpServletRequest , Model 타입의 파라미터는 명시만 해도  스프링이 알아서 DI 시켜준다.
+	: public String paramData1(HttpServletRequest reqeust) throws Exception // HttpServletRequest reqeust 를 파라미터로 받으면 Spring 이 알아서 request 객체를 삽입해준다
+	: public String paramData2(@RequestParam("name")String name , @RequestParam("age")int age , Model model) throws Exception // Model model 를 파라미터로 받으면 Spring 이 알아서 model 객체를 삽입해준다
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+참고로 전 세계적으로 jsp 를그닥 사용 안한다
