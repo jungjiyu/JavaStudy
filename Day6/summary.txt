@@ -17,9 +17,6 @@ JSP 에서의 파일 구조 Review
 			▼ web.xml : 어플리케이션의 기본적인 설정(서블릿 매핑, 에러페이지, 초기화 파라미터, 필터, 세션 등을 설정, 정보 제공 가능)을 작성하는 파일. web.xml 로 서버에게 해당 어플리케이션의 컴포넌트에 대한 정보를 제공하게 된다
 
 
-Spring Legacy Project 란?
-	: 일반적인 스프링 프레임워크의 프로젝트
-	: 라이브러리 설정을 자유롭게 할 수 있으나 초반 설정양이 많다
 
 Maven 
 	: https://sjh836.tistory.com/131
@@ -102,7 +99,6 @@ Maven
 	: 근데 요즘엔 Maven 보단 Gradle 을 더 쓴다
 
 
-Spring MVC 에서의 파일 구조
 
 
 Spring MVC
@@ -151,33 +147,77 @@ Spring MVC
 
 
 -----------------------------------------------------------------------------------------------------
-스프링 레거시 프로젝트
-	: 템플릿은 Spring MVC Project 클릭 << 이 템플렛 때문에 이전에 고생했던거
-	: specify top-level package 
-		: com.sprig.mvc
-		: 이때 마지막 이름이 contextPath (위 경우 MVC)로 설정 되어진다
-			: 그러니까 접속했을떄 url 에 표시된단거다
-	
-	: 프로젝트 구조
-		: SpringMVC 프젝
-			: src/main/resources
-		: root-context.xml >>db 관련 설정 파일
-		: web.xml >> 설정파일
+
+Spring Legacy Project 란?
+	: 일반적인 스프링 프레임워크의 프로젝트
+	: 다양한 라이브러리가 내장되있어 설정을 자유롭게 할 수 있다	
+	: Spring Legacy Project 의 템플렛 중 하나가 Spring MVC Project 이다
+		: 현재는 STS3 에서도 MVC Project 의 템플릿을 지원하지 않기 때문에 앞서 개고생해서 따로 복붙했던거다
+		: 참고로 simple project 로 택할 수도 있는데, 이건 정말 기본적인 라이브러리만 내장하고 있는거
+
+(스프링 레거시 프로젝트의) Spring MVC Project
+	: create 할때 나오는 specify top-level package
+		: Maven 의 groupId 를 지을때와 마찬가지로 회사명을 거꿀로 하여 만든다. 대부분 3토막으로 만든다.
+  			: ex) com.sprig.mvc 
+
+		: 세 토막 중 "마지막" 토막(위의 예시에선 mvc)이 contextPath로 설정 되어진다. 그러니까 마지막 토막이 프로젝트명이 된다
+
+		: 입력한 3토막으로 프로젝트의 default package 가 만들어진다
+			: 괜히 specify top-level "package" 인게 아니다
 
 
-	: pom.xml 
-		: properties >> 변수 설정 하는 부분
-		: 아래와 같은 경우
-			<properties>
-				<java-version>11</java-version>
-				<org.springframework-version>5.3.23</org.springframework-version>
-				<org.aspectj-version>1.6.10</org.aspectj-version>
-				<org.slf4j-version>1.6.6</org.slf4j-version>
-			</properties>
+		
+	: SpringMVC 프젝구조
+		▼ src
+			▼main
+				▼java : 자바파일 저장
+					▼defaultPackage
+						▷ 자바파일
 
-			: java-version == 11 이되는거고, org.springframework-version == 5.3.23 이 되는거임
-			: 이렇게 변수 설정을 해놨기 떄문에, pom.xml 에서 el 표현식을 통하여 해당 변수로 값을 표현 가능하기에 값을 수정해야하는 경우 일일이 다 수정 안하고 , properties 부분만 변경하면 된다
- 				: ex) dependencies 의 첫 자식 태그를 보면 el 표현식으로 ${org.springframework-version} 가 들어가 있는걸 볼 수 있다. 해당 부분엔 properties 부분에 정의해둔 org.springframework-version 값이 들어가게 된다
+				▼resources 
+					▼META-INF
+
+				▼webapp : 설정파일 저장
+					▼resources
+
+					▼WEB-INF
+						▼ classes
+
+						▼ spring
+							▼ appServlet
+								▷ servlet-context.xml  : 웹 관련 스프링 설정파일
+							▷root-context.xml : db 관련 설정 파일
+
+						▼ views : jsp 파일 저장되는 곳 
+							▷jsp 파일
+
+					▷web.xml : tomcat 서버 설정 파일
+
+			▼test : 테스트 전용 경로 (main 폴더와비슷한 하위계층 가짐)
+				▼ ... 
+
+		 ▷ pom.xml : maven 의 pom.xml
+
+
+
+
+	: SpringMVC 프젝의 설정 파일들 && 기본적으로 설정해줘야하는 사항
+		: pom.xml >> 빌드 설정	
+			: 구성
+				< properties > 
+					: 변수 비슷한거 선언하는 태그. pom.xml 에서 properties 에 명시된 자식 태그명으로 그 값을 대신 가능하다
+						: 이렇게 변수 설정을 해놨기 떄문에, pom.xml 에서 el 표현식을 통하여 해당 변수로 값을 표현 가능하기에 값을 수정해야하는 경우 일일이 다 수정 안하고 , properties 부분만 변경하면 된다
+ 							: ex) dependencies 의 첫 자식 태그를 보면 el 표현식으로 ${org.springframework-version} 가 들어가 있는걸 볼 수 있다. 해당 부분엔 properties 부분에 정의해둔 org.springframework-version 값이 들어가게 된다
+
+					: 아래와 같은 경우
+						<properties>
+							<java-version>11</java-version>
+							<org.springframework-version>5.3.23</org.springframework-version>
+							<org.aspectj-version>1.6.10</org.aspectj-version>
+							<org.slf4j-version>1.6.6</org.slf4j-version>
+						</properties>
+
+						" java-version" == 11 이되는거고, "org.springframework-version" == 5.3.23 이 되는거임
 					<!-- Spring -->
 					<dependency>
 						<groupId>org.springframework</groupId>
