@@ -1,13 +1,121 @@
+컴포넌트란?
+	: 독립적인 기능을 실행하는 구성 요소.
 
------------------------------------------------------------------------------------------------------
+artifact란?
+	: 가공물. sw 의 산출물.
+
+Handler의미
+	: 자동차의 핸들과 마찬가지로 클라이언트의 request 를 처리하는 처리자.
+
+
+JSP 에서의 파일 구조 Review
+	: src/main.java 
+		▼ .java 파일
+	: src/main/webapp
+		▼ jsp 파일
+		▼ WEB-INF	
+			▼ web.xml : 어플리케이션의 기본적인 설정(서블릿 매핑, 에러페이지, 초기화 파라미터, 필터, 세션 등을 설정, 정보 제공 가능)을 작성하는 파일. web.xml 로 서버에게 해당 어플리케이션의 컴포넌트에 대한 정보를 제공하게 된다
+
+
+Spring Legacy Project 란?
+	: 일반적인 스프링 프레임워크의 프로젝트
+	: 라이브러리 설정을 자유롭게 할 수 있으나 초반 설정양이 많다
+
+Maven 
+	: https://sjh836.tistory.com/131
+	: 빌드 및 모듈(의존라이브러리) 관리 도구 (==build tool)로, 플러그인을 구동해준다
+		: 빌드 build >> 애플리케이션 자원(.java, .xml, .jpg, .jar, .properties )을 컴퓨터에서 실행할 수 있는 artifact로 패키징하는 것
+		: "의존"라이브러리 >> 해당 어플리케이션이 돌아가기 위해 필요한 라이브러리란 의미
+		: 플러그인 >>  해당 프로그램에 외부 기능을 쉽게 설치하여 사용할 수 있게 하는 프로그램
+			: maven 의 모든 작업은 플러그인에서 수행된다. 메이븐은 여러 플러그인으로 구성되어있고, 각각의 플러그인은 하나 이상의 goal을 포함하고 있다
+
+	:  goal >> Maven 의 실행된위로 명령, 작업을 의미
+
+	: groupID 와 ArtifactID
+		: groupID
+			: 대부분 회사 명을 거꾸로 한다
+				: ex) com.naver
+				: 그래야 나중에 확장하기 편하기 때문이다
+					: 당장 네이버 날씨 도메인만 봐도 weather.naver.com 이다. 하위 패키지 만들때는 기존에 있는거 뒤에 . 붙여서 추가하게 되므로 com.naver --> com.naver.weather 할 수 있어지는거다
+
+		: ArtifactID
+			: 프로젝트의 고유식별자. 이걸 프로젝트명으로 해 프로젝트가 생성되게 된다
+	: pom.xml Project Object Model
+		: Maven 프로젝트 바로 아래에 위치한다 (그러니까 src 와 같은 계층임)
+		: Maven 프로젝트의 다양한 정보를 처리하기 위한 객체 모델.
+		: 뭘 설정하건 <project> 내부에 써야 인식된다
+			1.  <dependencies> 태그 내 : 모듈(의존라이브러리)들 설정
+				: maven repository 에 있는 코드 긁어서에 복붙하면 된다 
+				: 복붙된는 코드의 구성은 아래와 같다
+					<dependency > : (의존성)라이브러리를 정의하는 태그
+						<groupId> : 라이브러리의 그룹 아이디
+						<artifactId> : 라이브러리의 아티팩트 아이디
+						<version> : 라이브러리의 버전
+						<scope> : 라이브러리가 프로젝트 내에서 사용되는 범위
+				: 예시 
+					<dependency>
+						<groupId>mysql</groupId>
+						<artifactId>mysql-connector-java</artifactId>
+						<version>8.0.13</version>
+					</dependency>
+					
+				: 명시한 라이브러리만 띡 설치하는게 아니라, 해당 라이브러리를 구동하기 위한 라이브러리도 추가적으로 알아서 설치해준다
+				: 내부적으로 plugin 을 가지고 있어 가능한것
+
+			2. <build> 태그 내 : 빌드 build 설정 
+				: <plugins> 태그 내 : 플러그인(들) 정의하는 태그 
+					: 사이트에서 복붙하는건 아니고 직접 써야된다 
+					: 내부 구성
+						<plugin> : 플러그인 (하나를) 정의하는  태그
+							<artifactId> : 플러그인의 아티팩트 아이디
+							<version> : 플러그인의 버전
+							<executions> : 특정 상황"들"을 정의하는 태그
+								<execution> : 특정상황 (하나를) 정의하는 태그 
+									: 내부적으로 <id> , <phase>, <goals> , <configuration> 을 가져 특정 상황에서의 플러그인 설정이 가능
+
+							<configuration> : 실행 옵션을 설정하는 태그
+								: <plugin> 의 직방 자식 태그로도 쓰일 수 있고, <execution> 의 자식 태그로도 쓰일 수도 있다
+									: <plugin> 의 바로 아래에 쓰인 경우 해당 내용은 해당 플러그인의 기본 실행 옵션을 정의하게 된다
+									: <execution> 아래에 쓰인 <configuration>은 해당 <execution> 내에서만 유효한 실행 옵션을 정의하게된다. 해당 <plugin> 의 바로 아래에 쓰인 <configuration> 을 오버라이딩하게 된다. 
+
+				: 예시 ) 
+  				<build>
+					<plugins>
+						<plugin>
+							<artifactId>maven-compiler-plugin</artifactId>
+							<version>3.8.1</version>
+							<configuration>
+								<source>11</source>
+								<target>11</target>
+								<encoding>UTF-8</encoding>
+							</configuration>
+						</plugin>
+					</plugins>
+				</build>  
+
+			<modelVersion>4.0.0</modelVersion>
+			<groupId>com.spring</groupId>
+ 			<artifactId>maven</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+
+
+	: 근데 요즘엔 Maven 보단 Gradle 을 더 쓴다
+
+
+Spring MVC 에서의 파일 구조
+
 
 Spring MVC
-	: Spring에서 제공하는 웹 모듈로 Model, View, Controller 이 세가지 요소를 사용해 사용자의 다양한 요청을 처리하고 응답해주는 프레임워크 이다.
+	: Model, View, Controller 이 세가지 요소를 사용해 사용자의 다양한 요청을 처리하게 해주는  Spring에서 제공하는 웹 모듈
 	: 효과 >>뷰와 로직을 분리할 수 있다
-	: 구성 객체
-		: 모델(Model) >> 데이터베이스와 연동하여 CRUD 데이터를 처리하는 컴포넌트이다.
-		: 뷰(View) >> 모델이 처리한 데이터 결과를 가지고 사용자에게 보여줄 화면을 만드는 컴포넌트이다.
-		: 컨트롤러(Controller) >> 클라이언트의 요청을 받아서 요청에 대해  Model에게 작업 수행을 전달하고, 그 결과를  뷰에게 전달하는 컴포넌트이다.
+	: springMVC의 컴포넌트
+		: 모델(Model) >> 데이터베이스와 연동하여 CRUD 데이터를 처리하는 컴포넌트
+			: 비즈니스 로직을 처리한다
+			: Model 역할의 클래스를 service 클래스 라고 한다
+
+		: 뷰(View) >> 사용자에게 보여줄 화면을 만드는 컴포넌트
+
+		: 컨트롤러(Controller) >> 클라이언트에게 request을 받아서  Model에게 위임하고, 그 결과를  뷰에게 전달하는 컴포넌트
 
 	: 구성 >> Controller 이전 부분(DispatcherServlet , Handler 어쩌구, ViewResolver)은 스프링이 알아서 다 해준다
 		: DispatcherServelt
