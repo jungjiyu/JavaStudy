@@ -1,0 +1,4 @@
+BeanFactory와 ApplicationContext 의 차이
+  : BeanFactory와 ApplicationContext는 스프링 컨테이너의 두 가지 주요 인터페이스로, 스프링의 IoC 컨테이너 역할을 담당합니다. BeanFactory는 가장 기본적인 기능을 제공하고, ApplicationContext는 더 많은 기능을 제공하고
+GenericXmlApplicationContext와 AnnotationConfigApplicationContext은 ApplicationContext의 구현 클래스로, 각각 XML 파일과 어노테이션 기반 자바 클래스를 이용하여 빈을 등록하고 관리합니다.
+이들은 스프링 컨테이너의 종류로 분류되는 것이 아니라, 스프링 컨테이너를 생성하고 관리하는 방식을 구체화한 구현체입니다.
