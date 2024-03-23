@@ -1,1 +1,212 @@
 
+Spring (Annotation)
+	1. 빈 등록으로 사용되는 대표적인 어노테이션
+		@Component : 해당 클래스를 스프링의 Bean으로 등록할 때 사용하는 어노테이션.
+			: @Controller , @Service , @Repository 는 다 @Componet 로 부터 파생된거다 
+
+		@Controller : 해당 클래스가 Controller임을 명시			
+		@Service : 해당 클래스가  Service 클래스임을 명시
+		@Repository : 해당 클래스가 DAO 역할을 한다고 명시
+
+
+	2. "클래스 혹은 메서드" 와 "특정 url"을 매핑시켜주는 어노테이션
+		: 해당 url 로 request 가 들어올 경우 해당 클래스 혹은 메서드를 호출시켜준다
+
+		: URL 표현 tip
+			: 어노테이션에 매핑시킬 URL ==  contextPath 다음 url 이고 ,  "/" 로 시작한다
+			:  반환될 view Name == WEB-INF/views/ 아래의 jsp 파일의 URL 이고, "/" 로 시작 안한다
+
+		: 클래스와 매핑시킨 URL은 해당 클래스의 전체 메서드들의 공통 url 을 의미한다
+
+		@RequestMapping("매핑URL")
+			: get 방식과 post 방식 모두 받을 수 있다 << @GetMapping, @PostMapping 은 @RequestMapping 에서 파생된거다
+				:  get , post 중 특정 방식으로만 받게할려면 따로 method, value 속성 명시 필요
+
+		@GetMapping : GET 방식일때만 사용
+  
+		@PostMapping : Post 방식일때만 사용
+
+
+
+---------------------------------------------------------------------------------------------------------------
+Command Object 커맨드 객체
+
+	: 스프링에서 HttpServletRequets 를 통해 전송 정보를 얻을 수도 있고 @RequestParam 으로 데이터를 해당 매개변수에 바인딩하여 전송정보를 얻을 수도 있다. 하지만 이 두 방식은 파라미터 갯수들이 많아지면 하나하나 명시를 하여 처리해야되서 가독성이 떨어지는 등의 단점이 있다. 따라서 스프링은 커맨드 객체(Command Object) 를 지원하고 있다. 
+
+
+
+	: Http request 파라미터의 이름을 사용한 setter 메서드를 작성한 클래스를 만들고 이 클래스의 커맨드 객체를 메서드의 매개변수에 작성을 해주면 파라미터 값들이 객체의 속성 값으로 자동으로 바인딩되어 전송정보를 얻을 수 있따
+
+
+---------------------------------------------------------------------------------------------------------------
+
+
+체크박스로 한 name 으로 여러 value 를 받는 경우해당 필드의 타입은 List<어쩌고> 여야되고, 받은 후 el 표현식으로 꺼낼때 그냥 객체.리스트필드명 만 해줘도 잘 보인다
+
+---------------------------------------------------------------------------------------------------------------
+: 3계층
+	: Presentation Layer << 여기선 service 계층 객체 사영
+		- 클라이언트의 요청 및 응답을 처리
+		- 서비스계층, 데이터 엑세스 계층에서 발생하는 Exception을 처리
+		- @Controller 어노테이션을 사용
+
+	: Service Layer << 여기선 커맨드 객체 사용
+		- 비즈니스 로직 처리와 비즈니스와 관련된 도메인 모델의 적합성 검증 트랜잭션 관리 및 처리
+		- 프리젠테이션 계층과 데이터 엑세스 계층 사이를 연결하는 역할
+		- 주로 인터페이스를 먼저 만들고 그걸 기반으로 서비스 (구현) 클래스를 만듬
+		- @Service 어노테이션을 사용
+
+	: Data Access Layer << DAO
+		- ORM (Mybatis, Hibernate)를 주로 사용하는 계층
+		- Dabase에 data를 CRUD(Create, Read, Update, Delete)하는 계층
+		- 주로 인터페이스를 먼저 만들고 그걸 기반으로 DAO (구현) 클래스를 만듬
+		- @Repostiory 어노테이션 사용
+
+
+---------------------------------------------------------------------------------------------------------------
+
+날짜를 직접 작성하는건 비효율적. 물론 db 쓰면 db 서 처리해주겠지만 우리는 지금 db 안쓰고 있으므로 컬렉션 이용해야됨
+
+private Timestamp regDate; 
+Timestamp now = new Timestamp(System.currentTimeMillis());  
+member.setRegDate(now);
+
+
+ms 단위의 시간을 예쁘게 포맷하는 법: 
+<fmt:formatDate value="${element.redDate}" pattern="yyyy-mm-dd"/>
+---------------------------------------------------------------------------------------------------------------
+
+jstl 같은 경우는 이미 스프링에 내장되어있다 (디펜던시로)
+
+    <c:set var="c" value="값"/>
+
+<c:out value="값">
+
+    <c:if test="${num1>num2}'></c:if>
+
+
+
+<c:forEach begin="1" end="100" items="${list} var="element">
+       ${ element.name } <br>
+	${element.age} <br>
+    </c:forEach>
+
+<c:forEach var="i" begin="1" end="10">
+        <c:out value="${i}" />
+</c:forEach>
+
+---------------------------------------------------------------------------------------------------------------
+
+타입에 해당하는 빈 자동 주입 >> 
+@Autowired
+private MemberDAO dao;
+
+---------------------------------------------------------------------------------------------------------------
+
+Model 객체와 request 객체
+	: Model 객체는 Request 를 대신하는거다. Request 가 더 넓은 영역에서 쓰일 수 있따. model 에 담으면 해당 view 에서만 사영 가능하다(<< Parameter 느낌인듯?)
+
+
+
+
+
+똑같은 url 이라도 방식에 따라 다른 메서드와 메핑 가능
+	@GetMapping("/join") // 얘는 get 방식이니까 다른거임 (아래와)
+	public String joinForm() {
+		return "member/joinForm";
+	}
+
+	
+	// 회원 가입 후에 등록 요청
+	@PostMapping("/join")
+	public String join() {
+		return "";
+	}
+
+
+----------------------------------------------------------------------------------------------
+
+스프링에서의 리다이렉트
+	: https://amy-it.tistory.com/111
+	return "redirct:/경로";
+RedirectAttributes ra >> 이걸 파라미터에 추가해줌 또 DI 시켜준다.
+	: redirect 통해 이동하는 경우  RedirectAttributes 객체를 통해 데이터 전달 가능
+		: model 객체에 넣어줘도 상관 없지만 페이지를 새로 고침한다 했을떄 model 객체 안의 데이턴는 유지가 된다
+
+	: ra.addFlashAttribute("msg","같은 아이디가 존재합니다");
+		: addFlashAttribute( ) 는 리다이렉트 직전 프래시에 데이터를 저장하는  메서드. 
+		: 일회성 데이터를 보내주기 때문에 리다이렉트 이후에는 소멸한다
+
+
+	: redirect, forward 
+		: 스프링 컨테이너의 
+
+----------------------------------------------------------------------------------------------
+jsp 에서 get 방식으로 전달하기
+
+        <a href="/mvc/member/info?id=${element.id}">이름:</a>${element.name } <br>
+
+
+@ModelAttribute 는 저장할 객체가 해당 메서드에 아예 파라미터로 넘어올때 , 그걸 통째로 model 객체에 attribute 로 저장하기 위해 사용하는거다.
+
+@RequestMapping 은 "request 객체를 DI 시켜 생성한후 getParam 하지 않고"도  파라미터명을 통하여 바로rquest 객체의 파라미터값을 메서드의 파라미터로 받을 수 있게 해준다
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+form 태그 자체에도 이름을 붙일 수 있따
+	<form name="modifyForm" action="/mvc/member/modifyForm" method="post">
+
+
+JS
+			var check = confirm('회원탈퇴를 하시겠습니까?'); // 확인을 누르면 true, 취소 누름 false 반환
+				var modify = document.modifyForm // document == 현재문서	
+												// modifyForm 이건 우리가 폼에 붙인 name 
+					modify.method ="post";
+					modify.action="/mvc/member/delete";
+					modify.submit(); // 바로 전송----------------------------------------------------------------------------------------------
+
+새로만든 프로젝트 설정은 걍 복붙한다. 서블릿 설정 파일은 함 안된다.
+	web.xml , pom. xml 만 해준다
+
+JDBC 간의 비교
+기존 Java DataBase Connectivity
+JDBC(Java DataBase Connectivity)는 데이터베이스에 연결 및 작업을 하기 위한 자바 표준 인터페이스이다. JDBC 를 사용하여 데이터베이스 작업을 하여도 되지만 반복적인 작업이 계속되는 단점이 있다
+
+
+Spring JDBC
+Spring JDBC는 JDBC의 모든 반복적인 로직의 처리를 스프링 프레임워크에 위임하므로 Connection의 연결과 생성 및 종료 Statement 준비와 실행 및 종료 ResultSet 처리와, 예외 처리, 트랙젝션 등의 반복되는 작업을 Spring이 해줌으로 개발자가 직접 작성하지 않고 Database에 대한 작업을 수행할 수 있다
+
+
+커낵션 풀 >> 커낵션 관련 저장해두는 풀,
+웹 컨테이너(WAS)가 실행되면서 DB와 미리 connection(연결)을 해놓은 객체들을 pool에 저장해 두었다가, 클라이언트 요청이 오면 connection을 빌려주고, 처리가 끝나면 다시 connection을 반납 받아 pool에 저장하는 방식을 말한다. 스프링의 JDBC Template과 커넥션풀을 관리하는 HikariCP 라이브러리를 사용하기 위해 <dependency> 태그로 pom.xml 에 추가한다. 
+	: 그러니까 톰캣에 내장되있는게 아니다
+	: 커맨드 객체랑 다르다
+
+1. ojdbc8 >> 걍 젤 클릭수 많은거
+2. spring jdbc >> 5.2.3 버전 맞춰서
+3. hikaricp >> 걍 젤 클릭수 ㅏㅁㄶㅇ느거
+
+
+root 설정 파일
+	<!--  db 관련 빈 등록을 하고 관리하는 설정 파일 -->	
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
+		<property name="jdbcUrl" value="jdbc:oracle:thin:@Localhost:1521:xe"></property>
+		<property name="username" value="C##javauser"></property>
+		<property name="password" value="java2024"></property>
+	</bean>
+	
+	<!-- 히카리 데이터 소스 클래스 빈 등록 설정 -->
+	<bean id="hikariDataSource" class="com.zaxxer.hikari.HikariDataSource">
+		<constructor-arg ref="hikariConfig"></constructor-arg>
+	</bean>
+
+
+
+
+hikari 빈 설정 tip
+	: 클래스 풀 네임으론 걍 java 파일에서 import 해서 그거 복붙한다
+
+
+마찬가지로 dao 클래스는 interface 먼저 만든다음에 만든다
