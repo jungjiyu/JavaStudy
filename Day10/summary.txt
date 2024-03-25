@@ -1,0 +1,86 @@
+Spring 3계층
+	1. Presentation Layer >> @Controller
+		:  @RequestMapping 따라서 특정 메서드를 실행시켜 비즈니스 로직 처리하고 viewname 을 반환해줌
+
+	2. Service Layer >> @Service
+		: 내부적으로 DAO, DTO 를 활용함
+		: 인터페이스 만든 후 구현 클래스 만듬
+
+	3. Data Access Layer >> @Repository
+		: DAO 클래스, DTO 클래스에 해당 
+		: 인터페이스 만든 후 구현 클래스 만듬
+
+
+---------------------------------------------------------------------------------------------------
+
+@ModelAttribute 는 저장할 객체가 해당 메서드에 아예 파라미터로 넘어올때 , 그걸 통째로 model 객체에 attribute 로 저장하기 위해 사용하는거다.
+
+@RequestParam 은 "request 객체를 DI 시켜 생성한후 getParam 하지 않고"도  파라미터명을 통하여 바로rquest 객체의 파라미터값을 메서드의 파라미터로 받을 수 있게 해준다
+
+Command Object 커맨드 객체
+	: 스프링에서 HttpServletRequets 를 통해 전송 정보를 얻을 수도 있고 @RequestParam 으로 데이터를 해당 매개변수에 바인딩하여 전송정보를 얻을 수도 있다
+
+	@RequestMapping("/data3") 
+	public String paramData3(ParamMember member){ // DTO 객체랑 느낌 비슷한듯?
+		
+		System.out.println("이름:"+member.getName()+", 나이:"+member.getAge());
+		return "param/paramPrint";
+	}
+
+
+---------------------------------------------------------------------------------------------------
+RedirectAttributes ra.
+	: redirect 통해 이동하는 경우  RedirectAttributes 객체를 통해 데이터 전달 가능
+		: model 객체에 넣어줘도 상관 없지만 페이지를 새로 고침한다 했을떄 model 객체 안의 데이턴는 유지가 된다
+
+	: ra.addFlashAttribute("msg","같은 아이디가 존재합니다");
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+ㅈㄴ 어이없는게 textarea 는 그냥 < /> 만해서는 제대로 인식이 안되고<textarea name="content" rows="5" cols="23"></textarea>로 굳이 끝태그 나타내줘야 인식이된다.
+: 그리고 디폴트값은 여는태그 닫는태그 내ㅜ에 써야도니다
+
+
+jsp 페이지에서 필드별로 입력 받은걸 합쳐서 넘기지 않았더라도 받는쪽에서 해당 필드의 커멘드 객체를 파라미터로 하면 자동으로 모아서 해준다
+
+
+jstl 할떄 uri == 키값 느낌. import 느낌이다. 새로 다운 받는건 아니다. 인터넷이 연결되지 않아도 사용 가능한다
+
+
+if buffersize 작다 어쩌구 오류 뜨면 >> window- preferences - console검색-해서 버퍼 사이즈를 ㅈㄴ 키워줌 됨(100만정도)
+
+
+추가적으로 쿠키를 사용하면 한 사용자당 한 카운트만 올라가게 할 수도 있따
+
+
+테이블도 반복문돌려서 생성할수있다. 
+
+
+
+
+
+attribute 로 설정해준거 아님 param.id 인거 잊지 x
+
+return "board/list"; // 그냥 board/list 라고 쓰면 해당 jsp 페이지로 가는거지 컨트롤로러 가는게 아니라 리다이렉트 처리해주ㅓ야됨
+
+
+return "redirect:/board/contentView?id="+dto.getId();  와 같이 java 소스 코드에서는 jstl 안쓰고 걍 문자열 연산자 사용한다
+
+
+스프링 jdbc >> 반복적인 작업을 spring framework 에 위임한다
+	; Connection의 연결과 생성 및 종료 Statement 준비와 실행 및 종료
+ResultSet 처리와, 예외 처리, 트랙젝션 등 
+	: '위임'한다는 말에서 알 수 있다 싶이 어쨌뜬 spring jdbc 도 jdbc 드라이버를 사용한다, 걔네가 대신 접ㄱㄴ해주ㄴ는거지.
+
+todo
+	>> model , command객체 , request 객체 , request 의 차이점 && param 여부
+
+	>> mvc 애플리케이션에서 왜 데이터가 안넘어가는지.
+
+	>> addAttribute 와 addFlashAttribute 의 차이점
+	>> 자바빈 어디서 생성?? 
+
+
+
+
