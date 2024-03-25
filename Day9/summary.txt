@@ -1,1 +1,46 @@
 
+
+새로만든 프로젝트 설정은 걍 복붙한다. 서블릿 설정 파일은 함 안된다.
+	web.xml , pom. xml 만 해준다
+
+JDBC 간의 비교
+기존 Java DataBase Connectivity
+JDBC(Java DataBase Connectivity)는 데이터베이스에 연결 및 작업을 하기 위한 자바 표준 인터페이스이다. JDBC 를 사용하여 데이터베이스 작업을 하여도 되지만 반복적인 작업이 계속되는 단점이 있다
+
+
+Spring JDBC
+Spring JDBC는 JDBC의 모든 반복적인 로직의 처리를 스프링 프레임워크에 위임하므로 Connection의 연결과 생성 및 종료 Statement 준비와 실행 및 종료 ResultSet 처리와, 예외 처리, 트랙젝션 등의 반복되는 작업을 Spring이 해줌으로 개발자가 직접 작성하지 않고 Database에 대한 작업을 수행할 수 있다
+
+
+커낵션 풀 >> 커낵션 관련 저장해두는 풀,
+웹 컨테이너(WAS)가 실행되면서 DB와 미리 connection(연결)을 해놓은 객체들을 pool에 저장해 두었다가, 클라이언트 요청이 오면 connection을 빌려주고, 처리가 끝나면 다시 connection을 반납 받아 pool에 저장하는 방식을 말한다. 스프링의 JDBC Template과 커넥션풀을 관리하는 HikariCP 라이브러리를 사용하기 위해 <dependency> 태그로 pom.xml 에 추가한다. 
+	: 그러니까 톰캣에 내장되있는게 아니다
+	: 커맨드 객체랑 다르다
+
+1. ojdbc8 >> 걍 젤 클릭수 많은거
+2. spring jdbc >> 5.2.3 버전 맞춰서
+3. hikaricp >> 걍 젤 클릭수 ㅏㅁㄶㅇ느거
+
+
+root 설정 파일
+	<!--  db 관련 빈 등록을 하고 관리하는 설정 파일 -->	
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
+		<property name="jdbcUrl" value="jdbc:oracle:thin:@Localhost:1521:xe"></property>
+		<property name="username" value="C##javauser"></property>
+		<property name="password" value="java2024"></property>
+	</bean>
+
+	<!-- 히카리 데이터 소스 클래스 빈 등록 설정 -->
+	<bean id="hikariDataSource" class="com.zaxxer.hikari.HikariDataSource">
+		<constructor-arg ref="hikariConfig"></constructor-arg>
+	</bean>
+
+
+
+
+hikari 빈 설정 tip
+	: 클래스 풀 네임으론 걍 java 파일에서 import 해서 그거 복붙한다
+
+
+마찬가지로 dao 클래스는 interface 먼저 만든다음에 만든다
