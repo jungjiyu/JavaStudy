@@ -43,11 +43,10 @@ Spring JDBC
 		: db관련 bean 을 생성한다 >> HikariConfig 빈,  HikariDataSource 빈, JDBC빈 을 등록한다
 			: 주의
 				: 헷갈리면 안되는게 이전에 maven 프로젝트에서 우리가 직접 만든 클래스 파일에 대한 빈을 생성했던건 src/main/resources 에  우리가 직접 xml 파일 만들어서 했었던거다
-					: servlet-context.xml 에선 딱히 빈 생성 안한다. 걍 url 맵핑 관련 정의만 되어있다.
 					: 어쨌뜬 db 관련 외부에서 다운 받은 라이브러리에 대한 bean 을 만드는건 src/main/webapp/web/inf/spring 의 이미 존재하는 root-context.xml 에서 하는거다
 
 	servlet-context.xml : 
-		: 
+		: 걍 url 맵핑 관련 정의만 되어있고 우린 건드리지 안한다
 
 
 
