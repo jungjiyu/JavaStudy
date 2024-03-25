@@ -39,20 +39,21 @@ Spring JDBC
 			3. hikaricp >> 걍 젤 클릭수 ㅏㅁㄶㅇ느거
 
 	web.xml : 한글 filter 부분만 복붙해온다
-	root-context.xml : 드디어 쓴다 !
-		: db관련 bean 을 생성한다 >> HikariConfig 빈,  HikariDataSource 빈, JDBC빈 을 등록한다
+	root-context.xml :
+		: root-context.xml >>  db 관련 빈 등록을 하고 관리하는 설정 파일 
 			: 주의
 				: 헷갈리면 안되는게 이전에 maven 프로젝트에서 우리가 직접 만든 클래스 파일에 대한 빈을 생성했던건 src/main/resources 에  우리가 직접 xml 파일 만들어서 했었던거다
 					: 어쨌뜬 db 관련 외부에서 다운 받은 라이브러리에 대한 bean 을 만드는건 src/main/webapp/web/inf/spring 의 이미 존재하는 root-context.xml 에서 하는거다
 
-	servlet-context.xml : 
-		: 걍 url 맵핑 관련 정의만 되어있고 우린 건드리지 안한다
 
+		: root-context.xml 에서의 빈 설정 tip
+			: 클래스 풀 네임으론 걍 java 파일에서 import 해서 그거 복붙한다
 
+		: 설정 사항
+			: HikariCOnfig 는 Hikari 설정 . 관리 클래스 뭐 그런거다
+			: driverClassName , jdbcUrl 같은건 이미 해당 클래스에 있는 프로퍼티고, 철자 다 지켜야된다. 자동완성기능사용하자
+			: 이렇게 하고서 run 했을때 hello world 나와야 잘 된거다
 
-
-root 설정 파일
-	<!--  db 관련 빈 등록을 하고 관리하는 설정 파일 -->	
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
 		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
 		<property name="jdbcUrl" value="jdbc:oracle:thin:@Localhost:1521:xe"></property>
@@ -65,11 +66,12 @@ root 설정 파일
 		<constructor-arg ref="hikariConfig"></constructor-arg>
 	</bean>
 
+	servlet-context.xml : 
+		: 걍 url 맵핑 관련 정의만 되어있고 우린 건드리지 안한다
 
 
 
-hikari 빈 설정 tip
-	: 클래스 풀 네임으론 걍 java 파일에서 import 해서 그거 복붙한다
+
 
 
 마찬가지로 dao 클래스는 interface 먼저 만든다음에 만든다
