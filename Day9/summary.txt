@@ -2,10 +2,15 @@
 
 
 JDBC vs Spring JDBC
+	: 일단 둘다 spring 에 내장 안되있어서 따로 다운받아야된다
+
 Java DataBase Connectivity
 	:데이터베이스에 연결 및 작업을 하기 위한 자바 표준 인터페이스이다. 
 	:반복적인 작업이 꽤 있다
 		connection 연결, statement 준비, executequery||executeUpdate 등
+	: ojdbc8 라이브러리를 다운받으면 쓸 수 있다
+		: 자동으로 의존성 라이브러리 깔아준다 (우리가 예전에 직접 .jar 파일 옮겨야했었던거 이젠 안그래도 된다)
+		: oracle jdbc 의 줄임말인거다
 
 Spring JDBC
 	: JDBC의 반복적인 로직 처리 스프링 프레임워크가 해준다.
@@ -26,7 +31,13 @@ Spring JDBC
 
 
 새로만든 프로젝트 설정의 경우 
-	pom. xml  : properties 이하부터 이전 프로젝트에서 복붙해온다
+	pom. xml  
+		1. 일단 properties 이하부터 이전 프로젝트에서 복붙해온다
+		2.  필요한 라이브러리 저장한다
+			1. ojdbc8 >> 걍 젤 클릭수 많은거
+			2. spring jdbc >> 5.3.23 버전 맞춰서
+			3. hikaricp >> 걍 젤 클릭수 ㅏㅁㄶㅇ느거
+
 	web.xml : 한글 filter 부분만 복붙해온다
 	root-context.xml : 드디어 쓴다 !
 		: db관련 bean 을 생성한다 >> HikariConfig 빈,  HikariDataSource 빈, JDBC빈 을 등록한다
@@ -37,9 +48,6 @@ Spring JDBC
 		: 
 
 
-1. ojdbc8 >> 걍 젤 클릭수 많은거
-2. spring jdbc >> 5.2.3 버전 맞춰서
-3. hikaricp >> 걍 젤 클릭수 ㅏㅁㄶㅇ느거
 
 
 root 설정 파일
