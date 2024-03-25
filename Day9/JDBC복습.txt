@@ -1,0 +1,104 @@
+jdbc 절차 복습
+	DTO >> Data Transfer Object. 계층간 데이터 편하게 이동 가능하게 하는 클래스 
+	DAO >> Data Access Object. db 에 접근하여 CRUD 수행하는 클래스
+		: 싱글톤 패턴으로 구현되있음 >> 애플리케이션 통틀어 하나 존재
+		: db 접근에 사용되는 핵심적인 객체
+			DataSource 객체 : 반복 작업을 덜어준다.
+				: 한번만 DataSource 객체를 생성해두면 (각 메서드에서 매번 classForname, DriverManager 과정 없이) Connection 객체를 생성해낸다
+					: 그렇다고 Connection 객체까지 각 메서드에서 생성하지 않아도 되는건 아님 주의
+
+			Connection 객체 : 특정 데이터 원본과 연결된 객체. 
+				: 내부적으로 DB의 연결정보(ip주소, port 번호, 계정명, 비번)를 담고 있다
+				: 특정 쿼리문을 arg 로 하여 PreparedStatement 객체를 생성해낸다
+
+			PreparedStatement 객체 : (생성당시 arg 로 들어왔었던) 쿼리문을 수행하고 그 결과(ResultSet 혹은 int)  를 반환하는 객체
+
+			ResultSet 객체 : 결과가 담긴 객체
+
+
+		: db 접근 방법
+
+			: sol1 ) DataSource 미사용
+				: 다음의 과정을 각 메서드 마다 반복
+					1. 특정드라이버틀래스(오라클의 경우 oracle.jdbc.OracleDriver) 를 로딩시킨다
+						Class.forName( "특정 드라이버 클래스" );
+						: 메모리에 로딩 시키면 해당 db 대한 DriverManager 를 사용할 수 있게된다 
+							: 반환값이 DriverManger 인건 아니고, 걍 메모리에 로딩시키면 사용 가능해지는거임
+
+					2. connection 객체 생성
+						connection객체 = DriverManager.getConnection(dbURL,dbID,dbPW);
+
+						:  DriverManager 객체를 대상으로 dbURL ( "jdbc:oracle:thin:@localhost:1521:xe";  ) , "내가설정한db아이디" , "내가설정한db비번" 정보를 arg 로 하여 Connection 객체를 얻게된다
+
+					3. PreparedStatement 객체 생성
+				    		PreparedStatement객체 = connection객체.prepareStatement( "쿼리문" );
+						: connection 객체를 대상으로, 특정 쿼리문을 arg 로 하여 PreparedStaement 객체를 생성한다
+					4. 쿼리문 완성
+						: 매번 거치는 단계는 아니고, PreparedStatement 객체 생성당시 arg 로 들어온 쿼리문에 '?' 가 있을경우 수행한다
+						PreparedStatement객체.set값의자료형( 인덱스 , 값);
+							: 인덱스는 0 부터가 아닌 1부터 시작함 주의
+
+
+					5. 쿼리문 실행
+						: PreparedStatement 객체를 대상으로 excuteXXX( )를 실행한다
+		 					: 실행할때 따로 쿼리문이 들어가는건 아님 주의 ( preparedStatement 객체 생성당시에 들어가는거다)
+
+						case1 : 특정 결과를 반환하는 쿼리문일 경우 ( select ) >> executeQuery( ); 
+							: ResultSet객체 = PreparedStatement객체.executeQuery( );
+								: ResultSet 객체가 반환된다
+
+						case2 : 단순 수정하는 쿼리문일 경우( update ,delete ) >> excuteUpdate( ); 
+							: 변경된record수 = PreparedStatement객체.executeQuery( );
+								:  변경된record수는 당연히 int 형이다
+
+					6. 쿼리문 결과 분석
+						case1 : ResultSet객체를 반환 받은 경우 >> while 문으로 끝을 볼때까지 레코드정보를 빼낸다
+							: next( )  를 통하여 더 뽑아낼 레코드가 있는지 여부를 알 수 있다
+							: get값의자료형("특정컬럼명") 을 통하여 해당 레코드의 그 컬럼값을 얻을 수 있다
+							: 결과적으론 
+							while( ResultSet객체.next( ) ){
+								Resultset객체. get값의자료형("특정컬럼명"); 
+								. .  .
+							}
+							꼴이 된다
+							
+
+
+						case2 : 변경된record수를 반환 받은 경우 >> 뭐 . .. 알아서 !
+
+
+					7. Connection 객체, PreparedStatement , ResultSet 객체 모두 close 해주기
+						try{
+							if(rs!= null) rs.close();
+							 if (pstmt != null) pstmt.close();
+							 if (conn != null) conn.close();
+						}catch(Exception e){}
+
+
+			: sol2 ) DataSource 사용 
+				1. DAO 객체의 생성자 내부에서 datasource 객체를 생성한다
+					Context context =new InitialContext();
+					ds = (DataSource)context.lookup("java:comp/env/jdbc/oracle");
+
+						: DAO 객체의 생성자는 애플리케이션 통틀어 하나만 존재하므로,  애플리케이션 통틀어 한번만 실행된다.(각 메서드 마다 반복되지 않는다)	
+					
+
+				2. 각 메서드에서 다음의 과정을 반복한다
+					1. connection 객체 생성
+				    		connection객체  = datasource객체.getConnection();
+						: datasource객체를 대상으로 connection 객체를 생성한다
+
+					2. preparedStatement 객체 생성
+					3. 쿼리문 실행
+					4. 쿼리문 완성
+					5. 쿼리문 결과 분석
+					6. Connection 객체, PreparedStatement , ResultSet 객체 모두 close 해주기
+
+
+
+
+
+
+						
+
+
