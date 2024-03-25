@@ -1,4 +1,29 @@
 
+
+체크박스로 한 name 으로 여러 value 를 받는 경우해당 필드의 타입은 List<어쩌고> 여야되고, 받은 후 el 표현식으로 꺼낼때 그냥 객체.리스트필드명 만 해줘도 잘 보인다
+
+---------------------------------------------------------------------------------------------------------------
+: 3계층
+	: Presentation Layer << 여기선 service 계층 객체 사영
+		- 클라이언트의 요청 및 응답을 처리
+		- 서비스계층, 데이터 엑세스 계층에서 발생하는 Exception을 처리
+		- @Controller 어노테이션을 사용
+
+	: Service Layer << 여기선 커맨드 객체 사용
+		- 비즈니스 로직 처리와 비즈니스와 관련된 도메인 모델의 적합성 검증 트랜잭션 관리 및 처리
+		- 프리젠테이션 계층과 데이터 엑세스 계층 사이를 연결하는 역할
+		- 주로 인터페이스를 먼저 만들고 그걸 기반으로 서비스 (구현) 클래스를 만듬
+		- @Service 어노테이션을 사용
+
+	: Data Access Layer << DAO
+		- ORM (Mybatis, Hibernate)를 주로 사용하는 계층
+		- Dabase에 data를 CRUD(Create, Read, Update, Delete)하는 계층
+		- 주로 인터페이스를 먼저 만들고 그걸 기반으로 DAO (구현) 클래스를 만듬
+		- @Repostiory 어노테이션 사용
+
+
+---------------------------------------------------------------------------------------------------------------
+
 날짜를 직접 작성하는건 비효율적. 물론 db 쓰면 db 서 처리해주겠지만 우리는 지금 db 안쓰고 있으므로 컬렉션 이용해야됨
 
 private Timestamp regDate; 
@@ -50,7 +75,7 @@ Model 객체와 request 객체
 		return "member/joinForm";
 	}
 
-	
+
 	// 회원 가입 후에 등록 요청
 	@PostMapping("/join")
 	public String join() {
@@ -98,49 +123,4 @@ JS
 												// modifyForm 이건 우리가 폼에 붙인 name 
 					modify.method ="post";
 					modify.action="/mvc/member/delete";
-					modify.submit(); // 바로 전송----------------------------------------------------------------------------------------------
-
-새로만든 프로젝트 설정은 걍 복붙한다. 서블릿 설정 파일은 함 안된다.
-	web.xml , pom. xml 만 해준다
-
-JDBC 간의 비교
-기존 Java DataBase Connectivity
-JDBC(Java DataBase Connectivity)는 데이터베이스에 연결 및 작업을 하기 위한 자바 표준 인터페이스이다. JDBC 를 사용하여 데이터베이스 작업을 하여도 되지만 반복적인 작업이 계속되는 단점이 있다
-
-
-Spring JDBC
-Spring JDBC는 JDBC의 모든 반복적인 로직의 처리를 스프링 프레임워크에 위임하므로 Connection의 연결과 생성 및 종료 Statement 준비와 실행 및 종료 ResultSet 처리와, 예외 처리, 트랙젝션 등의 반복되는 작업을 Spring이 해줌으로 개발자가 직접 작성하지 않고 Database에 대한 작업을 수행할 수 있다
-
-
-커낵션 풀 >> 커낵션 관련 저장해두는 풀,
-웹 컨테이너(WAS)가 실행되면서 DB와 미리 connection(연결)을 해놓은 객체들을 pool에 저장해 두었다가, 클라이언트 요청이 오면 connection을 빌려주고, 처리가 끝나면 다시 connection을 반납 받아 pool에 저장하는 방식을 말한다. 스프링의 JDBC Template과 커넥션풀을 관리하는 HikariCP 라이브러리를 사용하기 위해 <dependency> 태그로 pom.xml 에 추가한다. 
-	: 그러니까 톰캣에 내장되있는게 아니다
-	: 커맨드 객체랑 다르다
-
-1. ojdbc8 >> 걍 젤 클릭수 많은거
-2. spring jdbc >> 5.2.3 버전 맞춰서
-3. hikaricp >> 걍 젤 클릭수 ㅏㅁㄶㅇ느거
-
-
-root 설정 파일
-	<!--  db 관련 빈 등록을 하고 관리하는 설정 파일 -->	
-	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
-		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
-		<property name="jdbcUrl" value="jdbc:oracle:thin:@Localhost:1521:xe"></property>
-		<property name="username" value="C##javauser"></property>
-		<property name="password" value="java2024"></property>
-	</bean>
-	
-	<!-- 히카리 데이터 소스 클래스 빈 등록 설정 -->
-	<bean id="hikariDataSource" class="com.zaxxer.hikari.HikariDataSource">
-		<constructor-arg ref="hikariConfig"></constructor-arg>
-	</bean>
-
-
-
-
-hikari 빈 설정 tip
-	: 클래스 풀 네임으론 걍 java 파일에서 import 해서 그거 복붙한다
-
-
-마찬가지로 dao 클래스는 interface 먼저 만든다음에 만든다
+					modify.submit(); // 바로 전송
