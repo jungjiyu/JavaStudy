@@ -1,0 +1,136 @@
+HikariDataSource ds; // 커넥션 풀 관리 객체
+
+오토와이어드 걸어서 di 시키는 경우 반드시 해당 타입의 빈이 여러개 있는지 항상 찾아봐야된다
+	: 여러개면 @Qalifier("이르ㅡㅁ") 을 통해 특정 클래스를 명시해줘야하고, "이름" 은 해당 클래스의 어토테이션 옆에서 설정 가능하다
+		;ex) @Repository("dao2") // 이름을 dao2 로 설정하면서 빈을 생성한단
+
+
+
+
+root-context.xml 에서 저번에 추가했던거 밑에 jdbc 템플릿 빈 설정
+	: 		<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+
+
+
+
+
+Spring JDBCTemplate
+	: 순수하게 JDBC Connection을 얻어서 DB 를 사용하는 것 보다 편하고 자주 쓰는 반복코드를 많이 줄일 수 있다.
+	: DAO 클래스를 빈으로 등록하기 위해 @Repository 어노테이션으로 설정한 후 JdbcTemplate 필드에 @Autowired 어노테이션으로 객체 자동주입을 해준다
+		: jdbc 도 DAO 클래스에서 접근해서 사용하는거니까 jdbcTemplate 도 dao 에서 설정 걸어주는거임
+
+	:jdbc template 의 메서드
+ select 문 류
+query 메서드
+	: 결과가 "여러"레코드인 경우 사용한다. 
+	:타입으로 반환해준다.	
+	:  List<T> query(쿼리문 , new RowMapper<T>(){
+			@Override
+			public T mapRow(ResultSet rs, int rowNum) throws SQLException{
+					... 작업내용 작성
+				return T타입객체;
+			}
+		} );
+
+		: List<T> 타입값을 반환한다
+			:주의 )  ArrayList<T> 타입으로 받으면 안되고 딱 List<T> 타입으로 받아야된다
+		
+		: arg 로는 쿼리문과 RowMapper<T> 객체를 주어야한다. 
+			: RowMapper<T>는 인터페이스고, 내부적으로  
+			: RowMapper<T> 객체는 익명 객체로 해도 상관 없고, 아님 직접 구현 RowMap
+		: SQLException 말고 걍 Exception 쓰면 에러 난다
+
+		
+
+
+
+query 메소드는 RowMapper<T> 타입에 해당하는 객체를 인자로 주어 List<T>타입으로 반환한다. RowMapper 인터페이스의 mapRow 메소드를 오버라이딩 하여 ResultSet 에서 읽은 데이터를 <T> 타입으로 반환을 하도록 작성한다. 
+
+ex) 
+
+	@Override
+	public List<BoardDTO> boardList() {
+		String query ="select * from board order by id desc";
+		List<BoardDTO> list = jt.query(query, new RowMapper<BoardDTO>(){
+			@Override
+			public BoardDTO mapRow(ResultSet rs, int rowNum) throws SQLException{
+    			BoardDTO dto = new BoardDTO();
+    			dto.setId(rs.getInt("id")); 
+    			dto.setWriter(rs.getString("writer"));
+    			dto.setTitle(rs.getString("title"));
+    			dto.setContent(rs.getString("content"));
+    			dto.setRegDate(rs.getTimestamp("reg_date"));	
+    			dto.setViewCount(rs.getInt("view_count"));
+				return dto;
+			}
+		});
+		return list;
+	}
+
+
+queryForObject 
+	: 결과가 하나의 행인 경우 사용한다. 
+	: 지정한 객체타입으로 반환해준다.
+마찬가지로 RowMapper 인터페이스의 타입의 객체를 주어 해당하는 결과의 타입으로 객체를 얻을 수 있다. (BoardMapper 객체는 RowMapper를 구현한 객체)
+
+	@Override
+	public BoardDTO getContent(int boardID) {
+
+		String query = "SELECT * FROM BOARD WHERE ID=?";
+		 upViewCount(boardID); // 조회수 1 증가
+		
+		BoardDTO dto = jt.queryForObject(query, new RowMapper<BoardDTO>() {
+
+			@Override
+			public BoardDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				BoardDTO dto = new BoardDTO();
+				dto.setId(rs.getInt("id"));
+				dto.setWriter(rs.getString("writer"));
+				dto.setTitle(rs.getString("title"));
+				dto.setContent(rs.getString("content"));
+				dto.setViewCount(rs.getInt("view_count"));	
+				dto.setRegDate(rs.getTimestamp("REG_DATE"));	
+			
+				return dto;
+			}
+			
+		},boardID);
+		
+		
+		return dto;
+
+
+	}
+
+
+근데 똑같은 익명 객체가 2번이상 쓰이면 매번 익명 객체를 만드는 것보단 걍 해당 클래스를 구현해서 쓰는게 편한다
+	: 그러니까 RowMapper 의 구현 클래스를 만들잔 말이다.
+
+아니면 내부 클래스를 만들 수 있다 . 이 경우 해당 페이지 내에서만 사용 가능하다
+
+ 
+INSERT / UPDATE / DELETE 문 류
+update 
+	: 테이블의 내용만 변경되는 경우 사용한다. 변경된 행의 수를 정수로 반환해준다
+		: 물론 insert 의 경우 (제대로 되면) 고정적으로 1이다
+쿼리문을 작성할때 데이터가 들어갈 자리에 ? 로 표시하고
+가변인자로 선언된 매개변수의 파라미터를 제공해준다
+	
+ex) 
+	@Override
+	public int boardInsert(BoardDTO dto) {
+		String query = "INSERT INTO Board(ID , WRITER , TITLE , CONTENT ) VALUES (board_seq.nextVal,?,?,?)";
+		int result = jt.update(query,dto.getWriter(),dto.getTitle(),dto.getContent());
+		return result;
+	}
+
+
+왜 dao의 인터페이스에선ㄴ 파라미터 타입이 원시타입이어도 되는데, service 인터페이스에선 파라미터 타입이 레퍼런스 타입이어야 하는가?
+	: 아마도 dao 객체의 경우 service 클래스에서만 쓰이는데, service 클래스에선 메서드 들의 파라미터들을 딱히 di 통해서 얻는건 아니니까그런거고, service 객체의 경우 컨트롤러 클래스에서 쓰이는데 컨트롤러는 request 같은 데이터를 직접 받고 메서드에 di 시키는 경우가 많기 때문에 제대로 di안되면 null 값 들어가는데, controller 클래스의 메서드 내부서 service 객체의 메서드가 해당 파라미터 값을 arg 로 받아 사용하기 떄문에 null값에 대비할 수 있는 래퍼 클래스 타입으로 받아야된다
+
+
+
