@@ -5,6 +5,7 @@ GenericXmlApplicationContext와 AnnotationConfigApplicationContext은 Applicatio
 
 
 parameter 와 attribute 의 차이
+  : https://honinbo-world.tistory.com/45
   parameter 보다 attribute 가 좀 더 유연하다
   : parameter >> 브라우져에서 넘어온 값
     : 1. string 만 사용 가능 2. request 객체에만 저장 가능
