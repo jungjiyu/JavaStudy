@@ -4,6 +4,13 @@ GenericXmlApplicationContext와 AnnotationConfigApplicationContext은 Applicatio
 이들은 스프링 컨테이너의 종류로 분류되는 것이 아니라, 스프링 컨테이너를 생성하고 관리하는 방식을 구체화한 구현체입니다.
 
 
+parameter 와 attribute 의 차이
+  parameter 보다 attribute 가 좀 더 유연하다
+  : parameter >> 브라우져에서 넘어온 값
+    : 1. string 만 사용 가능 2. request 객체에만 저장 가능
+  : attribute >> 개발자가 코딩으로 설정하는 값
+    : 1. 다양한 타입의 값을 저장가능 2. 다양한 객체에 저장 가능
+
 MODEL, Request, RedirectAttribute, 커맨드 객체 의 차이점
 :model 객체와 request 객체의 차이점
   : https://velog.io/@yoonddo/model.addAttribute-request.setAttribute
@@ -11,5 +18,7 @@ MODEL, Request, RedirectAttribute, 커맨드 객체 의 차이점
   : 일단 spring 에서는 request 객체 보다는 model 객체를 더 잘 사용하는 편이다
   : request 객체의 경우 해당 request 가 종료될때까지 유지되어 사용할 수가 있다. 그러니까 페이지가 전환되어도, request 객체가 유지된 상태라면 해당 데이터를 다른 페이지에서도 사용할 수 있단 말이다.
   : model 객체의 경우 데이터가 특정 view 로 전달되는거고, request 객체가 유지된 상태라도 뷰가 전환되면 그 데이터는 더이상 사용하지못한다
+
+
 
 
