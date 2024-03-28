@@ -1,0 +1,83 @@
+단순 db 접근은 repository 에서 하고, 총점 평균 뭐 그런거는 service 계층에서 처리한다
+
+double 의 wrapper 클래스는 Double 이다.
+Double 클래스에도 parseDouble 있다
+
+Wrapper 클래스의 parseXXX >> arg 로 들어온 문자열을 XXX 타입으로 변환해준다
+Wrapper 클래스의 toString >> arg 로 들어온 XXX 타입의 값을 문자열로 변환해준다
+Wrapper 클래스의 valueOf >> arg 로 들어온 XXX 타입의 값을 문자열로 변환해준다
+
+arg 로 레퍼런스 변수 넘기고 메서드 내부에서 해당 레퍼런스 변수를 수정한다 했을때 굳이 다시 그 레퍼런스를 반환 받을 필요 없다. 레퍼런스 변수이기 때문에 메서드의 변경 사항이 외부까지도 잘 적용되어 나타난다
+	: 물론 원시 타입 변수를 넘겨 수정하는 경우는 반드시 돌려받아야된다.
+
+
+소수점 쉽게 제한하는 법: String.format("%.nf ", 변수);
+	: String.format 함수는 첫 arg 로 들어온 format(c언어처럼 형식지정자 사용한 문자열) 을 기준으로 두번째 arg 로 들어온 대상을 포맷하여 "문자열" 의 형태로 반환한다
+		: 두번째 arg 는 레퍼런스 변수이건 원시타입 변수이건 별 상관 없다
+
+
+List<T> 컬렉션 
+	: set 컬렉션에 get 메서드가 없는거지, list 컬렉션에는 get 메서드가 존재하는거다
+	: 원한다면 list.iterator( ) 해서 iteraotr 객체 얻어낼 수도 있따
+	: List<T> 자체는 인터페이스고, ArrayList<T> 등은 그의 구현 클래스이다
+		: 따라서 List<T> list = ArrayList 객체  는 되지만 ArrayList<T> aryList = List 객체 ; 는 안된다.
+				: 자식 타입 변수에  부모클래스 객체 그냥은 할당 못하니까
+
+		: LIst<T>( ) 로 객체 생성 못한다
+			: 인터페이스니까
+
+	: add(int index , Object val) 과 set (int index , Object val)  의 차이점
+		: add 는 새로 insert 하는 거고 set 은 이미 존재하는 요소를 수정하는거다
+
+
+
+Set 컬렉션에 get 메서드가 없는 이유
+	: set 은 순서가 중요하지 않기 때문에 인덱스를 기반으로 접근하는 get 메서드가 없는둣
+
+
+
+
+
+요소에 랭크 매기는 메서드 
+	: 랭크만 매기면 됬지, 굳이 실제로 swap 할 필욘 없다.
+	: 일단 조사 대상이 1등이라 가정하고, 내부 for 문 돌아서 조사 대상 보다 더 큰 값 나올때마다 " 랭크+1 " 시킨다
+		: < 이지, <= 이 아님을 주의 >> 안그럼 자기 자신과 비교당할떄 +1 되어버린다
+  
+	private void rankSet(List<SungJukDTO> list) {
+		
+		for(int i=0 ; i<list.size(); i++) {
+			SungJukDTO curDto = list.get(i); 
+			curDto.setRank(1);
+			
+			for(int j = i+1 ; j <list.size(); j++) {
+				SungJukDTO tmpDto = list.get(i); 
+				if(curDto.getTotal() < tmpDto.getTotal()) {
+					curDto.setRank(curDto.getRank()+1);
+				}
+			}
+		}
+
+
+
+RedirectAttributes 객체의 add"Flash"Attributes( ) 임을 잊으면 안된다
+
+model 객체에 addAttribute 할때 제발 띡 값만 대입하지 말고 이름도 첫 arg 로 넣는거 잊지x.
+
+DTO 의 프로퍼티 네임과 똑같이 input 으로 받는 값의 name 을 지정해준다 << 왜
+
+리다이렉트 되는 url 은 왜 getMapping 방식인가 >> Post 방식으로 따로 지정하지 않으면 get 방식인 듯? 
+
+
+
+java.sql.SQLException: 부적합한 열 이름
+	: 그냥 스택 트레이스 보면 쿼리문에만 문제가 있는 것처럼 보이지만, 실제론 쿼리문엔 문제 없고 rowmapper 같은데서 존재하지 않는 열에 insert 했다거나 그래서 생긴ㄴ 문제일 수도 있따. 
+	 : 어쨌뜨 ㄴ확실한건 어디선가 열 이름을 이상하게 썼단거다
+
+
+jsp 페이지에선 "/groupid" 까지 경로에 명시해야된다
+
+
+RedirectAttributes 객체는 일시적인 메시지를 전달하고 싶을때주로 사용한다
+
+커맨드 객체는 뭔가 한 객체의 attribute 들을 많이 받는경우에 사용하는거지, 굳이 attribute 하나 받는데 커맨드 객체를 사용할 필욘 없고 그 경우엔 걍 requestParam 을 쓰는게 더 좋다
+		
