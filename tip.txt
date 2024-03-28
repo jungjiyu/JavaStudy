@@ -2,3 +2,14 @@ BeanFactory와 ApplicationContext 의 차이
   : BeanFactory와 ApplicationContext는 스프링 컨테이너의 두 가지 주요 인터페이스로, 스프링의 IoC 컨테이너 역할을 담당합니다. BeanFactory는 가장 기본적인 기능을 제공하고, ApplicationContext는 더 많은 기능을 제공하고
 GenericXmlApplicationContext와 AnnotationConfigApplicationContext은 ApplicationContext의 구현 클래스로, 각각 XML 파일과 어노테이션 기반 자바 클래스를 이용하여 빈을 등록하고 관리합니다.
 이들은 스프링 컨테이너의 종류로 분류되는 것이 아니라, 스프링 컨테이너를 생성하고 관리하는 방식을 구체화한 구현체입니다.
+
+
+MODEL, Request, RedirectAttribute, 커맨드 객체 의 차이점
+:model 객체와 request 객체의 차이점
+  : https://velog.io/@yoonddo/model.addAttribute-request.setAttribute
+  : 둘다 데이터를 뷰로 전달하기 위해 사용한다
+  : 일단 spring 에서는 request 객체 보다는 model 객체를 더 잘 사용하는 편이다
+  : request 객체의 경우 해당 request 가 종료될때까지 유지되어 사용할 수가 있다. 그러니까 페이지가 전환되어도, request 객체가 유지된 상태라면 해당 데이터를 다른 페이지에서도 사용할 수 있단 말이다.
+  : model 객체의 경우 데이터가 특정 view 로 전달되는거고, request 객체가 유지된 상태라도 뷰가 전환되면 그 데이터는 더이상 사용하지못한다
+
+
