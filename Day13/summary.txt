@@ -1,1 +1,140 @@
 
+[ @ModelAttribute란? ]
+https://mangkyu.tistory.com/72
+
+
+커넥션풀: 웹 컨테이너(WAS)가 실행되면서 connection 객체를 미리 pool에 생성해 둡니다.
+
+커넥션 풀(DBCP)을 사용하는 이유
+	:자바에서 DB에 직접 연결해서 처리하는 경우(JDBC) 드라이버(Driver)를 로드하고 커넥션(connection) 객체를 받아와야 한다. 그러면 매번 사용자가 요청을 할 때마다 드라이버를 로드하고 커넥션 객체를 생성하여 연결하고 종료하기 때문에 매우 비효율적이다. 이런 문제를 해결하기 위해서 커넥션풀(DBCP)를 사용한다.
+
+	
+-----------------------------------------------------------------------------------------------------------------------
+
+트랜잭션(Transaction)
+
+: 데이터베이스의 상태를 변환시키는  작업의 단위 (일련의 연산) 이다
+	: 데이터베이스의 상태를 변경시킨다는 것은 UPDATE, INSERT, DELETE 와같은 행동을 뜻한다. 
+		: 그러니까 CRUD 
+		: SELECT도 ppt 에 있긴 한데 그다지 ... 뭐 상태를 변하게 하는건ㄴ 아니라고 한다
+
+	: 트랜잭션은 상황에 따라 여러 개가 만들어질 수 있다. 
+	: 하나의 트랜잭션은 Commit (저장) 되거나 Rollback (철회)될 수 있다.
+
+
+데이터베이스에서 데이터를 읽어 온 후 다른 테이블에 데이터를 입력, 갱신, 삭제하는 도중에 오류가 발생하면, 
+모든 작업을 원상태로 복구하고, 처리 과정이 모두 성공하였을때만 그 결과를 반영하도록 한다.
+	: A은행에서 돈이 인출이 됬는데 B은행으로 입금하는 행위가 실패하면 ㅈ되니까 그렇다
+
+트랜잭션 성질
+	원자성(Atomicity)
+		: 한 트랜잭션 내의 실행 작업은 하나로 간주한다.
+		(즉 모두 성공 또는 모두 실패를 의미)
+
+	일관성(Consistency)
+		: 트랜잭션은 일관성 있는 데이터베이스 상태를 유지한다.
+		(제약 조건이나 데이터 규칙에 위반하지 않는 일관성을 의미)
+
+	독립성(Isolation)
+		: 동시에 실행되는 트랜잭션들이 서로 영향을 미치지 않도록 해야 한다.
+		(한 동작이 독립적으로 처리해야 한다는 원칙)
+
+	지속성(Durability)
+		: 트랜잭션을 성공적으로마치면 결과가 항상 저장되어야 한다.
+
+Spring 트랜잭션(Transaction)
+	: PlatformTransactionManager
+		: PlatformTransactionManager는 TransactionManager의 최상위 인터페이스로, 인터페이스에 각자의 환경에 맞는 TransactionManager 객체를 주입하여 사용한다.
+			: JDBC 기반 라이브러리로 데이터베이스에 접근하는 경우에 DataSourceTransactionManager를 트랜잭션 관리자로 사용
+			: PlatformTransactionManager로 트랜잭션울 추상화 처리할 수 있다
+		: DI를 하기위한 구현 클래스는 xml에 Bean으로 등록하고
+
+예를 들어, JDBC 및 MyBatis (마이 바티스)등의 JDBC 기반 라이브러리로 데이터베이스에 접근
+하는 경우에 DataSourceTransactionManager를 트랜잭션 관리자로 사용하고, 하
+이버네이트는 HibernateTransactionManager, JPA는 JpaTransactionManager 를
+트랜잭션 관리자로 사용하여 해당 객체를 주입한다.
+
+
+
+JDBC 기반 트랜잭션 처리
+	: 스프링 설정파일에 DataSourceTransactionManager 클래스로 빈 객체를 생성한 후 Data Access Object 클래스에서는 PlatformTransactionManager 한테 주입하여 COMMIT 메소드와 ROLLBACK 메소드로 트랜잭션 처리를 한다
+
+
+
+root-context.xml 에 DataSourceTransactionManager 빈 추가 한다
+	<!--  트랜잭션 매니져 클래스 빈 등록 설정-->
+	<bean id="tm" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+
+이번엔 편의상 서비스 클래스는 생략하겠다
+
+
+
+: 자주쓰일 RowMapper 구현 클래스가 아니라면 걍 익명 객체로 만들어라
+: RowMapper 의 제네릭 타입이 항상 DTO 객체인건 아니다. 제네릭 타입을 DTO로 해야할 때는 한 row 에서 두개 이상의 column 값을 뽑아내야할때이고 ( 그래야 dto 객체에 담아서 반환하기 편하니까) ,  한 row에서 특정 column값 하나만 뽑아내는 경우 String, Integer 같은 걸 제네릭 타입으로 뽑아내는게 좋다
+
+
+	@Override
+	public int loginCheck(String userId, String userPw) {
+		String query = "select USER_PW from movie_member where USER_ID=?";
+		String dbPw  = jt.queryForObject(query, new RowMapper<String>() {
+			@Override
+			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+				String pw = rs.getString("user_pw");
+				return pw;
+			}
+		},userId);
+		
+		
+		if(dbPw == null) return -1;
+		
+		else {
+			if(dbPw.equals(userPw)) return 1;
+			else return 0;
+		}
+		
+	}
+
+
+: 아이디, 비번 일치 여부 쉽게 확인 하는 법
+	쿼리문 여러번 쓸 필요 없고 일단 해당 id 대한 pw 를 찾는다
+		: 존재안하면>> 걍 나가리
+		: 존재하면 >>
+			: 만약 쿼리문으로 나온 pw 가 arg 로 들어온 pw 와 일치하면 >> 로그인 성공
+			: 만약 쿼리문으로 나온 pw 가 arg 로 들어온 pw 와 일치 안하면 >> 로그인 실패
+
+: 여러 레코드 검사하는게 아니라 특정 row 만 검사하는거면 queryForObject 쓴다
+: 업데이트 하는 경우 update 메서드 쓰고, 이때는 rowMapper 클래스가 별도로 필요 없다
+
+
+리다이렉트어트리뷰트스 없어도 리턴 문자열에 "redirect:/"  를 포함할 수 있고, 포함하면 당연히 리다이렉트 된다
+	: https://blog.naver.com/sim4858/221007278858
+
+
+리다이렉트 할경우 데이터를 model 객체에 담으면 안된다
+	: 일단 model 은 requets 객체보다 범위가 작으므로, reuqest  객체가 교체되는 redirect 의 상황에선 model 객체도 당연히 유지가 안되기때문
+	: 리다이렉ㅌ트 하는 경우 해당 데이터를 RedirectAttributes 객체 혹은 HttpSession 같은 객체에 저장해야된다'
+
+
+
+RedirectAttributes 란? 
+	: https://jake-seo-dev.tistory.com/484
+	: RedirectAttributes 에는 redirectAttributes.addAttribute() 와 redirectAttributes.addFlashAttribute() 두 메서드 모두를 통해 데이터 저장이 가능하다
+		: addFlashAttribute
+			: https://lionpower.tistory.com/297
+			: "세션"에 저장되고 오직 다음 "요청"에서만 접근 가능하다
+		: addAttribute()
+			: get방식으로( URL 에 추가하여 정보 넘긴다)
+
+
+로그아웃 하기 >> session.invalidate();
+
+
+출금은 됬는데 입금은 안됬다
+
+
+
+
+
