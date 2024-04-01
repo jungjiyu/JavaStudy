@@ -1,0 +1,250 @@
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+
+root-context 객체 정리
+
+jdbcTemplate :  직접 connection 생성 하지 않고도 쿼리문 실행할수있게해주는 객체. 
+	: jdbcTemplate 객체를 대상으로 query( 쿼리문, RowMapper객체, 물음표에들어갈값들), queryForObject( 쿼리문, RowMapper객체, 물음표에들어갈값들), update(쿼리문, 물음표에들어갈값들) 메서드를 사용하여 쿼리문 을 실행시킨다
+	: mybatis 를 쓰건 안쓰건 db 쓸꺼면 있어야된다
+
+PlatformTransactionManager : 트랜젝션 구현할 수 있게 해주는 객체. 우리가 직접 스프링이 알아서 definition , status 객체를 생성해서 써야된다
+
+TransactionTemplate: 쉽게 트랜잭션 구현할 수 있게 해주는 객체. 스프링이 알아서 definition , status 객체를 생성해준다
+	: 만약에 이걸 쓸꺼면 PlatformTransactionManager 는 쓰면 안된다 (둘이 겹친다)
+
+
+트랜잭션(Transaction) 이란 : 데이터베이스에서 CRUD 과정이 오류 없이 성공했을때만  그 결과를 반영(commit)하고, 오류 발생 시 그 결과를 반영하지 않는것(rollback)
+
+트랜잭션 매니저 클래스 빈 설정
+	: 스프링 같은 경우는 PlatformTransactionManager 를 통해 추상화 처릴를 한다
+		: 그러니까 PlatformTransactionManager 가 인터페이스 타입이고, JDBC 상에서 트랜젝션 DataSourceTransactionManager 
+
+	: 아래와 같은 꼴로 필드를 만들고 DI 시킨다
+	@Autowired
+	private PlatformTransactionManager tranManager;
+
+	: 사용하기
+
+		// 트랜젝션이 구동하는데 기본적으로 필요한 객체 << 트랜젝션 전파를 하는데 필요한 기본적인 객체
+		// 트랜젝션이 구동하는데 기본적으로 필요한 객체 << 트랜젝션 전파를 하는데 필요한 기본적인 객체
+		TransactionDefinition definition = new DefaultTransactionDefinition();
+		
+		// 트랜젝션매니져 객체로부터 얻어온다
+		//TransactionStatus >> 트랜젝션 실행 및 상태를 제어할 수 있는 객체 . 이제 상태 제어를 스프링에게 맞기겠다
+		TransactionStatus status = tranManager.getTransaction(definition);
+		
+		try {
+		// 포인트 차감
+		String query1 ="UPDATE MOVIE_MEMBER SET POINT =POINT-? WHERE USER_ID=?"; 
+		// 티켓 장수 올려주기
+		String query2 = "UPDATE MOVIE_TICKET SET TICKET_NUMBER = TICKET_NUMBER + ? WHERE USER_ID=?"; 
+
+		jt.update(query1, ticketNumber*MOVIE_PRICE ,userId); // MOVIE_PRICE 는 인터페이스에서 상수로 선언해둠
+		jt.update(query2, ticketNumber,userId);
+		
+		tranManager.commit(status); // 오류 없이 정상적으로 실행되면 commit 한다
+		}catch(Exception e) {
+			e.printStackTrace();
+			tranManager.rollback(status); // 오류발생하면 rollback 처리한다
+
+		}
+
+
+
+
+TransactionTemplate
+	
+	: PlatformTransactionManager 를 사용하여 개발자가 트랜잭션의 시작 및 종료 시점을 명시적으로 결정할 수 있다. 하지만 PlatformTransactionManager 보다 더 간편한 방법으로는 TransactionTemplate 을 사용하는 방법이 있다.
+	: 오류가 발생하면 알아서 rollback, 처리, 제대로 되면 알아서 commit 처리 해준다
+
+
+	<!--  트랜잭션 매니져 클래스 빈 등록 설정-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+		<!--  트랜잭션 템플릿 빈 등록 설정-->
+	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="transactionManager"></property>
+	</bean>
+	
+
+	: 주의 >> 둘다 Transaction Manage r 를 사용하는거라 	private PlatformTransactionManager tranManager;  둘 중 하나만 사용해야된다
+	@Autowired
+	private TransactionTemplate tranTemplate;
+
+
+		
+		tranTemplate.execute(new TransactionCallbackWithoutResult() {
+			
+			@Override
+			protected void doInTransactionWithoutResult(TransactionStatus status) {
+
+				// 포인트 차감
+				String query1 ="UPDATE MOVIE_MEMBER SET POINT =POINT-? WHERE USER_ID=?"; 
+				// 티켓 장수 올려주기
+				String query2 = "UPDATE MOVIE_TICKET SET TICKET_NUMBER = TICKET_NUMBER + ? WHERE USER_ID=?"; 
+
+				jt.update(query1, ticketNumber*MOVIE_PRICE ,userId); // MOVIE_PRICE 는 인터페이스에서 상수로 선언해둠
+				jt.update(query2, ticketNumber,userId);
+
+			}
+		});
+		
+
+
+
+
+Mybatis 마이 바티스 . <<  SQL mapper 라고도 불린다
+	:  개발자들의 편의성을 위한 스프링에서 데이터베이스 연동을 도와주는 프레임워크 이다.
+	:  SQL문을 이용해서 DB에 접근하여, 데이터를 객체화 시켜주고, 수행결과를 객체와 Mapping 해준다.
+	: (SQL문이 코드내에 섞여 있는게 아니라) sql 문은 따로 xml 에 작성하기 때문에 코드와 sql 문이 분리되어있다
+	: 별도의 JDBC 연동 과정이 없는 것 같다 ?!
+
+
+	: mapper
+		: sql 문이 적힌 xml 
+		: (이름이 mapper여도) dao 클래스 역할을 하게 된다. 그러니까 db 에 접근하여 crud 하게 된다.
+		: 인터페이스는 자바 언어로 선언하고, 그걸 xml 파일로 구현 객체로 만들게 된다
+
+	: 새로 legacy project 만든 다음에 일단 기본적인 pom.xml , web.xml , root-context.xml 설정 한다
+		: pom.xml >> 프로퍼티 이후 부분 복붙
+		: web.xml >> 한글 인코딩 부분 복붙
+		:  root-context.xml >> hikariConfig, HikariDataSource 복븉함 됨
+
+
+	: Mybatis 설정을 위한 필요 라이브러리 복붙
+		: 주의 )  라이브러리 설ㅊ는 root-context.xml 이 아니라 pom.xml 이다
+		Oracle JDBC (ojdbc) : 오라클을 사용해야하니까 필요
+		spring-jdbc : jdbc template 사용하니까 필요
+		mybatis
+			: 걍 다운로드 수 많은거 다운 받아도 된다
+		mybatis-spring
+			: 걍 다운로드 수 많은거 다운 받아도 된다
+
+
+	: 마이바티스 사용 위해 SqlSessionFactoryBean 빈 등록
+		: 주의) db 관련 빈 설정은 root-context.xml 에서 하는거다
+		: mapperLocations 속성 ) 한 DataSource 객체를 참조하여 동작하는 속성 설정과 [**Mapper.xml] 파일이 스프링이 동작할 때 같이 동작하도록 한다
+		: 정규 표현식을 사용하면 모든 mapper 기능 xml 파일 대해서 bean을 만들어 줄 필요 없고, 한번에 만들어 줄 수 있다
+			: classpath:/mappers/**/*Mapper.xml  
+				: classpath: == src/
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	  <property name="dataSource" ref="dataSource" />
+	  <property name="mapperLocations" value="classpath:/mappers/**/*Mapper.xml" /> 
+	</bean>
+
+
+
+	: 이번엔 dao 패키지 안만들고 mapper 패키지를 만든다 . 그리고 boardMapper 의 내용도 이전 프젝의 dao 인터페이스 내용 복붙한다
+		: 이름 이 mapper 여도 인터페이스는 만든다
+
+	: boardDTO 솔직히 이전 프젝 꺼 복붙해도 된다
+
+
+	: xml 파일은 src/main/resources 에 만든다
+
+		: 우리가 작성한 xml 파일을 인식할 ㅎ수 있도록 설정이 필요
+			: 외울 필요는 없고 걍 복붙한다
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="">
+
+</mapper>
+
+		: namespace
+			: 구현할 인터페이스를 명시한다. 자바에서의 implements 랑 똑같은거다. 풀패키지명으로 작성해야흐는거 주의
+
+
+	: root-context 마저 설정
+
+	그리고 name space 부분에서 my batis 체크하고 아래를 작성한다
+	
+	<!--  매퍼로 인식하느 스캔 설정 -->
+	<!--  base-package == xml 이 구현하는 인터페이스의 패키지-->
+	<mybatis-spring:scan base-package="com.spring.web.board.mapper"/> 
+
+
+
+
+	: xml 에서 SQL 명령어 태그
+		: SELECT문은 <select> 이고 반환값은 검색 결과 
+		: INSERT문은 <insert>, UPDATE문은 <update>, DELETE문은 <delete>이고 결과값은 성공한 record 수 
+
+	: SQL 명령어 태그안에 들어가는 속성
+		: 검색결과(select) 가 아닌 경우 딱히 resultType 혹은 resultMap 속성을 사용하지 ㅇ낳아도 도니다
+		(1) id : 구현할 메소드명(== 인터페이스에 선언된 메서드명)
+		(2) resultType: SELECT문 실행 결과를 담을 객체를 지정한다. (패키지 이름을 포함한 클래스 이름 또는 객체 alias 지정)
+		(3) resultMap : SELECT문 실행 결과를 담을 객체를 resultMap으로 지정한다. <resultMap>을 따로 선언해줘야 한다.
+			: 결과가 리스트건 아니건간에 그런듯?
+(resultType과 resultMap 중 하나를 택해서 설정한다.)
+
+
+	<!--  db 컬럼과 dto 객체의 프로퍼티를 매핑 시켜주기 위한 resultMap 선언 -->
+	<resultMap id="boardMap" type="com.spring.web.board.dto.BoardDTO">
+		<id property="id" column="ID"/> <!-- id == primary key 를 맵핑할 때 사용 -->
+		<result property="title" column="TITLE"/> 
+		<result property="content" column="content"/> 
+		<result property="viewCount" column="view_count"/> 
+		<result property="regDate" column="REG_DATE"/> 
+		<result property="writer" column="writer"/> 
+	</resultMap>
+	
+	<select id="boardList" resultMap="boardMap">
+	select * from board order by id desc
+	</select>
+	
+
+
+
+	private Integer id;
+	private String writer;
+	private String title;
+	private String content;
+	private Timestamp regDate;
+	private Integer viewCount;
+
+와 
+
+
+    STUDENTID number(10) primary key,
+    studentname nvarchar2(20) not null,
+    kor number(3) not null,
+    eng number(3) not null,
+    spring number(3) not null,
+    Avg number(3) not null
+
+같은 column  을 매핑시켜준다
+
+
+
+
+parameterType 이 속성에 지정한 객체의 프로퍼티값이 SQL문의 입력 파라미터에 지정된다.
+
+
+el 표현식의 종류
+	#{ 변수명 } 혹은 ${ 변수명 }
+		#{ } : 자동적으로 결과 값에 작은 따옴표( ' )  를 붙여 처리한다. 그러니까 문자 처리딘다
+			: 근데 sql 문의 ?를 다 #{ } 처리해야되는건 아니다. varchar 같은 타입이 아니라 숫자 타입인 경우 작은 따옴표가 안붙는 ${ } 를 쓰는게 바람직하다  
+				: 근데 sql 문 특성상 숫자타입값에 '값' 을 할당 해도 문제가 되지 않아 사실 다 #{ } 처리 햏줘도 되긴 하다
+
+	INSERT INTO Board(ID , WRITER , TITLE , CONTENT ) VALUES (board_seq.nextVal, #{WRITER} , #{TITLE} , #{CONTENT})
+
+
+		${ } : 
+
+
+
+mybatis 같은 경우는 ㅇ여러 레코드가 있는 경우 자동으로 리스트로 반환해준다
+
+서비스인터페이스,ㅡ 서비스 구현 클래스도 만들어줘야된다
+	: 근데 서비스 구현 클래스에서 dao 객체가 아닌 mapper 객체를 사용하고, autowired 해준다
+
+
+jsp 도 다 복붙해주면 되는데 contextpath 는 수정해줘야된다
+
+
+
