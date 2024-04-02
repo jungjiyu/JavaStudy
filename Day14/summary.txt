@@ -1,63 +1,88 @@
+** 
 
 
----------------------------------------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------------
-
-root-context 객체 정리
-
-jdbcTemplate :  직접 connection 생성 하지 않고도 쿼리문 실행할수있게해주는 객체. 
-	: jdbcTemplate 객체를 대상으로 query( 쿼리문, RowMapper객체, 물음표에들어갈값들), queryForObject( 쿼리문, RowMapper객체, 물음표에들어갈값들), update(쿼리문, 물음표에들어갈값들) 메서드를 사용하여 쿼리문 을 실행시킨다
-	: mybatis 를 쓰건 안쓰건 db 쓸꺼면 있어야된다
-
-PlatformTransactionManager : 트랜젝션 구현할 수 있게 해주는 객체. 우리가 직접 스프링이 알아서 definition , status 객체를 생성해서 써야된다
-
-TransactionTemplate: 쉽게 트랜잭션 구현할 수 있게 해주는 객체. 스프링이 알아서 definition , status 객체를 생성해준다
-	: 만약에 이걸 쓸꺼면 PlatformTransactionManager 는 쓰면 안된다 (둘이 겹친다)
+트랜잭션(Transaction)  : 데이터베이스의 상태를 변화시키기 해서 수행하는 더 이상 쪼갤 수 없는(== 한번에 수행되어야하는) 논리적 작업 단위
+	: 데이터베이스의 상태를 변화 시킨다 ==  SELECT, UPDATE, INSERT, DELETE 와 같은 쿼리문을 실행한다
+	: 주의 ) 쿼리문 하나가 트랜잭션의 단위가 되는게 아니다
+		: 이해를 위한 예시 ) A 은행에서 출금하여 B은행에 입금하는 과정은 하나의 트랜젝션이다. A 은행에서 출금하는 작업이 잘 됬는데, B 은행에 입금하는 과정에서 오류 나서 돈이 입금이 안됬다면 A 은행에서 출금한 작업을 취소할 수 있어야된다
 
 
-트랜잭션(Transaction) 이란 : 데이터베이스에서 CRUD 과정이 오류 없이 성공했을때만  그 결과를 반영(commit)하고, 오류 발생 시 그 결과를 반영하지 않는것(rollback)
+트랜잭션 처리를 위해서 db에서는 두가지 명령어가 존재하고, 그걸 사용한다
+션을 종료한다
 
-트랜잭션 매니저 클래스 빈 설정
-	: 스프링 같은 경우는 PlatformTransactionManager 를 통해 추상화 처릴를 한다
-		: 그러니까 PlatformTransactionManager 가 인터페이스 타입이고, JDBC 상에서 트랜젝션 DataSourceTransactionManager 
+	: rollback
+		: 작업 중 오류가 발생했을시 그 결과를 반영하지 않고, 이전 커밋을 한 부분까지 복구 시킨다. 이렇게 한꺼번에 삭제가 가능한 것은 위에서 언급한 것과 같이 하나의 묶음으로 처리되기 때문이다.
 
-	: 아래와 같은 꼴로 필드를 만들고 DI 시킨다
-	@Autowired
-	private PlatformTransactionManager tranManager;
 
-	: 사용하기
 
-		// 트랜젝션이 구동하는데 기본적으로 필요한 객체 << 트랜젝션 전파를 하는데 필요한 기본적인 객체
-		// 트랜젝션이 구동하는데 기본적으로 필요한 객체 << 트랜젝션 전파를 하는데 필요한 기본적인 객체
-		TransactionDefinition definition = new DefaultTransactionDefinition();
-		
-		// 트랜젝션매니져 객체로부터 얻어온다
-		//TransactionStatus >> 트랜젝션 실행 및 상태를 제어할 수 있는 객체 . 이제 상태 제어를 스프링에게 맞기겠다
-		TransactionStatus status = tranManager.getTransaction(definition);
-		
-		try {
-		// 포인트 차감
-		String query1 ="UPDATE MOVIE_MEMBER SET POINT =POINT-? WHERE USER_ID=?"; 
-		// 티켓 장수 올려주기
-		String query2 = "UPDATE MOVIE_TICKET SET TICKET_NUMBER = TICKET_NUMBER + ? WHERE USER_ID=?"; 
+트랜잭션 특징 ACID
+	원자성(Atomicity) : 트랜잭션이 원자 단위로 처리된다. 그러니까  모두 성공 또는 모두 실패이지, 부분적인 성공은 없다
 
-		jt.update(query1, ticketNumber*MOVIE_PRICE ,userId); // MOVIE_PRICE 는 인터페이스에서 상수로 선언해둠
-		jt.update(query2, ticketNumber,userId);
-		
-		tranManager.commit(status); // 오류 없이 정상적으로 실행되면 commit 한다
-		}catch(Exception e) {
-			e.printStackTrace();
-			tranManager.rollback(status); // 오류발생하면 rollback 처리한다
+	일관성(Consistency) : 트랜잭션은 일관성 있어야된다
 
-		}
+	독립성(Isolation) : 동시에 실행되는 트랜잭션들은 서로 영향을 미치지 않는다. 또한 완료 되지 않은 트랜잭션의 처리 결과를 다른 트랜잭션에서 참조할 수 없다
+
+	영구성 (Durality) : 트랜잭션을 성공적으로마쳐 commit 했으면 그 결과는 항상 db 에 저장된다. ( commit 이후 시스템 다운되서 저장 안되도, 시스템을 복구하면 commit 한 내용이 다시 저장된다고 한다)
+
+
+
+PlatformTransactionManager
+	: https://gngsn.tistory.com/152
+	: 트랜잭션 처리와 관련한 최상위 인터페이스이다. 
+		: 실제 트랜잭션 처리를 하는 대표적인 클래스들은 다 PlatformTransactionManager 를 구현한 클래스들이다
+ 	: 스프링은 PlatformTransactionManager 를 통하여 특정 기술에 종속되지않는 일관된 방식으로 트랜잭션을 적용할 수 있다. 그러니까 추상화 처리를 가능하게 해준다
+	
+
+DataSourceTransactionManager
+	: (mybatis 포함) JDBC 기반 라이브러리로 데이터베이스로 접근하는 경우 사용하는 라이브러리로,  PlatformTransactionManager 의 구현 클래스이다
+
+트랜잭션 처리 방법
+	sol1 ) JDBC 기반 트랜잭션 처리 
+		: 우리가 명시적으로 rollback, commit 메서드를 사용해줘야된다
+			: rollback >> 트랜잭션 수행 도중 에러나면 해준다
+			: commit >> 트랜잭션이 끝까지 수행됬으면 해준다
+
+			1. xml 파일에 PlatformTransactionManager의 구현 클래스인 DataSourceTransactionManager 의 bean을 등록해서 DI 시킬 수 있게 준비해둔다. 
+			2. @Repository 클래스에서 db  접근하는 객체를 받는 필드는  PlatformTransactionManager 타입으로 선언하고,  @Autowired 를 통해 앞서 등록한 DataSourceTransactionManager 빈 객체를 DI 받는다
+			3. 트랜잭션을 수행하는 메서드 "내"에서 TransactionDefinition 객체와 TransactionStatus 객체를 생성한다
+				TransactionDefinition 객체: 트랜젝션이 구동하는데(트랜젝션 전파를 하는데) 기본적으로 필요한 객체. 이 객체를 arg 로 하여 TransactionStatus 객체를 얻을 수 있다
+
+				TransactionStatus 객체: 트랜젝션 실행 및 상태를 제어할 수 있는 객체 . 
+					: TransactionStatus status = tranManager.getTransaction(definition);
+
+		: 형식
+
+			TransactionDefinition definition = new DefaultTransactionDefinition();
+			TransactionStatus status = tranManager.getTransaction(definition);
+	
+			try {
+			
+			. . .
+
+			jt.update(query1,... );
+			jt.queryForObject(query2, mapper ...);
+
+			. . .
+
+
+			tranManager.commit(status);  // try 의 젤 마지막 부분에 작성
+
+			}catch(Exception e) {
+				e.printStackTrace( );
+				tranManager.rollback(status); // catch 의 마지막 부분에 작성
+			}
+
+
+	sol2) TransactionTemplate 기반 트랜젝션 처리 
+		: (우리가 따로 명시안해도) 스프링이 알아서 rollback, commit 처리 해준다
+
+
 
 
 
 
 TransactionTemplate
 	
-	: PlatformTransactionManager 를 사용하여 개발자가 트랜잭션의 시작 및 종료 시점을 명시적으로 결정할 수 있다. 하지만 PlatformTransactionManager 보다 더 간편한 방법으로는 TransactionTemplate 을 사용하는 방법이 있다.
-	: 오류가 발생하면 알아서 rollback, 처리, 제대로 되면 알아서 commit 처리 해준다
 
 
 	<!--  트랜잭션 매니져 클래스 빈 등록 설정-->
@@ -93,6 +118,23 @@ TransactionTemplate
 			}
 		});
 		
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+
+root-context 객체 정리
+
+jdbcTemplate :  직접 connection 생성 하지 않고도 쿼리문 실행할수있게해주는 객체. 
+	: jdbcTemplate 객체를 대상으로 query( 쿼리문, RowMapper객체, 물음표에들어갈값들), queryForObject( 쿼리문, RowMapper객체, 물음표에들어갈값들), update(쿼리문, 물음표에들어갈값들) 메서드를 사용하여 쿼리문 을 실행시킨다
+	: mybatis 를 쓰건 안쓰건 db 쓸꺼면 있어야된다
+
+PlatformTransactionManager : 트랜젝션 구현할 수 있게 해주는 객체. 우리가 직접 스프링이 알아서 definition , status 객체를 생성해서 써야된다
+
+TransactionTemplate: 쉽게 트랜잭션 구현할 수 있게 해주는 객체. 스프링이 알아서 definition , status 객체를 생성해준다
+	: 만약에 이걸 쓸꺼면 PlatformTransactionManager 는 쓰면 안된다 (둘이 겹친다)
 
 
 
@@ -245,6 +287,3 @@ mybatis 같은 경우는 ㅇ여러 레코드가 있는 경우 자동으로 리�
 
 
 jsp 도 다 복붙해주면 되는데 contextpath 는 수정해줘야된다
-
-
-
