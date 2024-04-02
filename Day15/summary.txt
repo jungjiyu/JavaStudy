@@ -1,0 +1,553 @@
+
+
+
+TransactionTemplate
+	root-context 빈 설정 :
+
+		<!--  트랜잭션 템플릿 빈 등록 설정-->
+	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="transactionManager"></property>
+	</bean>
+	
+
+
+	@Autowired
+	private TransactionTemplate tranTemplate;
+
+
+		
+		tranTemplate.execute(new TransactionCallbackWithoutResult() {
+			
+			@Override
+			protected void doInTransactionWithoutResult(TransactionStatus status) {
+
+				String query1 ="UPDATE MOVIE_MEMBER SET POINT =POINT-? WHERE USER_ID=?"; 
+				// 티켓 장수 올려주기
+				String query2 = "UPDATE MOVIE_TICKET SET TICKET_NUMBER = TICKET_NUMBER + ? WHERE USER_ID=?"; 
+
+				jt.update(query1, ticketNumber*MOVIE_PRICE ,userId); // MOVIE_PRICE 는 인터페이스에서 상수로 선언해둠
+				jt.update(query2, ticketNumber,userId);
+
+			}
+		});
+		
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+
+ 정리
+
+jdbcTemplate :  직접 connection 생성 하지 않고도 쿼리문 실행할수있게해주는 객체. 
+	: jdbcTemplate 객체를 대상으로 query( 쿼리문, RowMapper객체, 물음표에들어갈값들), queryForObject( 쿼리문, RowMapper객체, 물음표에들어갈값들), update(쿼리문, 물음표에들어갈값들) 메서드를 사용하여 쿼리문 을 실행시킨다
+	: mybatis 를 쓰건 안쓰건 db 쓸꺼면 있어야된다
+
+PlatformTransactionManager : 트랜젝션 구현할 수 있게 해주는 객체. 우리가 직접 스프링이 알아서 definition , status 객체를 생성해서 써야된다
+
+TransactionTemplate: 쉽게 트랜잭션 구현할 수 있게 해주는 객체. 스프링이 알아서 definition , status 객체를 생성해준다
+	: 만약에 이걸 쓸꺼면 PlatformTransactionManager 는 쓰면 안된다 (둘이 겹친다)
+
+
+
+
+Mybatis 마이 바티스 . <<  SQL mapper 라고도 불린다
+	:  개발자들의 편의성을 위한 스프링에서 데이터베이스 연동을 도와주는 프레임워크 이다.
+	:  SQL문을 이용해서 DB에 접근하여, 데이터를 객체화 시켜주고, 수행결과를 객체와 Mapping 해준다.
+	: (SQL문이 코드내에 섞여 있는게 아니라) sql 문은 따로 xml 에 작성하기 때문에 코드와 sql 문이 분리되어있다
+	: 별도의 JDBC 연동 과정이 없는 것 같다 ?!
+
+
+	: mapper
+		: sql 문이 적힌 xml 
+		: (이름이 mapper여도) dao 클래스 역할을 하게 된다. 그러니까 db 에 접근하여 crud 하게 된다.
+		: 인터페이스는 자바 언어로 선언하고, 그걸 xml 파일로 구현 객체로 만들게 된다
+
+	: 새로 legacy project 만든 다음에 일단 기본적인 pom.xml , web.xml , root-context.xml 설정 한다
+		: pom.xml >> 프로퍼티 이후 부분 복붙
+		: web.xml >> 한글 인코딩 부분 복붙
+		:  root-context.xml >> hikariConfig, HikariDataSource 복븉함 됨
+
+
+	: Mybatis 설정을 위한 필요 라이브러리 복붙
+		: 주의 )  라이브러리 설ㅊ는 root-context.xml 이 아니라 pom.xml 이다
+		Oracle JDBC (ojdbc) : 오라클을 사용해야하니까 필요
+		spring-jdbc : jdbc template 사용하니까 필요
+		mybatis
+			: 걍 다운로드 수 많은거 다운 받아도 된다
+		mybatis-spring
+			: 걍 다운로드 수 많은거 다운 받아도 된다
+
+
+	: 마이바티스 사용 위해 SqlSessionFactoryBean 빈 등록
+		: 주의) db 관련 빈 설정은 root-context.xml 에서 하는거다
+		: mapperLocations 속성 ) 한 DataSource 객체를 참조하여 동작하는 속성 설정과 [**Mapper.xml] 파일이 스프링이 동작할 때 같이 동작하도록 한다
+		: 정규 표현식을 사용하면 모든 mapper 기능 xml 파일 대해서 bean을 만들어 줄 필요 없고, 한번에 만들어 줄 수 있다
+			: classpath:/mappers/**/*Mapper.xml  
+				: classpath: == src/
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	  <property name="dataSource" ref="dataSource" />
+	  <property name="mapperLocations" value="classpath:/mappers/**/*Mapper.xml" /> 
+	</bean>
+
+
+
+	: 이번엔 dao 패키지 안만들고 mapper 패키지를 만든다 . 그리고 boardMapper 의 내용도 이전 프젝의 dao 인터페이스 내용 복붙한다
+		: 이름 이 mapper 여도 인터페이스는 만든다
+
+	: boardDTO 솔직히 이전 프젝 꺼 복붙해도 된다
+
+
+	: xml 파일은 src/main/resources 에 만든다
+
+		: 우리가 작성한 xml 파일을 인식할 ㅎ수 있도록 설정이 필요
+			: 외울 필요는 없고 걍 복붙한다
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="">
+
+</mapper>
+
+		: namespace
+			: 구현할 인터페이스를 명시한다. 자바에서의 implements 랑 똑같은거다. 풀패키지명으로 작성해야흐는거 주의
+
+
+	: root-context 마저 설정
+
+	그리고 name space 부분에서 my batis 체크하고 아래를 작성한다
+	
+	<!--  매퍼로 인식하느 스캔 설정 -->
+	<!--  base-package == xml 이 구현하는 인터페이스의 패키지-->
+	<mybatis-spring:scan base-package="com.spring.web.board.mapper"/> 
+
+
+
+
+	: xml 에서 SQL 명령어 태그
+		: SELECT문은 <select> 이고 반환값은 검색 결과 
+		: INSERT문은 <insert>, UPDATE문은 <update>, DELETE문은 <delete>이고 결과값은 성공한 record 수 
+
+	: SQL 명령어 태그안에 들어가는 속성
+		: 검색결과(select) 가 아닌 경우 딱히 resultType 혹은 resultMap 속성을 사용하지 ㅇ낳아도 도니다
+		(1) id : 구현할 메소드명(== 인터페이스에 선언된 메서드명)
+		(2) resultType: SELECT문 실행 결과를 담을 객체를 지정한다. (패키지 이름을 포함한 클래스 이름 또는 객체 alias 지정)
+		(3) resultMap : SELECT문 실행 결과를 담을 객체를 resultMap으로 지정한다. <resultMap>을 따로 선언해줘야 한다.
+			: 결과가 리스트건 아니건간에 그런듯?
+(resultType과 resultMap 중 하나를 택해서 설정한다.)
+
+
+	<!--  db 컬럼과 dto 객체의 프로퍼티를 매핑 시켜주기 위한 resultMap 선언 -->
+	<resultMap id="boardMap" type="com.spring.web.board.dto.BoardDTO">
+		<id property="id" column="ID"/> <!-- id == primary key 를 맵핑할 때 사용 -->
+		<result property="title" column="TITLE"/> 
+		<result property="content" column="content"/> 
+		<result property="viewCount" column="view_count"/> 
+		<result property="regDate" column="REG_DATE"/> 
+		<result property="writer" column="writer"/> 
+	</resultMap>
+	
+	<select id="boardList" resultMap="boardMap">
+	select * from board order by id desc
+	</select>
+	
+
+
+
+	private Integer id;
+	private String writer;
+	private String title;
+	private String content;
+	private Timestamp regDate;
+	private Integer viewCount;
+
+와 
+
+
+    STUDENTID number(10) primary key,
+    studentname nvarchar2(20) not null,
+    kor number(3) not null,
+    eng number(3) not null,
+    spring number(3) not null,
+    Avg number(3) not null
+
+같은 column  을 매핑시켜준다
+
+
+
+
+parameterType 이 속성에 지정한 객체의 프로퍼티값이 SQL문의 입력 파라미터에 지정된다.
+
+
+el 표현식의 종류
+	#{ 변수명 } 혹은 ${ 변수명 }
+		#{ } : 자동적으로 결과 값에 작은 따옴표( ' )  를 붙여 처리한다. 그러니까 문자 처리딘다
+			: 근데 sql 문의 ?를 다 #{ } 처리해야되는건 아니다. varchar 같은 타입이 아니라 숫자 타입인 경우 작은 따옴표가 안붙는 ${ } 를 쓰는게 바람직하다  
+				: 근데 sql 문 특성상 숫자타입값에 '값' 을 할당 해도 문제가 되지 않아 사실 다 #{ } 처리 햏줘도 되긴 하다
+
+	INSERT INTO Board(ID , WRITER , TITLE , CONTENT ) VALUES (board_seq.nextVal, #{WRITER} , #{TITLE} , #{CONTENT})
+
+
+		${ } : 
+
+
+
+mybatis 같은 경우는 ㅇ여러 레코드가 있는 경우 자동으로 리스트로 반환해준다
+
+서비스인터페이스,ㅡ 서비스 구현 클래스도 만들어줘야된다
+	: 근데 서비스 구현 클래스에서 dao 객체가 아닌 mapper 객체를 사용하고, autowired 해준다
+
+
+jsp 도 다 복붙해주면 되는데 contextpath 는 수정해줘야된다
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+오라클 :=
+	: 오라클에서는 특이하게 대입 연산자를 '=' 가 아닌 := 를 쓴다
+		: mySQL에서의 = 에 대응한다
+
+오라클 ||
+	: 문자(열)를 합치는 방법이다
+		: 거의 아무데나 쓸 수 있다 
+			: select 문의 column명과 column 명 사이에도 쓸 수 있고
+			: insert 문에서 insert 되는 값과 값 사이에도 쓸 수 있다.
+
+오라클 as
+	: 특정 column 명에 별칭을 붙일때 쓴다
+		: column 명이 실제로 바뀌는게 아니라 일시적으로 사용되는거다
+	: 주로 select 문에서 쓰인다.
+		select colum명 as 별명 from 테이블
+			: 별명을 column명으로 하여 테이블의 record 들이 출력된다.
+
+	: 근데 우리가 만든게 아니라 오라클 자체적으로 제공하는 키워드나 함수 같은거는 대부분 as 를 생략하고 바로 별칭을 적어도 상관 없는 것 같다
+		: 인터넷에서 그렇게들 많이 한다
+		: ex) COUNT(어쩌구) count == COUNT(어쩌구) as count , ROWNUM num == ROWNUM as num
+
+	: AliaS 
+		: alias >> 별칭
+
+오라클 count( ) 
+	: 오라클에서 제공하는 함수로, 행의 개수를 반환한다. 
+	: 사용법
+		: column 을 arg로 한다
+		1. count(*)
+			: 해당 테이블의 전체 행 개수를 반환한다	
+			: null값과 상관 없이 count 한다
+
+		2. count( 컬럼명 )
+			: 해당 테이블의 특정 column 에 대응하는 행의 개수를 반환한다
+			: NULL 값을 가지는 행은 count 하지 않는다
+
+		2. count( DISTINCT 컬럼명 )
+			: 해당 테이블의 특정 column 에 대응하는 행의 개수를 중복된 행은 제외하여 반환한다
+
+
+	: select 문의 column 이 들어가는 자리에서 주로 쓰인다.
+		: 이때 결과로 반환되는 레코드들의 column 명은 'count( 어쩌구)' 꼴로 그대로 들어가게 된다.
+			: 만약 이를 변경하고 싶은 경우
+				sol1. as  문법을 사용
+					' count(어쩌구) as 별명 ' 의 꼴로 사용한다
+				sol2. 그냥 바로 뒤에 별명을 쓴다
+					: 어떻게 가능한건지는 몰라도 ' count( 어쩌구) 별명 ' 의 꼴로 column 명을 대입해도 잘 인식이 되서 as 문법을 쓴 것과 같은 효과가 난다
+		
+
+
+
+
+오라클 '집합'
+	: '하나'의 select 문이 반환한 결과를 '한'개의 집합이라고 한다
+
+오라클 '결과 집합'
+	: '하나' '이상' 의 select 문이 연결되어 만들어진 '한'개의 결과 집합이라고 한다.
+
+
+
+
+
+오라클 ROWNUM
+	: https://myblog1128.tistory.com/111
+	: 오라클 내부적으로 각 레코드에 붙여주는 인덱스를 값으로 하는 column 
+	: 엑셀에서 맨 왼쪽에 표시되는 행 번호랑 비슷한거다
+	: column 이 들어갈 수 있는 자리엔 ROWNUM 도 들어갈 수 있다
+			: ' select ROWNUM from 테이블명 ' 처럼 column명이 들어가는 자리에 들어갈 수 있다 
+
+	: 실제 column 이 아니라 가상 column 이라고 한다
+
+
+	: 주의
+		1. 0이 아닌 1부터 시작
+
+		2. ROWNUM 컬럼 과 함께 테이블 내의 다른 컬럼도 뽑아내야하는 경우 테이블을 대상으로 명시하여 그 컬럼을 사용해한다
+			: 잘 이해는 안가는데 ROWNUM 자체가 전부로 인식되서 그렇다는 것 같다
+				: 아래와 맥락이 비슷한것 같다
+					select * from BOARD; 로 했으면 
+					select * , writer from BOARD 하면 안되고
+					select BOARD.* , BOARD.WRITER  from BOARD 와 같이 테이블을 명시해야된다는 것 같다
+
+			:이런식으로 써야된다는거다 ex)  
+				"SELECT ROWNUM, MEMBER.* FROM MEMBER;" 
+				"SELECT ROWNUM , MEMBER.name FROM MEMEBER"  
+					:  " SELECT ROWNUM , * FROM MEMER; "이나 "SELECT ROWNUM , name FROM MEMEBER" 이런식으로 쓰면 안된다.
+
+		3.  select 해서 나오는 결과마다 새로 ronum 매겨지는게 아니라(select 할때 젤 처음 레코드로 온거라고 그 레코드의 rownum이 1번이 되는게 아니라) 데이터가 들어간 순서대로 rownum 이 매겨진다
+			: 그렇다고한번 매겨진 rownum 은 영원히 그 레코드의 rownum 이 아니란 말이다. 앞 레코드가 삭제되면 자동적으로 rownum 이 앞당겨진다. 
+				: 그러니까 db 에 저장되어있는 레코드의 순서대로 rownum 이 매겨져있다
+
+
+		4. 결과 집합을 생성하는 시점에서 rownum 이 만들어진다.
+			:  이게 뭔말인지 잘 모르겠는데 어쨌뜬 결론적으론 이때문에 ROWNUM이 1이 아닌 레코드부터 값을 뽑아내는 것이 불가해진다고 거다
+				: ex )  
+					SELECT * FROM MEMBER WHERE NUM BETWEEN 6 AND 10; 가 안된다.
+
+		5. ROWNUM이 1이 아닌 레코드부터 데이터를 뽑을는 경우, 서브 쿼리를 사용해야된다
+			: 서브쿼리를 사용해서 본격적인 select문을 실행하기에 앞서 ROWNUM 을 먼저 생성시켜주는 거다.
+			: 서브 쿼리에서 ROWNUM 을 미리 생성시킬때 별칭을 거의 무조건 붙여줘야되는것 같다
+				 : 안그럼 결과가 여전히 이상하게 나온다
+				: 추측하건데 ROWNUM 이란 column 은 호출될때마다 새로 생성되는거라 아무리 앞서서 생성한 적이 있다 하더라도 그걸 쓰지 못하는것 같고, 이때문에 앞서 생성한 ROWNUM 을 별칭으로 저장후 그 별칭으로 그 시점에 생성한 ROWNUM 을 불러와서 써야되는 것 같다
+
+			: ex ) 
+				 SELECT * FROM (SELECT ROWNUM NUM,MEMBER.* FROM MEMBER)
+WHERE NUM BETWEEN 6 AND 10;
+	
+
+오라클 BEGIN-END
+	: PL/SQL oracle's Procedural Language extension to SQL
+		: PL/SQL 이란
+			: 오라클에서 제공하는 SQL 을 확장한 프로시져 지향 프로그래밍 언어로, "블럭 구조" 를 가진다
+				: 그러니까 프로시져를 만들때 사용하는 문법이다.
+			: procedure 프로시져
+				: 메서드 , 함수 와 같은 것을 의미하는 표현으로, 재사용 및 유지보수를 용이하게 한 특정 기능을 구현한 블럭(=코드 덩어리)이다.
+					: 영단어 그자체인 procedure 즉 '절차' 의 뜻으로 쓴다면 오번역 한것.
+				: sql 에서 프로시져는 다른 언어의 함수와 비슷하게 특정 로직 처리를 위하여 여러 쿼리를 한번에 실행이 가능하고 재사용이 가능한데, 다른 점이 있다면  결과값을 반환하지 않는다.
+
+				: Procedural Programming >> 프로시져 지향 프로그래밍
+					: https://kikit-study.tistory.com/entry/%EA%B0%9D%EC%B2%B4%EC%A7%80%ED%96%A5-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-Object-Oriented-Programming
+					: 위에서부터 아래로 절차적으로 실행시키는걸 지향한다는 말이 아니라, 프로시져 의 사용을 지향한다는 의미이다.
+						: 한국에서는 절차 지향 프로그래밍이라고 많이 일컫는데 이건 오번역된거다
+					: 그러니까 기능별로 구분하여 메서드 혹은 함수로 구현해서 재사용 및 유지보수를 쉽게 하는 것이 목적이다
+					: 프로시저 지향 프로그래밍은 객체 지향 프로그래밍과 대립한다
+						: 엄청 다른건 아니고, 걍 관심사가 객체에 맞춰져 있느냐 아니냐 인거다
+	
+		: PL/SQL 의 구조
+			:	
+				DECLARE
+					변수명1 변수타입;
+					변수명2 변수타입;
+					변수명3 변수타입;
+					.
+					.
+					.
+				BEGIN
+					쿼리문1;
+					쿼리문2;
+					.
+					.
+					.
+				END;
+
+			: 전체가 하나의 블럭이고 , 구성 요소는 아래와 같다
+				(1) DECLARE
+					: 선언부로, 변수나 상수를 정의한다
+						: 단순 선언만 해도 되고, 선언과 동시에 값을 할당해놔도 된다.
+					: 옵션이다
+				(2) BEGIN
+					: 실행부로, 로직을 수행한다
+					: 필수이다
+				(3) EXCEPTION
+					: 예외처리부로, 로직 수행중 발생한 예외를 처리한다
+					: 옵션이다
+				(4) END
+					: 블록의 종료를 나타내고, 맨 끝에 쓴다
+					: 필수이다
+
+		: PL/SQL 블럭의 종류
+			1. Anonymous PL/SQL
+				: 익명 블럭
+				: 일회성으로 사용할 경우 사용 
+			2. stored PL/SQL
+				: 저장블럭
+				: 다회성으로 사용할 경우 사용
+
+		: 실행할때 전체를 드래그 하고 ctrl + enter 눌러야되는거 주의
+
+오라클 반복문
+	(1) for loop 문
+		:  범위는 '시작값<= 루프제어변수<=끝값' 이고 , 증감은 무조건 +1 로 고정되있는  for 문
+		: 구조
+			: for loop문의 루프제어변수는 따로 자료형 선언 없이 걍 사용 가능하고, 정수형이다.
+		
+	(2) loop 문
+		: do-while 문 중에서도 while문의 조건이 true 인것
+			: 그러니까
+				do{
+					. . .
+				}while(true);
+
+		: 구조
+			LOOP 
+				쿼리문1; 
+				EXIT WHEN 조건문;
+				.
+				.	
+				. 
+			END LOOP;
+
+			: 구성 요소
+				: LOOP >> LOOP 문의 시작을 나타낸다
+					: while(true) 라고 봄된다
+				: END LOOP >> LOOP 문의 끝을 나타낸다
+				: EXIT WHEN >> LOOP 문의 탈출 조건을 나타낸다
+					: while 문 안의 태클거는 if 문이라고 봄 된다.
+
+	(3) while loop 문
+		: 일반적인 while 문과 똑같음
+		: 구조
+			WHILE 조건문 LOOP
+				쿼리1;
+				쿼리2;
+				.
+				.
+			END LOOP;
+		: 일반 loop 문에서처럼 내부에 exit 을 사용 가능하다
+
+
+drop table board;
+create table board(
+BOARD_ID NUMBER(4,0) primary key,
+WRITER NVARCHAR2(50),
+TITLE NVARCHAR2(500),
+CONTENT	NVARCHAR2(500),
+BOARD_DATE TIMESTAMP(6),
+HIT	NUMBER(4,0)
+);
+
+
+
+-- 오라클에서 반복문을 사용하여 더미데이터 넣기
+BEGIN
+    FOR i IN 1..100 LOOP -- i 는 1부터 시작해서 100까지 반복
+    INSERT INTO BOARD(BOARD_ID , WRITER , TITLE , CONTENT ) VALUES (BOARD_SEQ.NEXTVAL, '이순신'||i,'이순신입니다'||i,'나는 이순신입니다'||i);
+    END LOOP;
+END;
+
+commit;
+COMMIT;
+rollback;
+
+select * from BOARD order by board_id desc;
+
+-- 10개의 데이터를 가져오고 싶다
+select * from board where board_id between 1 and 10; -- 글이 삭제가 되면 board id 도 일부 삭제되므로 이렇게 해서 10 개 가 나온다는 보장이 없다
+
+-- 1페이지당 10개씩 글의 목록을 출력하는 sol
+    -- 오라클에서 행의 범위를 정해주는 ronum 사용 << 레코드의 순번
+select ROWNUM, BOARD.* FROM BOARD;
+
+
+--- 서브 쿼리 << 쿼리문 안의 쿼리
+select * from
+    (
+select ROWNUM num, B.* from  -- B의 ROWNUM 의 집합을 num 이라고 붙였다
+    (
+    select * from BOARD order by board_id desc
+    )B -- 결과 집합의 별칭이 B이다
+    )
+where NUM between 1 and 10; -- 1 이 아니라 2가 되도 잘 나온다
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+프로시져를 이용해서 삽입하자
+
+:오라클에서 프로시져를 사용하여 더미데이터 넣기
+	
+BEGIN 
+    FOR I IN 1..100 LOOP
+    INSERT INTO BOARD(ID,WRITER,TITLE,CONTENT) VALUES(BOARD_SEQ.NEXTVAL, '홍길동'||I,'홍길동제목'||I,'홍길동내용'||I);
+    END LOOP;
+END;
+
+
+SELECT * FROM BOARD WHERE ID BETWEEN 1 AND 10;
+
+ROWNUM : 행에 붙이는 순번
+SELECT ROWNUM,BOARD.* FROM BOARD;
+
+아래와 같이 하면 , 만일 1 로시작하지 않을 시 오라클 특성상 제대로 불러오지 못한다
+
+    SELECT * FROM
+    (
+    SELECT * FROM BOARD ORDER BY ID DESC
+    )
+    WHERE ROWNUM BETWEEN 1 AND 10;
+
+
+
+아래와 같이 해야 제대로 된다
+SELECT * FROM
+(
+SELECT ROWNUM AS NUM, B.* FROM --NUM : 별칭. 조회된 결과 집한 내의
+    (
+    SELECT * FROM BOARD ORDER BY ID DESC
+    )B
+)
+    WHERE  NUM BETWEEN 1 AND 10;
+
+
+
+아래와 같이 하면 홍길동이 들어가기만 하면 알아서 찾아준다. 정규표현식 같은거
+
+SELECT * FROM
+(
+SELECT ROWNUM AS NUM, B.* FROM --NUM : 별칭. 조회된 결과 집한 내의
+    (
+    SELECT * FROM BOARD WHERE WRITER LIKE '%홍길동%' ORDER BY ID DESC 
+    )B
+)
+    WHERE  NUM BETWEEN 1 AND 10;
+    
+
+아래와 같이 해서 행의 수를 셀수도 있다
+SELECT COUNT(*) FROM BOARD;
+
+    
+
+
+NullPointerException 방지하기  :  빈 문자열로 대체
+	public String getSearchWord() {
+		if(searchWord==null) searchWord="";		return searchWord;
+	}
+
+
+
+
+나머지가 있는 경우 1 올림 해주는 방법
+	: 나눔당하는 수가 a, 나누는 수가 b 라고 할때 (a-1)/b+1 . 
+	: 일단 무조건 1 을 빼고 나누도록 해서 원래 딱 떨어지는 수라도 1 부족하게 나오게 하고, 살짝 넘는 경우 몫 부분이 나오게 해서 마지막에 + 1 을 해주면 결국 ㄴ나머지가 있으면 1 올림 해주게 도니다
+
+
+인터페이스에서도 어노테이션 사용 할 수 있다
+	public List<BoardDTO> boardList(@Param("searchWord")String searchWord, @Param("key")String key, @Param("postStart")int postStart, @Param("postEnd")int postEnd);
+
+	<select id="totalCount" resultType="int"> <!--  객체가 아닌 정수를 반환하면 reusltType 으로 해준다 -->
+	</select>
+
+ 
+동적 쿼리 >> 동적으로 쿼리문을 사용할 수 있다. 그때 사용 되는 태그는 <choose>이다
+
+	<select id="totalCount" resultType="int"> <!--  객체가 아닌 정수를 반환하면 reusltType 으로 해준다 -->
+	<choose> <!-- 쿼리문이 조건에 따라 동적으로 선택되게 한다 -->
+		<when test="searchWord == 'writer' or searchWord=='content'">
+			SELECT COUNT(*) FROM BOARD  WHERE ${searchWord} LIKE '%'|| #{key}||'%' 
+		</when>
+		<otherwise>
+			SELECT COUNT(*) FROM BOARD 
+		</otherwise>
+	</choose>
+	</select>
