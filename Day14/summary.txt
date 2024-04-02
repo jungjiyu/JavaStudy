@@ -43,34 +43,36 @@ DataSourceTransactionManager
 			: commit >> 트랜잭션이 끝까지 수행됬으면 해준다
 
 			1. xml 파일에 PlatformTransactionManager의 구현 클래스인 DataSourceTransactionManager 의 bean을 등록해서 DI 시킬 수 있게 준비해둔다. 
-			2. @Repository 클래스에서 db  접근하는 객체를 받는 필드는  PlatformTransactionManager 타입으로 선언하고,  @Autowired 를 통해 앞서 등록한 DataSourceTransactionManager 빈 객체를 DI 받는다
-			3. 트랜잭션을 수행하는 메서드 "내"에서 TransactionDefinition 객체와 TransactionStatus 객체를 생성한다
-				TransactionDefinition 객체: 트랜젝션이 구동하는데(트랜젝션 전파를 하는데) 기본적으로 필요한 객체. 이 객체를 arg 로 하여 TransactionStatus 객체를 얻을 수 있다
 
-				TransactionStatus 객체: 트랜젝션 실행 및 상태를 제어할 수 있는 객체 . 
+			2. @Repository 클래스에서 db  접근하는 객체를 받는 필드는  PlatformTransactionManager 타입으로 선언하고,  @Autowired 를 통해 앞서 등록한 DataSourceTransactionManager 빈 객체를 DI 받는다
+
+			3. 트랜잭션을 수행하는 메서드 "내"에서 TransactionDefinition 객체와 TransactionStatus 객체를 생성한다
+				TransactionDefinition 객체: 트랜젝션이 구동하는데(트랜젝션 전파를 하는데) 기본적으로 필요한 객체. 이 객체를 arg 로 하여 DataSourceTransactionManager 객체를 대상으로 TransactionStatus 객체를 얻을 수 있다
+
+				TransactionStatus 객체: 트랜젝션 실행 및 상태를 제어할 수 있는 객체 . 이 객체를 arg 로 하여  DataSourceTransactionManager 객체를 대상으로 commit 과 rollback 을 수행할 수 있다
 					: TransactionStatus status = tranManager.getTransaction(definition);
 
-		: 형식
+				: 형식
 
-			TransactionDefinition definition = new DefaultTransactionDefinition();
-			TransactionStatus status = tranManager.getTransaction(definition);
+					TransactionDefinition definition = new DefaultTransactionDefinition();
+					TransactionStatus status = tranManager.getTransaction(definition);
 	
-			try {
+					try {
 			
-			. . .
+					. . .
 
-			jt.update(query1,... );
-			jt.queryForObject(query2, mapper ...);
+					jt.update(query1,... );
+					jt.queryForObject(query2, mapper ...);
+	
+					. . .
 
-			. . .
 
+					tranManager.commit(status);  // try 의 젤 마지막 부분에 작성
 
-			tranManager.commit(status);  // try 의 젤 마지막 부분에 작성
-
-			}catch(Exception e) {
-				e.printStackTrace( );
-				tranManager.rollback(status); // catch 의 마지막 부분에 작성
-			}
+					}catch(Exception e) {
+						e.printStackTrace( );
+						tranManager.rollback(status); // catch 의 마지막 부분에 작성
+					}
 
 
 	sol2) TransactionTemplate 기반 트랜젝션 처리 
