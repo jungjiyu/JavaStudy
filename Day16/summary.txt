@@ -1,0 +1,32 @@
+<select> 태그는 form의 자식 태그로 드롭 다운 메뉴이다.
+내부적으로 <option value="특정값">표시할문구</option> 를 사용하여 메뉴들을 표현한다
+물론 <select name="이름"> 으로 하고, value 를 name 에 바인딩 해서 보낼 수 있다
+그리고 option 의 속성으로 selected 를 주면 그 항목이 기본 체크되게 세팅된다
+
+
+검색어를 입력했을때 해당 페이지에서는 검색결과가 잘 적용되는데 밑에 인덱스로 다음 페이지로 이동했을때 검색결과가 아닌 것까지 나오는 이유>> 인덱스 눌러서 다음 페이지로 넘어갈떄 , search 데이터를 들고 가지 않아서 그렇다
+
+컨트롤러에서만 페이지 이동전 addattribute 해서 데이터 실을 수 있는게 아니라 서비스 클래스에서도 add attribute 해서 데이터를 실을 수 있다(해당 서비스 클래스가 호출된 메서드에서 반환되는 경로로 같이 데이터 운반된다)
+	: 예제에서 paging 객체가 service 계층에서 add 되었다
+
+신기하게도 컨트롤러 내부의 메서드의 원시타입 파라미터로 받은 값들 그 자체 혹은 레퍼런스 타입 파라미터로 받은 객체로 얻어낼 수 있는 필드값은 따로 addattribute 안해줘도 이동된 페이지 내에서 param. 으로 접근할 수 있는 것 같다
+	:  SearchVO 타입이  key, searchWord 필드를 가지는데 , 컨트롤러 메서드에서 " SearchVO search " 파라미터로 DI 받고 별도로 addattribute 안해줬는데 이동한 페이지에서 param.key, param.searchWord 로 바로 접근이 가능했다
+
+	: 물론 컨트롤러 내부의 메서드에서 파라미터로 받은 값 그자체가 아닌 따로 변형해서 만들었거나 한 것은 param으로도 접근 불가하다
+
+
+<a style="${pageNum == paging.currentPage ? 'color:red':'color:blue'}" href="/web/board/list?page=${pageNum}&searchWord=${param.searchWord}&key=${param.key}" >  ${pageNum} </a>&nbsp 	
+	: 위와 같이 el 표현식으로 style 의 값을 다르게 할 수 있다
+
+<option ${param.searchWord == 'writer'?'selected':''} value="writer">작성자</option> 		
+	: 위와 같이 단순 값이 아니라 속성 자체를 el 표현식으로 표현할 수도 있다
+
+조건식짤때 나눗셈 혹은 곱셈 두 방향 모두로 구현할 수 있는 경우 되도록 곱셈으로 해라. 나눗셈은 부정확하니까
+
+1ms == 1/1000s  이지 , 1/60s 가 아니다
+
+mapper 인터페이스 를 xml 로 구현할때 #{ } 표현식 쓸 수 있는데,  mapper 인터페이스의 추상 메서드의 parameter 타입이 int , string 뭐 그런 타입인건 걍 #{ 파라미터명 } 으로 쿼리문에 대입 가능한건 알거고,  존나 특이한게 왜그런진 모르겠는데 parameter 타입이 레퍼런스 타입이고 그 내부에 필드가 있을떄 #{ 파라미터명.필드명} 으로 사용하는게 아니라 대놓고 #{ 필드명 } 으로  사용한다
+	:  #{ 파라미터명.필드명}  으로 하면 걍 ㅇ에러가 난다
+	: #{ db상의column명 } 이 아니라   #{ 소스코드상의필드명같은거 } 임 주의
+
+mapper 는 어쩌다가 쓰이게 된거지? 왜 xml 이지? 
