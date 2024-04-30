@@ -1,0 +1,170 @@
+- sqlplus 버전 확인
+sqlplus -v
+
+- sqlplus 실행
+sqlplus
+
+- sys관리자 계정으로 로그인
+사용자명 입력: sys / as sysdba
+비밀번호 입력: 1234
+
+SQL> Success
+
+사용자 계정 생성
+create user C##JAVAUSER identified by java2024;
+
+권한 부여
+grant connect, resource, dba to C##JAVAUSER;
+
+커밋
+commit;
+
+권한 취소
+revoke connect, resource, dba from C##JAVAUSER;
+
+사용자 삭제
+drop user C##JAVAUSER;
+
+다시 계정 생성 및 권한 부여
+create user C##JAVAUSER identified by java2024;
+grant connect, resource, dba to C##JAVAUSER;
+commit;
+
+- sqlplus 종료
+exit;
+
+
+- C##JAVAUSER 계정으로 로그인
+sqlplus
+사용자명 입력: C##JAVAUSER
+비밀번호 입력: java2024
+
+
+데이터 타입
+
+- 문자 데이터 타입
+CHAR(N): 고정 길이 문자
+VARCHAR2(N): 가변 길이 문자
+
+NCHAR(N): 고정 길이 유니코드 문자
+NVARCHAR2(N): 가변 길이 유니코드 문자
+
+- 숫자 데이터 타입
+number(p,s): +- 38자리수의 숫자를 저장
+number(3): 최대 3자리까지 표현이 가능한 숫자
+number(2,2): 최대 2자리, 소수이하 자리 포함(-99.99 ~ 99.99)
+
+- 날짜형 데이터 타입
+DATE: 날짜형식의 자료형으로 시, 분, 초까지 표현가능
+TIMESTAMP: 밀리초까지 표현가능
+
+- SQL 명령어
+select : 검색
+where : 조건
+* : 모든 것(전체)
+update: 수정
+delete: 삭제
+rollback : 되돌리기
+commit: 저장하기
+
+
+
+- 테이블 생성
+create table itMember(
+id varchar2(10) primary key,
+pw varchar2(10),
+name varchar2(10) not null,
+age number(3),
+phone char(13)
+);
+
+SQL> commit;
+
+- 테이블 조회
+select * from tab;
+
+
+- 데이터 추가
+insert into itMember(id, pw, name, age, phone) values('hong', '1234', '홍길동', 20, '010-1111-2222');
+
+insert into itMember(id, pw, name, age, phone) values('sung', '5678',
+'성춘향', 21, '010-1111-3333');
+
+insert into itMember(id, pw, name, age, phone) values('lee', '1111', '이순신', 22, '010-1111-5555');
+
+insert into itMember(id, pw, name, age, phone) values('jang', '2222', '장보고', 23, '010-1111-6666');
+
+commit;
+
+
+
+- 데이터 전체 조회 및 조건에 맞게 조회
+
+데이터 전체 조회
+select * from itMember;
+
+나이가 20살인 데이터 전체 조회
+select * from itMember where age = 20;
+
+
+- 데이터 수정
+id가 hong인 데이터의 전화번호를 010-1234-5678로 변경
+update itMember set phone='010-1234-5678' where id='hong';
+
+
+- 데이터 삭제
+id가 lee인 데이터 삭제
+delete from itMember where id='lee';
+
+
+- 롤백
+SQL> select * from itMember;
+SQL> rollback;
+SQL> select * from itMember;
+SQL> commit;
+
+
+- 테이블 삭제
+drop table itMember;
+select * from tab;
+
+
+sql Developer(GUI)
+
+1.
+https://www.oracle.com/database/sqldeveloper/technologies/download/
+
+2. 
+Windows 64-bit with JDK 11 included Download(465 MB) 클릭
+
+3. 라이센스 동의 및 로그인
+
+4. 다운로드 완료 후 압축 풀기
+
+5. sqldeveloper.exe 파일 실행 
+(설치 중 환경 설정 임포트 확인이 나오면 꼭 "아니오" 클릭!)
+
+
+--------------------------------------------------------------------
+테이블 생성
+
+create table department(
+departmentcode number(3) primary key,
+departmentname nvarchar2(10) not null,
+departmentnumber char(13)
+);
+
+commit;
+
+select * from tab;
+
+데이터 추가
+insert into department(departmentcode, departmentname, departmentnumber) values(111, '컴퓨터학과', '02-111-2222');
+insert into department(departmentcode, departmentname, departmentnumber) values(222, '요리학과', '02-3333-4444');
+insert into department values(333, '경제학과', '02-555-6666');
+insert into department values(444, '역사학과', '02-777-8888');
+
+
+commit;
+
+select * from department;
