@@ -1,1 +1,163 @@
-s
+스프링 부트 Spring Boot
+	: 자바 웹 프로그램을 더 쉽고 빠르게 만들기 위한 도구
+
+	: spring VS spring boot
+		spring boot : spring framework 를 개선한 것
+			: 개발환경설정 간소화 >> 미리 외부 라이브러리를 최적화해 제공하여 직접 연동할 필요 없음
+			: WAS 서버(tomcat)를 내장
+
+	: 환경 설정
+		1. JDK 설치 >> 자바 코드 번역, 실행 위한 자바 개발 도구
+			: JDK 17 이상 다운
+		2. IDE 설치 >> 인텔리제이( community edition ). 이클립스 등의 통합개발환경
+		3. 스프링 부트 프로젝트 생성
+			: Spring Initializer 페이지에서 설정하고 generate 함
+			: 설정 사항
+				(1) project : Gradle-Groovy
+				(2) Language : java
+				(3) Spring Boot : 괄호 없는 것 중에서 버전 높은거 택
+					: (SNAPSHOT)  >> release 되기 전 버전. 테스트 단계
+					: (Mx) >> 버그 수정중인 단계.. M9 M1 등
+
+				(4)project metadata
+					group :일반적으로 회사 도메인을 "역"으로 입력
+						: ex>> naver 사이트면 com.naver
+					artifact : 프로젝트명
+						: group 내에서 artifact 가 중복되면 안됨
+					name: artifact 명으로 자동 생성됨
+						: 생성되는 디렉터리명이됨
+					package name: group.artifact꼴로 자동생성됨
+					packaging : jar
+					java: jdk 버전 택
+
+				(5) dependencies : 필요한 라이브러리 포함
+					필수포함
+						1. spring web
+						2. spring data jpa
+						?3. h2 database
+						?4. mustache
+	: 인텔리제이 
+		구성
+			메뉴바 : 젤위의 file, edit, navigate .. 같은 라인
+			도구바: run 이런 아이콘 있는 오른쪽 위의 라인			
+			프로젝트 탐색기 : 왼쪽 사이드의 프로젝트 구조 볼 수 있는 부분
+			편집기: 코드 편집하는 부분
+
+		유용 단축키
+			alt + 1 : 프로젝트 탐색기 열기/닫기
+
+			ctrl + b : 해당 항목의 선언부로 이동
+			alt + f7 : 해당 항목이 사용된 위치로 이동
+
+			ctrl 2번연타 : 현재 위치에 상관 없이 원하는 파일 실행
+
+			shift 2번연타 : 프로젝트 전체 범위 검색
+			ctrl+ shift + f : 현재 파일내 검색
+
+			ctrl + / : 해당 라인 주석 처리 및 해제
+
+			ctrl+ space : 자동완성
+			shift + ctrl + enter : 구문 완성
+			alt + enter : 수정제안목록표시  
+
+			ctrl+y : 한 줄 삭제
+			ctrl+d : 한 줄 복사
+
+			shift+f10 : 프로젝트 run
+
+			ctrl+alt+o : 해당클래스 import 
+
+	: groovy 란 >> 언어
+	: Gradle 이란>> groovy 기반의 빌드 자동화 도구
+		: maven VS gradle
+			: 빌드 설정 >> 프로젝트의 기본적인 설정을 설정
+			: maven >> 프로젝트의 전체적인 라이프사이클을 관리하는 도구
+				: 라이브러리 및 빌드 설정
+				: 필요한 라이브러리와 그 라이브러리가 의존성 가지는 라이브러리 까지 자동 다운받아줌
+				: 네트워크 연결필요
+				: pom.xml (xml 기반)을 통해 maven 의 기능을 활용
+
+			: gradle >> 빌드 배포 도구(Build Tool)
+				: 라이브러리 및 빌드 설정
+				: 스크립트 언어(groovy)를 통해 gradle 의 기능을 활용
+				: maven 보다 빠르다
+
+
+		: Gradle task >> Gradle 프로젝트의 작업 단위
+		: Gradle 프로젝트 구성
+		******├── build.gradle : 프로젝트에 필요한 의존성과 빌드처리 내용을 작성하는 파일
+			├── .gradle : 작업(Task) 파일이 생성된다.
+			├── gradle 
+			│     └── wrapper : gradle 의 설치 없이도 빌드 가능하게 해준다
+			├──. . .
+
+
+	: 스프링 부트 프로젝트 기본 구성
+		▼build.gradle  : 프로젝트에 필요한 의존성과 빌드처리 내용을 작성하는 파일
+			: spring initializer 로 설정했던 사항( spring boot 버전, groupid, jdk버전 ,dependency ) 변경 가능한 파일
+			: 파일 자체가 Project 오브젝트다. build.gradle에 작성하는 수많은 코드들은 모두 Project 오브젝트의 프로퍼티와 메서드가 된다
+				Project Object 	
+					: 프로젝트단위에서 필요한 작업을 수행하기 위해 모든 메서드와 프로퍼티를 모아놓은 객체
+					: Project interface 구현 객체
+
+			: groovy 특성상 문장 끝에 ; 를 쓰지 않는다
+			: java application용 build.gradle의 대표적인 메서드
+				plugins
+				repositories
+				dependencies
+				application
+
+			: {  } 로 감싸진 부분 == 메서드의 인자로 받아지는 Groovy의 Closure.
+				:  Groovy의 Closure >> java 의 람다와 비슷한 것으로, { } 블록은 해당 메서드의 arg 에 넣어진다.
+
+				plugins {
+					id 'java'
+					id 'org.springframework.boot' version '3.2.5'
+					id 'io.spring.dependency-management' version '1.1.4'
+				}
+
+				는 
+				plugins ( {
+					id 'java'
+					id 'org.springframework.boot' version '3.2.5'
+					id 'io.spring.dependency-management' version '1.1.4'
+				} )
+
+				와 같다
+
+			: 프로퍼티 설정 
+				미리 정의된 프로퍼티 설정>> project.프로퍼티명=값 혹은 프로퍼티명=값
+				커스텀 프로퍼티 설정 >> project.ext.커스텀프로퍼티명 = 값
+			: 
+
+
+
+			: https://kotlinworld.com/321
+		▼src
+			▼main : 
+				▼java : 자바파일이 저장됨
+					▼기본페키지명 : 프로젝트생성할떄설정했던기본패키지 
+						→ atrifact명Application.java : 프로젝트 생성시 기본 생성되는 클래스
+							: @SpringBootApplication 이 정의되어있음
+							: main 메서드가 정의되있음
+
+				▼resources : 외부 파일이 저장됨
+
+			▼test :
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
