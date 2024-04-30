@@ -1,0 +1,467 @@
+--------------------------------------------------------------------------
+package Chapter8;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+public class EX05 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		try {
+			String query = "UPDATE STUDENT SET DEPARTMENTCODE = ? WHERE NAME = ?";
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, 222);
+			pstmt.setString(2, "홍길동");
+			int result = pstmt.executeUpdate();
+			
+			if (result == 1) {
+				System.out.println("UPDATE 성공!");
+			}
+		} catch (Exception e) {
+			System.out.println("UPDATE 실패!");
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null) pstmt.close();
+				if (conn != null) pstmt.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------
+package Chapter8;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+public class EX06 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		try {
+			String query = "DELETE FROM STUDENT WHERE STUDENTID = ?";
+			
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, 202412);
+			int result = pstmt.executeUpdate();
+			
+			if (result == 1) {
+				System.out.println("DELETE 성공!");
+			}
+		} catch (Exception e) {
+			System.out.println("DELETE 실패!");
+		} finally {
+			try {
+				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------
+package Chapter8;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class EX07 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		// Quiz. 학번 입력 받아서 학생 정보를 조회하는 코드 작성
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		try {
+			Scanner input = new Scanner(System.in);
+			System.out.print("조회할 학생의 학번 입력: ");
+			int studentID = input.nextInt();
+			String query = "SELECT * FROM STUDENT WHERE STUDENTID = " + studentID;
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(query);
+			
+			while(rs.next()) {
+				studentID = rs.getInt("STUDENTID");
+				String name = rs.getString("NAME");
+				int age = rs.getInt("AGE");
+				int grade = rs.getInt("GRADE");
+				int departmentCode = rs.getInt("DEPARTMENTCODE");
+				
+				System.out.println(name + "학생의 학번 : " + studentID);
+				System.out.println(name + "학생의 나이 : " + age + "살");
+				System.out.println(name + "학생의 학년 : " + grade + "학년");
+				System.out.println(name + "학생의 학과 코드 : " + departmentCode + "번");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(stmt != null)stmt.close();
+				if(conn != null)conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------
+package Chapter8;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+
+public class EX08 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String driver = "oracle.jdbc.OracleDriver";
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String dbId = "C##JAVAUSER";
+		String dbPw = "java2024";
+		
+		try {
+			String query = "SELECT * FROM STUDENT";
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			pstmt = conn.prepareStatement(query);
+			rs = pstmt.executeQuery();
+			
+			ResultSetMetaData metaData = rs.getMetaData();
+			int columnCount = metaData.getColumnCount();
+			
+			System.out.println("===== Result Set MetaData =====");
+			for (int i = 1; i <= columnCount; i++) {
+				System.out.println("Column " + i + ":");
+				System.out.println("NAME: " + metaData.getColumnName(i));
+				System.out.println("Type: " + metaData.getColumnTypeName(i));
+				System.out.println("Size: " + metaData.getColumnDisplaySize(i));
+				System.out.println("IS Nullabe: " + metaData.isNullable(i) );
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null) pstmt.close();
+				if(conn != null)conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+}
+
+--------------------------------------------------------------------------
+Quiz1번 테이블 활용하여 데이터 프로그램 제작
+
+1. 데이터 전체 조회 2. 데이터 삽입 3. 데이터 삭제 4. 데이터 수정 5. 데이터 조회 기능 제작
+
+1. 데이터 전체 조회
+2. id, password, name, age, address 입력받아 데이터 삽입
+3. id 입력 받아 데이터 삭제
+4. name 입력 받아 address 수정
+5. name 입력 받아 데이터 조회
+
+잘못 입력시 데이터 프로그램 종료
+
+file
+package: Chapter8
+interface: DataPro.java
+class : DataProImpl.java, Datamain.java  
+
+
+정답
+-------------------------------------------------------------------------
+package Chapter8;
+
+public interface DataPro {
+	public void listData();
+	public void insertData();
+	public void deleteData();
+	public void updateData();
+	public void selectData();
+}
+
+-------------------------------------------------------------------------
+package Chapter8;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.util.Scanner;
+
+public class DataProImpl implements DataPro {
+	Connection conn = null;
+	PreparedStatement pstmt = null;
+	ResultSet rs = null;
+ 	Scanner input = null;
+	
+	String driver = "oracle.jdbc.OracleDriver";
+	String url = "jdbc:oracle:thin:@localhost:1521:xe";
+	String dbId = "C##JAVAUSER";
+	String dbPw = "java2024";
+
+	@Override
+	public void listData() {
+		// TODO Auto-generated method stub
+		try {
+			String query = "SELECT * FROM Quiz1";
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			pstmt = conn.prepareStatement(query);
+			rs = pstmt.executeQuery(query);
+			
+			while(rs.next()) {
+				String id = rs.getString("ID");
+				int password = rs.getInt("PASSWORD");
+				String name = rs.getString("NAME");
+				String age = rs.getString("AGE");
+				String address = rs.getString("ADDRESS");
+				
+				System.out.println("ID: " + id);
+				System.out.println("PASSWORD: " + password);
+				System.out.println("NAME: " + name);
+				System.out.println("AGE: " + age);
+				System.out.println("ADDRESS: " + address);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null)pstmt.close();
+				if(conn != null)conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				}
+			}
+		}
+
+
+	@Override
+	public void insertData() {
+		// TODO Auto-generated method stub
+		try {
+			input = new Scanner(System.in); 
+			System.out.print("id: ");
+			String id = input.next();
+			System.out.print("password: ");
+			int password = input.nextInt();
+			System.out.print("name: ");
+			String name = input.next();
+			System.out.print("age: ");
+			String age = input.next();
+			System.out.print("address: ");
+			String address = input.next();
+			
+			String query = "INSERT INTO Quiz1 VALUES (?, ?, ?, ?, ?)";
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, id);
+			pstmt.setInt(2, password);
+			pstmt.setString(3, name);
+			pstmt.setString(4, age);
+			pstmt.setString(5, address);
+			int result = pstmt.executeUpdate();
+			if (result == 1) {
+				System.out.println("INSERT 성공!");
+			}
+		} catch (Exception e) {
+			System.out.println("INSERT 실패!");
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				}
+			}
+		}	
+	
+	@Override
+	public void deleteData() {
+		// TODO Auto-generated method stub
+		try {
+			input = new Scanner(System.in); 
+			System.out.print("id: ");
+			String id = input.next();
+			String query = "DELETE FROM Quiz1 WHERE ID = ?";
+			
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, id);
+			
+			int result = pstmt.executeUpdate();
+			
+			if (result == 1) {
+				System.out.println("DELETE 성공!");
+			}
+		} catch (Exception e) {
+			System.out.println("DELETE 실패!");
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null)pstmt.close();
+				if (conn != null)conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				}
+			}
+		}
+	
+	@Override
+	public void updateData() {
+		try {
+			input = new Scanner(System.in); 
+			System.out.print("수정할 name: ");
+			String name = input.nextLine();
+			System.out.print("수정할 address: ");
+			String address = input.next();
+			String query = "UPDATE Quiz1 SET ADDRESS = ? WHERE NAME = ?";
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, address);
+			pstmt.setString(2, name);
+			int result = pstmt.executeUpdate();
+			if (result == 1) {
+				System.out.println("UPDATE 성공!");
+			}
+		} catch (Exception e) {
+			System.out.println("UPDATE실패");
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null)pstmt.close();
+				if (conn != null)conn .close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				}
+			}
+		}
+		
+	
+	@Override
+	public void selectData() {
+		try {
+			input = new Scanner(System.in);
+			System.out.print("name: ");
+			String selectname = input.next();
+			String query = "SELECT * FROM Quiz1 WHERE NAME = ?";
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, dbId, dbPw);
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, selectname);
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				String id = rs.getString("ID");
+				int password = rs.getInt("PASSWORD");
+				String name = rs.getString("NAME");
+				String age = rs.getString("AGE");
+				String address = rs.getString("ADDRESS");
+				
+				System.out.println("ID: " + id);
+				System.out.println("PASSWORD: " + password);
+				System.out.println("NAME: " + name);
+				System.out.println("AGE: " + age);
+				System.out.println("ADDRESS: " + address);
+			} else {
+				System.out.println("존재하지 않습니다.");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs != null)rs.close();
+				if(pstmt != null)pstmt.close();
+				if(conn != null)conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				}
+			}
+		}
+}
+
+-------------------------------------------------------------------------
+package Chapter8;
+
+import java.util.Scanner;
+
+public class Datamain {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Scanner input = new Scanner(System.in);
+		DataPro pro = new DataProImpl();
+		
+		while(true) {
+			System.out.println("1. 데이터 전체 조회 2. 데이터 삽입 3. 데이터 삭제 4. 데이터 수정 5. 데이터 조회");
+			System.out.print("번호 입력: ");
+			int select = input.nextInt();
+			
+			switch(select) {
+			case 1: pro.listData(); break;
+			case 2: pro.insertData();break;
+			case 3: pro.deleteData(); break;
+			case 4: pro.updateData(); break;
+			case 5: pro.selectData(); break;
+			default: System.out.println("잘못입력하셨습니다.");
+					 input.close();
+					 System.out.println("프로그램을 종료합니다.");
+				 	 System.exit(0);
+			}
+		}
+	}
+}
