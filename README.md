@@ -1,1 +1,1 @@
-# JavaStudy - winter vacation 2.05.2024
+# JSPStudy - 02.05.2024
