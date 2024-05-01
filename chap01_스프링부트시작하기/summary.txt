@@ -70,6 +70,9 @@
 			ctrl + F4: 현재 창 닫기
 
 
+		플러그인 설치 : file-setting-plugin 에서 maketplace 에서 선택해 install
+
+
 	: Build vs Compile >> 
 		Compile :  javac 라는 컴파일러가 소스코드(.java)를 바이트 코드(.class)로 변환하는 과정
  			: 주의) jvm 은 .class 파일을 실행시키는 얘임
