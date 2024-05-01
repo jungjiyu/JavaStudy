@@ -155,6 +155,7 @@
 
 				▼resources : 외부 파일(html 등)이 저장됨
 					▼static : 클라이언트가 직접 명시해 request 하는 파일들 저장 
+					▼templates : 뷰 템플릿 저장
 			▼test :
 
 
