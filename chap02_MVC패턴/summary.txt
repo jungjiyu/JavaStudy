@@ -208,6 +208,8 @@ MVC 패턴
 
 										2. 파라미터 앞 (매개변수 레벨) >> "HttpServletRequset 객체로 받은 특정 파라미터값"을 "메서드의 대상 파라미터"와 바인딩시킨후 model 객체의 attribute 로써 add 해준다
 											: (그 메서드 내부에서)대상 파라미터에서 직접 꺼내 쓸수도 있고, model.getAttribute 로 꺼내쓸 수도 있다
+									: 속성
+										1. name : addAttribute 할때 지정하는 key 값을 직접 설정 가능하다 . 디폴트로는 메서드내부 @ModelAttribute 붙은 파라미터의 타입의 첫글자 소문자가 이름이 된다.
 
 
 
