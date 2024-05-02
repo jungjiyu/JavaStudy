@@ -1,1 +1,24 @@
 
+CRUD Create생성 Read조회 Update수정 Delete삭제
+
+폼데이터 form data
+	: html <form> 태그에 실려 서버로 전송되는 데이터	
+
+DTO Data Trasfer Object
+	: https://velog.io/@seongwop/Spring-DTO%EC%97%90-%EA%B8%B0%EB%B3%B8-%EC%83%9D%EC%84%B1%EC%9E%90-getter%EA%B0%80-%ED%95%84%EC%9A%94%ED%95%9C-%EC%9D%B4%EC%9C%A0
+		: 자세한건 rest API 하고 나서
+
+	: 계층간 데이터 전송 위해 사용하는 객체
+		: 컨트롤러에서 폼 데이터도 DTO 로 받을 수 있다
+	: 형식
+		: XXXXDTO.java 를 보통 클래스 명으로 한다
+		: private 필드
+		: 기본생성자 << 필수
+			: DTO 의 기본생성자와 getter/setter 가 필수인 이유 >> Reflection API 
+				: Reflection API >> 자바에서는 JVM이 실행되면 작성된 자바 코드가 static 영역에 저장된다. Reflection API는 이 정보를 활용하여 구체적인 클래스 타입을 알지 못해도 클래스 이름을 통해 static 영역에서 그 클래스의 정보(메서드, 타입, 변수 등등)에 접근할 수 있게 해준다.
+					: @RequestBody 나 JPA 에 Reflection API 가 사용되고, Reflection API 는 생성자와 getter 를 필요로 한다고 한다.
+
+
+		: getter / setter << 필수
+
+	
