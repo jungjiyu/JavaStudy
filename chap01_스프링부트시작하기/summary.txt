@@ -163,8 +163,9 @@
 
 
 				▼resources : 외부 파일(html 등)이 저장됨
-					: 용도에 따라서 layouts, images, .. 등으로 정리 좀 해라 (개발시)
-					▼static : 클라이언트가 직접 명시해 request 하는 파일들 저장 위치
+					▼static : 뷰텝플릿이아닌정적파일(html ,css , js) 저장위치
+						: static디렉터리 내부 파일들은 클라이언트가 직접 명시해 request 가능하다 (확장자까지 명시해야됨)
+
 					▼templates : 내부적으로 이동하는 파일들(뷰 템플릿) 저장위치
 			▼test :
 
