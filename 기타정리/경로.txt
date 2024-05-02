@@ -16,5 +16,7 @@
 				▼layouts
 					▶header.mustache
 
+	4. form 태그에서 action 경로 >> ""
+
 				
 
