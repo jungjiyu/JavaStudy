@@ -210,6 +210,8 @@ MVC 패턴
 											: (그 메서드 내부에서)대상 파라미터에서 직접 꺼내 쓸수도 있고, model.getAttribute 로 꺼내쓸 수도 있다
 									: 속성
 										1. name : addAttribute 할때 지정하는 key 값을 직접 설정 가능하다 . 디폴트로는 메서드내부 @ModelAttribute 붙은 파라미터의 타입의 첫글자 소문자가 이름이 된다.
+									: 사실 생략해도 잘 바인딩 된다
+										: https://velog.io/@0_0_yoon/%EB%A0%88%EB%B2%A83-ServletModelAttributeMethodProcessor%EA%B0%80-%EB%8F%99%EC%9E%91%ED%95%98%EB%8A%94-%EA%B3%BC%EC%A0%95
 
 
 
