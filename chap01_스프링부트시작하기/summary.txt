@@ -65,7 +65,7 @@
 
 			shift+f10 : 프로젝트 run
 
-			ctrl+alt+o : 해당클래스 import 
+			alt+enter : 해당클래스 import 
 
 			ctrl + F4: 현재 창 닫기
 
