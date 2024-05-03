@@ -93,7 +93,6 @@ MVC 패턴
 	: Model View Controller 
 		: 모델 Model
 			: 비즈니스 로직 처리
-				비즈니스 로직 >> 보이지 않는. 내부적인 핵심 작업. 
 			: MVC 에서 Model 에 대응하지만 ... Model 에 대응하는 클래스는 보통 "서비스클래스"라고 부르고, 어노테이션 조차 @Service 이다. (작명센스 뭐임;;)
 			: 보통  XXXXService.java 로 작명하여 "인터페이스"를 먼저 생성한 후, XXXXServiceImpl.java 로 구현클래스로써 서비스 클래스를 작성한다.
 
