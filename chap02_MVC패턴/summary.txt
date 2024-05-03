@@ -20,10 +20,23 @@
 	return 뷰네임 >> "확장자제외한뷰템플릿명"
 
 MVC 패턴
-	: 3계층
-		Presentation Layer >> 클리이언트 요청/응답 처리. @Controller 사용.
-		Service Layer >> 비즈니스 로직 처리. @Service 사용.
-		DataAccess Layer >> 데이터 CRUD 하는 계층 . @Repository 사용.
+	: 계층화 아키텍쳐 Layerd Arcitecture >> 어플리케이션을 n 개의 계층으로 구분한 것
+		: https://velog.io/@ygreenb/Layered-Architecture
+		: 3계층 4계층 딱히 정해져있는건 아니고 보통 그렇게 구분한다
+		: 특징 
+			1. 계층이 수직적으로(바로 아래에 있는 계층과만) 연결된다.
+			2. 어떤 계층이 수정되어도 다른 계층에 영향을 주지 않는다(다른계층까지 수정하진 않아도된다)
+
+		1. Presentation Layer >> 클리이언트에게 요청받고 응답해주는 계층. 
+			: View 와 controller 가 해당.
+		2. Service||Business Layer >> 비즈니스 로직 처리하는 계층. 
+			: service 가 해당
+			: 이 계층을 아래와 같이 세분화 하기도 한다
+				(1) Service||Business Layer
+				(2) Domain Layer : 순수 비즈니스 로직만 담기는 
+
+		3. Persistence||DataAccess Layer >> 데이터베이스에 접근 (CRUD)하는 계층 . @Repository 클래스 . 
+			: Persistence == 영속성. 그러니까 전원 꺼져도 안날라간다는 것. ( <-> 휘발성 )
 
 	: Model View Controller 
 		: 모델 Model
