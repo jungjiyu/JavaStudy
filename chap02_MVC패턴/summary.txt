@@ -24,7 +24,9 @@ MVC 패턴
 		: https://ksh-coding.tistory.com/96
 		: https://velog.io/@ygreenb/Layered-Architecture
 
-		1. 도메인형 아키텍쳐 >> 도메인을 기준으로 구분하는 아키텍쳐
+		1. 도메인형 아키텍쳐 ||  도메인 주도 설계 DDD Domain Driven Design >> 도메인을 기준으로 구분하는 아키텍쳐
+			: 도메인 객체 중심으로 설계하는 것. 즉, 각 비즈니스 로직 단위로 나눠 설계하는 것. 
+		********: https://happycloud-lee.tistory.com/94
 			product
 				⎿ controller
 				⎿ service
@@ -86,8 +88,7 @@ MVC 패턴
 
 
 	
-	: 도메인 주도 설계 DDD Domain Driven Design
-		: 도메인 객체 중심으로 설계하는 것. 즉, 각 비즈니스 로직 단위로 나눠 설계하는 것.
+
 
 	: Model View Controller 
 		: 모델 Model
