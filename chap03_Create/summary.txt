@@ -3,22 +3,42 @@ CRUD Create생성 Read조회 Update수정 Delete삭제
 폼데이터 form data
 	: html <form> 태그에 실려 서버로 전송되는 데이터	
 
+
+-----------------------------------------------------------------------------------------------------
+
+
 DTO Data Trasfer Object
 	: https://velog.io/@seongwop/Spring-DTO%EC%97%90-%EA%B8%B0%EB%B3%B8-%EC%83%9D%EC%84%B1%EC%9E%90-getter%EA%B0%80-%ED%95%84%EC%9A%94%ED%95%9C-%EC%9D%B4%EC%9C%A0
 		: 자세한건 rest API 하고 나서
 
 	: 계층간 데이터 전송 위해 사용하는 객체
 		: 컨트롤러에서 폼 데이터도 DTO 로 받을 수 있다
-	: 형식
-		: XXXXDTO.java 를 보통 클래스 명으로 한다
-		: private 필드
-		: 기본생성자 << 필수
-			: DTO 의 기본생성자와 getter/setter 가 필수인 이유 >> Reflection API 
-				: Reflection API >> 자바에서는 JVM이 실행되면 작성된 자바 코드가 static 영역에 저장된다. Reflection API는 이 정보를 활용하여 구체적인 클래스 타입을 알지 못해도 클래스 이름을 통해 static 영역에서 그 클래스의 정보(메서드, 타입, 변수 등등)에 접근할 수 있게 해준다.
-					: @RequestBody 나 JPA 에 Reflection API 가 사용되고, Reflection API 는 생성자와 getter 를 필요로 한다고 한다.
 
+	:  XXXXDTO.java 를 보통 클래스 명으로 한다
+		: 구성
+			1. private 필드
+			2. 기본생성자 << 필수
+				: DTO 의 기본생성자와 getter/setter 가 필수인 이유 >> Reflection API 
+					: Reflection API >> 자바에서는 JVM이 실행되면 작성된 자바 코드가 static 영역에 저장된다. Reflection API는 이 정보를 활용하여 구체적인 클래스 타입을 알지 못해도 클래스 이름을 통해 static 영역에서 그 클래스의 정보(메서드, 타입, 변수 등등)에 접근할 수 있게 해준다.
+						: @RequestBody 나 JPA 에 Reflection API 가 사용되고, Reflection API 는 생성자와 getter 를 필요로 한다고 한다.
+			3. getter / setter << 필수
+			4. toEntity( ) 구현 
+				: JPA 사용시 DTO객체를 entity 객체로 변환하는 역할이다
+				: 이름은 꼭 toEntity( ) 로 해야되는건진 모르겠다.
+				: 내부적으로는 해당 DTO 객체의 필드를 entity클래스의 생성자의 arg 로 하여  entity클래스객체를 생성하여 반환한다
+					: 일단 해당 entity클래스가 존재해야 사용 가능하므로, entity 클래스를 먼저 만든 후 작업한다.
+				
 
-		: getter / setter << 필수
+	: DTO 를 Entitiy 화
+		: 과정
+			0. DTO 클래스 만든다
+			1. entity패키지에 Entity 클래스 만든다
+			2. DTO 클래스에 toEntity() 를 구현한다
+			3. Controller 클래스에서 DTO 객체를 param으로 하여  클라이언트에게 데이터를 받고, 해당 DTO 의 필드를 arg 로 하여 Entity 객체를 생성한다
+			4. 
+
+	
+-----------------------------------------------------------------------------------------------------
 
 	
 
@@ -37,9 +57,13 @@ DDL DML , DCL
 		: 데이터(테이블)을 저장하거나 객체에 권한을 주는 등의 역할을 하는 언어
 		: commit, rollback, grant ( db사용자에게 수행권한 부여) , revoke  ( db사용자의 수행권한 박탈)
  
+데이터베이스 스키마 database schema >>DB 전체 또는 일부를 구조화한 것.
+	: 개체의 특성을 나타내는 속성(Attribute) , 속성들의 집합으로 이루어진 개체(Entity), 개체 사이에 존재하는 관계(Relation)에 대한 정의와 이들이 유지해야 할 제약조건들을 기술한 것.
+
 
 데이터베이스 DB >> 데이터 관리 창고
 	DBMS DataBase Management System >> DB 의 데이터에 접근할 수 있게 해주는 소프트웨어
+
 
 관계형 데이터베이스 RDB Relational DataBase >>KEY, VALUE 값을 ROW(RECORD) 와 COLUM(TUPLE) 으로 이뤄진 table 형식으로 저장 
 	: RDB ⊂ DB
@@ -47,6 +71,35 @@ DDL DML , DCL
 	: 관계형 데이터베이스 시스템 RDBMS Relational Database Management System >> RDB 데이터 접근할 수 있게 해주는 소프트웨어
 		: MySQL , Oracle , MariaDB, H2 등 있다
 
+	: 기본키 Primary key 와 외래키 Foreign Key
+		: https://velog.io/@hiy7030/DB-Primary-key%EC%99%80-foreign-key
+		: 기본키 PK Primary key >> 해당 테이블 내의 각 레코드의 고유한 식별자
+			1. primary key 에 대응하는 값은 null 값 할당이 불가하다
+			2. primary key 에 대응하는 값은 레코드간 중복이 불가하다
+			3. 보통 하나의 테이블에 하나의 PK 만 가지게 한다 (1개 이상도 가능하긴 하다)	 
+
+		: 외래키 FK Foreign Key >> 일종의 테이블을 연결하는 가상의 다리 역할
+			1. 다른 테이블의 PK 에 대응하는 COLUMN . 필드이다.
+			2. FK 를 가지는 테이블을 하위테이블, PK 를 가지는 테이블을 상위테이블||참조테이블 이라고 한다
+			3. 각 FK 와 PK 는 1:1 매칭되어야된다. PK 에 존재하지 않는 값을 FK 가 가질 수 없다.
+
+	: LOB Long OBject >>  (텍스트. 이미지. 비디오 등)구조화되지 않은 대형 데이터를 저장 목적
+		BLOB Binary Long OBject >> 바이너리 기반 데이터 저장 목적
+		CLOB Character Long OBject >> 문자 기반 데이터 저장 목적
+			: CLOB 와 VARCHAR2 사이에 암시적 변환이 일어난다고 한다 
+		: https://javaoop.tistory.com/73
+
+
+
+-----------------------------------------------------------------------------------------------------
+
+JDBC Java DataBase Connectivity >> 자바 언어로 데이터베이스와 통신하기 위한 API. 자바 언어와 DBMS 사이에 연결을 지원하는 표준 . DB 작업을 위한 표준
+	: JDBC 드라이버 
+		: JDBC 자체는 인터페이스이고, DBMS 회사들이 이를 구현하여 제공하는데 이를 JDBC 드라이버라 한다.
+		: 이를 통하여  특정 회사의 데이터베이스의 정확한 사용 방법을 몰라도 JDBC API만 알면 JDBC 드라이버를 활용하여 데이터베이스 조작이 가능하게 된다
+		: 오라클의 OracleDriver , mysql의 Driver 같은거
+
+	: https://livenow14.tistory.com/70
 
 ORM Object Relational Mapping >> 객체(class)와 RDBMS의 테이블을 매핑시켜주는 프레임워크
 	:  SQL Query가 아닌 직관적인 코드(메서드)로 데이터 조작 가능하게 한다.
@@ -54,29 +107,50 @@ ORM Object Relational Mapping >> 객체(class)와 RDBMS의 테이블을 매핑�
 
 JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하는 "인터페이스" 
 	: 그러니까 자바언어로 DB에 명령 내릴 수 있게 하는 얘다
+	: JDBC 와 JPA >>  JPA는 데이터베이스와 객체를 매핑해주는 API 이며 내부적으로는 데이터베이스와의 통신을 위해 JDBC를 사용한다.
+
 	: persistence 영속성 >> 데이터의 영속성. 즉, 프로그램이 종료되더라도 사라지지 않는 데이터 성질.
 		: volability 휘발성 과 대립되는 개념
+
 	: Hibernate, OpenJPA 등이 인터페이스인 JPA 의 "구현" 클래스이다.
 		: JPA 는 인터페이스이기 떄문에 JPA 기능 사용을 위해선 구현해야된다
+		: Hibernate 
+			: 동면하다. 
+			: 다른 구현체에 비해 가장 JPA와 호환이 잘되서가장 많이 쓰인다
+
+
 	: 사용하는이유(장점)
 		1. DBMS 종속성이 줄어든다 : DBMS 가 변경되더라도 소스 수정 필요가 없다
 		2. 객체 중심 개발이 가능
 			>> 가독성과 유지보수성이 높아진다.
 			>> 객체 간 상속관계를 표현가능하다
 			>> 객체 간 연관관계(클래스가 다른 클래스타입의 필드를 가짐)를 표현가능하다
-	: 주의 ) JPA 는 수정 메소드를 제공하지 않는다고 한다?
+
+
+	: @Entity,  @Table , @Column 같은 어노테이션들은 JPA 가 제공하는거고 , jakarta.persistence.* 에서 import 함 된다.
+
 
 	Entity 엔티티>> DB 테이블에 대응하는 하나의 클래스
+		: 관계
+			테이블 하나 ≒ entity
+			테이블의 하나의 row ≒ entity의 인스턴스
+			테이블의 하나의 column ≒ entity의 필드
+
+		
 		: @Entity >> 해당 클래스를 엔티티로 선언한다
 			: 그러니까 JPA에 의해 해당 클래스가 RDMS 의 테이블과 매핑되어 DB 구조를 만든다
+			: entity 클래스는 보통 entity 패키지에 따로 저장하고, 딱히 XXXEntity 처럼 이름을 짓진 않는다 (그냥 Person , Member 이런식으로 심플 이름).
 			: 클래스 제한 사항
 			*******0. 테이블에 저장할 필드는 final 키워드 사용 불가
 				1. 기본생성자가 있어야된다
 					: JPA 도 Reflection API 를 사용하기 때문
 				2. final, enum, interface, inner 클래스에는 사용 불가
-			: 속성
-				1. name >> 엔티티 이름을 지정한다
+
+			:  name 속성 >> 엔티티 이름을 지정한다
 					: 그냥 name 속성을 명시하지 않고 사용 가능하다
+
+
+
 		: @Table >> entity 를 db 상에서 어떠한 테이블로 생성할건지(맵핑할건지) 정한다
 			: 주로 @Entity 와 함께 쓰이고, 생략 시 엔티티 이름이 테이블명이 된다
 			: 속성 
@@ -87,12 +161,101 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 					: schema >>도식. 즉, db의 전반적인 명세를 기술한 것.
 				4. uniqueConstraints : DDL 생성 시, 유니크 제약조건을 만든다.
 
+		: @Column >> 테이블과 필드를 매핑하기 위해 사용. 해당 필드에 대응하는 column을 생성한다
+			: @Entity 내 필드 위에 명시한다
+			: 속성
+				1. name : column 명을 정한다 . 
+					: 디폴트값은 필드명이다.
+					: db에서는 대소문자 구분이 안되므로 camal 스타일 필드명을 snake 스타일 이름으로 바꿔 저장하는걸 추천
+  						@Column(name = "user_nm")
+   					 	private String userNm;
+
+
+				2. nullable : NULL 제약조건 설정
+					(1) true : NULL 도 허용한다<< 디폴트값
+					(2) false : NOT NULL 로 설정한다.
+
+				3. unique : UNIQUE 제약조건 설정
+					(1) true : UNIQUE 로 설정
+					(2) false : UNIQUE 하지 않아도 된다<< 기본값
+
+				4. length : String 타입 필드의 최대 길이 설정
+					: 디폴트값은 255
+					@Column(length = 400)
+					private String data;
+
+				5. precision , scale : 숫자의 전체자리수 , 소수 자리수 설정
+					@Column(precision = 10, scale = 2)
+					private BigDecimal data;
+
+				7. table : 하나의 엔티티를 두개의 테이블에서 사용하려할떄 사용
+
+				8. columnDefinition : 직접 해당 COLUMN 정보를 ( sql 문으로 )입력
+					@Column(columnDefinition = "varchar(100) default 'EMPTY'")
+					private String data;
+
+		: @Id >> Primary Key 로 지정할 필드를 설정
+			: @Column 위에 명시한다
+
+		: @GeneratedValue >> PK 값을 자동생성하기 위해 (시퀀스를 사용하기 위해) 사용한다
+			: @Id 위에 명시한다
+
+		: @Temporal >> java의 java.util.Date, java.util.Calendar를 RDBMS의 date, time, timestamp 중 하나에 매핑한다.
+			: value 속성 >> 시간포맷지정. 
+				: @Temporal를 아예 명시하지 않은 경우 timestamp 타입으로 매핑되지만, @Temporal 을 명시할 경우 디폴트값이 따로 지정되지 않기 떄문에 (@Temporal 을 명시하면) value 속성 명시는 필수이다
+				: 할당 가능한 값
+					1. TemporalType.DATE : date 에 매핑 ex) 2023-01-01
+					2. TemporalType.TIME : time 에 매핑 ex) 12:03:21
+					3. TemporalType.TIMESTAMP : timestamp 에 매핑  ex) 2023-01-01 12:03:21
+
+			: ex) 
+				@Temporal(TemporalType.TIMESTAMP)
+				private Date createdDate;
+
+		: @Enumerated >> 자바의 enum 타입을 매핑할 때 사용
+			: value 속성 >> 저장할 값 지정. 
+				: 할당 가능한 값
+					1. EnumType.ORDINAL : enum 순서를 db에 저장 
+					2. EnumType.STRING : enum 이름을 db에 저장 
+						:EnumType.ORDINAL 보다 권장된다 --> enum 의 순서가 변경되거나 중간에 새 내용 추가됬을떄 db의 기존 데이터와 일치하지 않게 될 수 있어서
+
+		: @Lob >> BLOB, CLOB 타입과 매핑
+			: 매핑하는 필드 타입이 문자면 CLOB 으로, 그 외의 타입이면 BLOB 로 자동 매핑된다
+				ex) 
+					@Lob 
+					private String lobString; // CLOB으로 매핑
+ 
+					@Lob 
+					private byte[] lobByte; // BLOB으로 매핑
+
+		: @Transient >> 무시
+			: @Transient가 지정된 필드는 데이터베이스에 저장하지 않고, 따라서 조회도 안된다.
+			: Transient 자체의 의미는 덧없는.. 일시적인.. 뭐 그런 뜻
+
+		: @Access >> JPA가 엔티티 데이터에 접근하는 방식을 지정
+			: https://velog.io/@cmsskkk/JPA-Access
+			: 할당 가능한 값 <<속성명 명시 없이 바로 ( ) 안에 때려넣는다
+				1. AccessType.FIELD : 필드에 직접 접근 (private 이라도 가능-- reflection 을 이용하기 때문)
+				2. AccessType.PROPERTY : getter 를 통해 접근
+
+			: @Access 를 붙이지 않으면 @Id 의 위치로 접근방식이 자동으로 결정된다 
+				1.  @Id 가 프로퍼티(getter)에 있으면 >> AccessType.PROPERY 
+				2.  @Id 가 필드에 있으면 >> AccessType.FIELD 
+
+
 		: https://data-make.tistory.com/610
-		: uniqueConstraints
+		: https://blog.mglee.dev/blog/jpa%EC%97%90%EC%84%9C-%EC%97%94%ED%8B%B0%ED%8B%B0%EB%A5%BC-%EC%9E%91%EC%84%B1%ED%95%98%EB%8A%94-%EB%B0%A9%EB%B2%95/
+
 
 	리파지토리 Repository >> Entity에 의해 생성된 DB에 접근하는 메서드들을 사용하기 위한 인터페이스
+		: DAO 객체 같은거 말하는거임
 
 	: https://data-make.tistory.com/610
 	: https://goddaehee.tistory.com/209
 	: https://dbjh.tistory.com/77
+
+
+-----------------------------------------------------------------------------------------------------
+
+
 	
