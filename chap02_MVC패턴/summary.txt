@@ -25,7 +25,6 @@ MVC 패턴
 		: https://velog.io/@ygreenb/Layered-Architecture
 
 		1. 도메인형 아키텍쳐 >> 도메인을 기준으로 구분하는 아키텍쳐
-			
 			product
 				⎿ controller
 				⎿ service
@@ -78,8 +77,8 @@ MVC 패턴
 				: service 가 해당
 				: 이 계층을 아래와 같이 세분화 하기도 한다
 					: https://dev-coco.tistory.com/166
-					(1)  Business||Application||Service Layer : 
-					(2) Domain Layer : 순수 비즈니스 로직을 수행하는 계층
+					(1)  Business||Application||Service Layer : 비즈니스 로직 "정의" 및 도메인 계층과 persistence layer 를 연결해줌. 
+					(2) Domain Layer : 실질적인.순수.핵심 비즈니스 로직을 수행하는 계층
 	
 			3. Persistence||DataAccess Layer >> 데이터베이스에 접근 (CRUD)하는 계층 . @Repository 클래스 . 
 				: Persistence == 영속성. 그러니까 전원 꺼져도 안날라간다는 것. ( <-> 휘발성 )
