@@ -35,7 +35,9 @@ MVC 패턴
 		: 리파지토리 Repository
 			: db에 접근하여 CRUD 를 수행한다
 			: DAO vs Repository
-				: https://ttl-blog.tistory.com/1285
+				: https://80000coding.oopy.io/dcd0f224-053f-456c-af22-d7e0946fa868
+				: https://hudi.blog/domain-domain-model-domain-object/
+
 			: how to
 				sol1. 인터페이스 생성 후 구현 클래스 활용 
 					(1) XXXXRepository.java 이름의 "인터페이스"를 먼저 생성
