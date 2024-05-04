@@ -1,3 +1,6 @@
+https://velog.io/@minju0426/JPARepository%EC%97%90-%EB%8C%80%ED%95%B4-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90%EC%82%AC%EC%9A%A9%EB%B2%95-Method
+-----------------------------------------------------------------------------------------------------
+
 CRUD Create생성 Read조회 Update수정 Delete삭제
 
 폼데이터 form data
@@ -297,9 +300,40 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 		: https://blog.mglee.dev/blog/jpa%EC%97%90%EC%84%9C-%EC%97%94%ED%8B%B0%ED%8B%B0%EB%A5%BC-%EC%9E%91%EC%84%B1%ED%95%98%EB%8A%94-%EB%B0%A9%EB%B2%95/
 
 
-	리파지토리 Repository >> Entity에 의해 생성된 DB에 접근하는 메서드들을 사용하기 위한 인터페이스
-		: DAO 객체 같은거 말하는거임
+	리파지토리 Repository >> Entity에 의해 생성된 DB에 접근하는 메서드들을 사용하기 위한 "인터페이스"
+		: 생성 방법
+			1. repository 패키지 내부에 XXXXRepository.java "인터페이스" 생성
+			2. 생성한 인터페이스가 JPA 가 제공하는 인터페이스 中 하나를 상속받게 함
+				: JPA 를 사용하면, 일반적으로 Repository 에서 다음의 인터페이스 中 하나를 상속하여 사용하게 된다.
+					: 주의 >> Repository "인터페이스" 위에 @Repository 를 붙이지 않는다
+						: 아니 구현 클래스가 아니라 인터페이스잖아. 인터페이스로 객체 만들수 있냐? 없잖ㅇㅏ!!
+							: 생각해보면 service layer 에서도 service 인터페이스 자체엔 암것도 안붙이고 serviceImpl 구현클래스에만 @Service 명시한다.
 
+					: 인터페이스를 꼭 상속받아야되는건 아니지만 보통 상속받는편
+						: 이 인터페이스들이 DAO 의 역할을 수행하기에 상속 받으면 개발자가 DAO를 직접 만들 필요가 없어지기 때문.
+						: 단순 이 인터페이스를 상속 받는 것 만으로 Repository 인터페이스의 구현 클래스를 생성하지 않아도(메서드 내용을 작성하지 않아도) JPA 가 알아서 내부적으로 구현 클래스를 생성해주기 때문.  
+
+
+					: 종류
+						(1) interface CrudRepository<T, ID> 
+							: 이를 상속받은 인터페이스로 entity 를 관리(CRUD) 할 수 있게한다
+								: 이를 상속받은 인터페이스 내부에 따로 메서드를 정의하지 않아도 아래의 메서드들은 호출이 가능하다
+								<S extends T> S save(S entity);
+								Optional<T> findById(ID id);
+								Iterable<T> findAll();
+								long count();
+								void deleteById(ID id);
+
+		
+							: T == 관리대상 엔티티 클래스
+							: ID == 해당 엔티티의 대푯값 타입 . 주로 PK의 타입.
+
+						(2) interface JpaRepository< T, ID > 
+							: CrudRepository 의 자식 인터페이스이다 >> CrudRepository 보다 더 많은 기능을 내포
+							: https://velog.io/@minju0426/JPARepository%EC%97%90-%EB%8C%80%ED%95%B4-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90%EC%82%AC%EC%9A%A9%EB%B2%95-Method
+					: https://zeroco.tistory.com/44
+					: https://velog.io/@baekgom/JpaRepository-%EC%99%80-Repository
+					
 	: https://data-make.tistory.com/610
 	: https://goddaehee.tistory.com/209
 	: https://dbjh.tistory.com/77
