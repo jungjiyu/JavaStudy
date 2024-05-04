@@ -6,13 +6,15 @@ CRUD Create생성 Read조회 Update수정 Delete삭제
 
 -----------------------------------------------------------------------------------------------------
 
+비즈니스 로직 >> 보이지 않는. 내부적인 핵심 작업. 
+퍼시스턴스 로직 >> db CRUD하는 작업
 
+-----------------------------------------------------------------------------------------------------
 DTO Data Trasfer Object
 	: https://velog.io/@seongwop/Spring-DTO%EC%97%90-%EA%B8%B0%EB%B3%B8-%EC%83%9D%EC%84%B1%EC%9E%90-getter%EA%B0%80-%ED%95%84%EC%9A%94%ED%95%9C-%EC%9D%B4%EC%9C%A0
 		: 자세한건 rest API 하고 나서
 
-	: 계층간 데이터 전송 위해 사용하는 객체
-		: 컨트롤러에서 폼 데이터도 DTO 로 받을 수 있다
+	: 계층간 데이터 교환을 쉽게 하기 위해 사용하는 객체. 운반책.
 
 	:  XXXXDTO.java 를 보통 클래스 명으로 한다
 		: 구성
@@ -37,7 +39,55 @@ DTO Data Trasfer Object
 			3. Controller 클래스에서 DTO 객체를 param으로 하여  클라이언트에게 데이터를 받고, 해당 DTO 의 필드를 arg 로 하여 Entity 객체를 생성한다
 			4. 
 
-	
+
+
+Domain Object Model
+	: https://hudi.blog/domain-domain-model-domain-object/
+	>> Domain 
+		: 핵심 비즈니스 요구사항을 의미하는 용어
+		: 하위 도메인으로 나눠질 수 있다
+		: ex) 온라인 쇼핑몰 이라는 도메인의 하위 도메인은 상품 , 회원 , 주문 이고 각 하위 도메인은 상품명/가격 , 회원성함/주소, 주문상품/수량 의 하위 도메인을 또 가진다.. 
+
+	>> Domain Model
+		: 도메인을 구조화 한 것. 꼭 코드로 구현한게 아니라 걍 그림으로 대충 도식화 해도 인정.
+
+	>> Domain Object Model
+		: 도메인을 객체화( 코드로 구조화 ) 한 것.
+		: 그러니까 도메인 객체 는 특정한 비즈니스 로직을 담당하는 객체이다.
+
+
+
+
+
+DAO 와 Repository >> 둘다 DB CRUD 하는데 쓰인다.
+	: https://velog.io/@mercurios0603/DAO%EC%99%80-Repository%EC%9D%98-%EC%B0%A8%EC%9D%B4
+	: https://80000coding.oopy.io/dcd0f224-053f-456c-af22-d7e0946fa868
+	: https://isaac56.github.io/etc/2021/08/29/difference_DAO_Repository/
+
+	: 일반적으로 스프링과 JPA를 사용하는 경우, Repository 패턴이 더 선호된다
+
+	DAO Data Access Object 
+		: 데이터 영속성을 추상화하는 패턴.  
+			: 데이터를 보내고 검색하는 등의 간단한 메소드를 노출하고, 수행하기 위한 복잡한 쿼리를 캡슐화 (내부적으로 감추고) 한다.
+		: persistence Layer 에 인터페이스를 제공하고, 그걸 구현하게 한다
+		: 좀더 DB스러운 저수준 개념 , lower layer>>  좀 더 유연하고 일반적인. 사용하기 까다로운. 쿼리 사용.
+			: DAO가 비록 객체지향적인 인터페이스를 제공하려는 의도를 가지고 있다고 하더라도, 실제 구현 시에는 DAO의 인터페이스는 데이터베이스의 CRUD 쿼리와 1:1 매칭 되는 세밀한 단위의 오퍼레이션을 구현한다
+			: persistence Layer 에 속한다
+			: DAO 에서 상위 계층인 Repository 의 사용은 불가
+		
+
+ 	리포지토리
+		: 도메인 객체(Entity) 모임을 추상화하는 패턴. 
+			:  Domain Layer과 Persistence Layer 사이의 데이터를 대조하고 Domain 객체로 Mapping하는 로직(객체의 Collection을 저장, 검색 하는 등의 동작)을 캡슐화 (내부적으로 감추고) 한다.
+				:  Collection >> 도메인 객체(Entity) 모임
+		: Repository 인터페이스를 정의하면 스프링 데이터 JPA가 이를 스캔하여 자동으로 데이터 액세스 메서드를 생성하고 관리하기 때문에 직접 구현 클래스를 작성하지 않아도 된다
+		: 좀더 도메인 객체에 더 가까운 상위 수준 개념 , higher layer >>더 좁게. 구체적으로 Get(id), Find(Specification), Add(Entity)와 같은 메서드를 사용
+			: Domain Layer 에 속한다. 
+			: 결과적으로 REPOSITORY에서 제공하는 하나의 오퍼레이션이 DAO의 여러 오퍼레이션에 매핑되는 것이 일반적이다. 따라서 하나의 REPOSITORY 내부에서 다수의 DAO를 호출하는 방식으로 REPOSITORY를 구현할 수 있다.
+
+
+
+
 -----------------------------------------------------------------------------------------------------
 
 	
