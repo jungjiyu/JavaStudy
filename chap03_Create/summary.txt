@@ -1,4 +1,6 @@
-https://velog.io/@minju0426/JPARepository%EC%97%90-%EB%8C%80%ED%95%B4-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90%EC%82%AC%EC%9A%A9%EB%B2%95-Method
+오버 헤드 overhead : 부수적인 처리하는데 들어가는 비용
+	: 그러니까 어떤 메서드에서 부수적 처리위해 다른 함수 호출했을때 그 함수가 실행되는데 걸리는시간/사용되는메모리 를 오버헤드라 한다
+
 -----------------------------------------------------------------------------------------------------
 
 CRUD Create생성 Read조회 Update수정 Delete삭제
@@ -159,7 +161,9 @@ ORM Object Relational Mapping >> 객체(class)와 RDBMS의 테이블을 매핑�
 
 
 JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하는 "인터페이스" 
+	: https://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/
 	: 그러니까 자바언어로 DB에 명령 내릴 수 있게 하는 얘다
+		: https://dbjh.tistory.com/77
 	: JDBC 와 JPA >>  JPA는 데이터베이스와 객체를 매핑해주는 API 이며 내부적으로는 데이터베이스와의 통신을 위해 JDBC를 사용한다.
 
 	: persistence 영속성 >> 데이터의 영속성. 즉, 프로그램이 종료되더라도 사라지지 않는 데이터 성질.
@@ -184,12 +188,16 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 
 	Entity 엔티티>> DB 테이블에 대응하는 하나의 클래스
+		: https://data-make.tistory.com/610
 		: 관계
-			테이블 하나 ≒ entity
-			테이블의 하나의 row ≒ entity의 인스턴스
+			테이블 하나 ≒ entity 
+			테이블의 하나의 record(row) ≒ entity의 인스턴스
+			테이블의 record(row)의 집합 ≒ entity의 인스턴스의 집합 ≒ entity   
+				: 인스턴스를 entity 라 할 수 있지만 (객체의 집합 이 entity 이므로 원소가 하나인 집합도 entity 다) , entity 를 인스턴스라고 할 수 있을지는 모르는거다(객체의 집합 !=  객체) 
 			테이블의 하나의 column ≒ entity의 필드
 
-		
+			: https://m.blog.naver.com/kmymk/110146646939
+
 		: @Entity >> 해당 클래스를 엔티티로 선언한다
 			: 그러니까 JPA에 의해 해당 클래스가 RDMS 의 테이블과 매핑되어 DB 구조를 만든다
 			: entity 클래스는 보통 entity 패키지에 따로 저장하고, 딱히 XXXEntity 처럼 이름을 짓진 않는다 (그냥 Person , Member 이런식으로 심플 이름).
@@ -198,6 +206,13 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 				1. 기본생성자가 있어야된다
 					: JPA 도 Reflection API 를 사용하기 때문
 				2. final, enum, interface, inner 클래스에는 사용 불가
+
+			: nullable=true 적용 원하는 필드는 reference type 으로 선언해야된다.
+
+			:entity 클래스 내부의 필드는 (@Column 을 명시하지 않아도) 자동적으로 모두 column 으로 간주되고, @Column 의 디폴트 값이 적용된다.
+				: 예외 ) nullable 속성 >> @Column 의 nullable 속성의 디폴트 값은 true 이지만, JPA 는 똑똑하게도 필드가 primitive 타입이면 null 값을 가지지 못하는 것을 감안하여 false 값을 적용해준다.
+					: 주의 ) @Column 을 명시하는 경우 딱히 primitive type 이런거 인식 안해주고 명시 안된건 걍 default 값 때려버리므로, @Controll 명시할 시 primitive 타입 필드엔 반드시 nullable=false 로 지정해주어야한다.
+				: https://ttl-blog.tistory.com/114
 
 			:  name 속성 >> 엔티티 이름을 지정한다
 					: 그냥 name 속성을 명시하지 않고 사용 가능하다
@@ -216,6 +231,7 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 		: @Column >> 테이블과 필드를 매핑하기 위해 사용. 해당 필드에 대응하는 column을 생성한다
 			: @Entity 내 필드 위에 명시한다
+			: 사실 Entity 내부의 모든 필드는 column 으로 간주되기 떄문에 생략해도 무방하나 디폴트 값이 아닌 다른 값으로 설정 원하면 명시해야된다.
 			: 속성
 				1. name : column 명을 정한다 . 
 					: 디폴트값은 필드명이다.
@@ -225,6 +241,7 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 
 				2. nullable : NULL 제약조건 설정
+					: 주의 >> primitive type 필드의 경우 null 값을 받지 못하므로 nullable=false 로 필수적으로 명시해줘야된다 (안그럼 아무런 데이터 안들어왔을 때 에러난다)
 					(1) true : NULL 도 허용한다<< 디폴트값
 					(2) false : NOT NULL 로 설정한다.
 
@@ -316,27 +333,89 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 					: 종류
 						(1) interface CrudRepository<T, ID> 
-							: 이를 상속받은 인터페이스로 entity 를 관리(CRUD) 할 수 있게한다
-								: 이를 상속받은 인터페이스 내부에 따로 메서드를 정의하지 않아도 아래의 메서드들은 호출이 가능하다
-								<S extends T> S save(S entity);
-								Optional<T> findById(ID id);
-								Iterable<T> findAll();
-								long count();
-								void deleteById(ID id);
+							: Repository 인터페이스의 자식 인터페이스로 entity 를 관리(CRUD) 할 수 있게한다
+							: <T, ID>
+								: T == 관리대상 엔티티 클래스
+								: ID == 해당 엔티티의 대푯값 타입 . 주로 PK의 타입.
 
-		
-							: T == 관리대상 엔티티 클래스
-							: ID == 해당 엔티티의 대푯값 타입 . 주로 PK의 타입.
+							: 정의 부분에 반환 타입으로 되있는 Optional
+								: java.util.Optional
+								: NullPointerException 처리 부담을 줄여주는 Wrapper 클래스. null 값이 할당된 객체를 참조하더라도 에러가 나지 않도록 해주
+								: https://mangkyu.tistory.com/70
+								: https://dev-coco.tistory.com/178
+
+							: 새롭게 정의 가능한 메서드
+								: https://devfunny.tistory.com/426
+								: tip
+									1. 메서드 명에 And , Or, Between ... 등을 명시하여 where ~ and||Or||Between ...  효과를 낼 수 있다
+									2. 
+								(1) Optional findBy컬럼명( 컬럼타입  임의의파라미터명 )
+									: 기본정의된 findById 의 변형 버전으로 특정COLUMN 을 기준으로 찾을 수 있게 해준다.
+									: 컬럼명을 findBy컬럼명1And컬럼명2  와 같이 하면 (컬럼타입1  파라미터명1 ,컬럼타입2 파라미터명2 ) 과 같이 내부에 두개의 파라미터를 정의하여  두 arg 값을 모두 만족하는 결과를 반환 받을 수 있다
+
+							: 기본 정의되있는 메서드 << 대부분의 핵심 메서드가 CrudRepository 에 정의되어있다
+								: https://bibi6666667.tistory.com/283
+								: param 가지는 메서드에 arg로 null 값 들어오면 거의 예외 발생한다. 
+								: return 값이 T (엔티티타입) 인건 테이블 자체(?)를 반환한다는게 아니라 해당 조건을 만족하는 record 의 집합을 반환한다는거다
+									: entity 가 table 자체를 나타내기도 하지만 record 의 집합을 의미하기도 하니까
+
+    								(1) <S extends T> S save(S entity) : 엔티티에 대한 저장
+    								(2) <S extends T> Iterable<S> saveAll(Iterable<S> entities) : 
+								
+
+								: 종류
+									1. read
+    								(1) Optional<T> findById(ID id) :주어진 id값을 가지는 entity"들" 을 Optional 타입으로 랩핑해서 반환
+									: 반환값이 Optional 이기 때문에 검색 결과가 없다면 null 이 아닌 Optional#empty( ) 가 반환된다 
+
+    								(2) boolean existsById(ID id) : 주어진 id값을 가지는 entity 의 존재 여부를 true/false 로 반환
+
+    								(3) Iterable<T> findAll(); : 
+
+    								(6) Iterable<T> findAllById(Iterable<ID> ids);
+
+   								(7) long count( ) : 가용 엔티티의 개수 반환. 페이징 할 때 유용하다. 
+   								(8) void deleteById(ID id) : 주어진 PK 를 가지는 "엔티티"( 즉 테이블 )를 삭제한다
+									: 구현 내용을 보면 findById(ID id) 를 통하여 해당 id 값을 가지는 
+    								(9) void delete(T entity) : 주어진 entity 를 삭제한다. 
+
+    								(10) void deleteAllById(Iterable<? extends ID> ids);
+
+   								 void deleteAll(Iterable<? extends T> entities);
+
+    								void deleteAll();
+
 
 						(2) interface JpaRepository< T, ID > 
-							: CrudRepository 의 자식 인터페이스이다 >> CrudRepository 보다 더 많은 기능을 내포
+							: CrudRepository, ListCrudRepository  의 자식 인터페이스이다 >> CrudRepository 보다 더 많은 기능을 내포
+							: 정의되어있는 메서드
+								: https://velog.io/@stpn94/JPA-Repository-Interface-%EC%83%81%EC%84%B8-1
+								1. CrudRepository 에 정의된 메서드"들" <-- 위의 정리 참고
+								2. ListCrudRepository 에 정의된 메서드"들"
+									: T, ID >>   (인터페이스 extends 할 때 명시한) 엔티티 타입, PK 타입
+
+    									(1) <S extends T> List<S> saveAll(Iterable<S> entities);
+    									(2) List<T> findAll( );
+										: (조건 없이) 테이블 전체값 가져오기
+										: Test에선 쓰이지만 실제서비스에선 성능 때문에( 모든 데이터 다 조회하는데는 시간이 오래 걸리니까 ) 잘 사용하지 않음.
+
+    									(3) List<T> findAllById(Iterable<ID> ids);
+										: arg 로 주어진 Iterable 객체에 대응하는 엔티티를 조회한다.
+
 							: https://velog.io/@minju0426/JPARepository%EC%97%90-%EB%8C%80%ED%95%B4-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90%EC%82%AC%EC%9A%A9%EB%B2%95-Method
+
+					: @NoRepositoryBean >>  이 어노테이션은 인터페이스가 Spring Data JPA에 의해 자동으로 빈으로 등록되는 것을 방지하는 역할을 한다.
+						: Repository 인터페이스에 붙어있는거라 그 아래의 CrudeRepository , JpaRepository 에도 붙어있다 ( ctrl + b 확인 가능)
+						
+					: https://curiousjinan.tistory.com/entry/spring-data-jpa-structure
 					: https://zeroco.tistory.com/44
-					: https://velog.io/@baekgom/JpaRepository-%EC%99%80-Repository
 					
-	: https://data-make.tistory.com/610
-	: https://goddaehee.tistory.com/209
-	: https://dbjh.tistory.com/77
+			3. 생성한 인터페이스 내부에 메서드를 정의하거나 정의하지 않는다
+				: 인터페이스 내부에 아무 메서드도 정의되지 않을 경우 >> extends 된 인터페이스가 제공하는 메서드가 모두 구현되며, 노출된다
+	이거맞는지몰겠음	>>	: 인터페이스 내부에 메서드를 정의할 경우 >> 정의된 메서드만 구현되며, 노출된다.
+				: https://velog.io/@baekgom/JpaRepository-%EC%99%80-Repository
+
+
 
 
 -----------------------------------------------------------------------------------------------------
