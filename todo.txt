@@ -1,4 +1,5 @@
 1. 어노테이션의 작동원리
+2. 제네릭 복습
 2. reflection 이란?
 3. dao 와 mapper
 4. https://happycloud-lee.tistory.com/94
