@@ -1,1 +1,130 @@
-https://github.com/jungjiyu/JavaStudy/blob/KgItBank/Day09/summary.txt
+    : java.util.Optional
+								:  'null일 수도 있는 객체'를 감싸는 일종의 Wrapper 클래스
+									: null 값이 할당된 객체를 참조하더라도 에러가 나지 않도록 해준다 (NPE Null Pointer Exception 방지)
+									: 명시적으로 해당 변수가 null일 수도 있다는 가능성을 표현할 수 있다
+									: null 일 수도 있는 객체를 다룰 수 있는 API 여러 API 제공한다
+									: wrapper class
+										: A type 의 데이터를 B type객체로 포장해주는 클래스
+										: java.lang.XXX										
+										: 산술 연산을 위한 클래스는 아니라 인스턴스에 저장된 값을 변경할 수 없고, 단순 생성 및 참조만 가능
+										: Boxing 과 Unboxing
+											: Boxing >> primive type 데이터를 wrapper 클래스의 인스턴스로 변환하는 과정
+											: Unboxing >> wrapper 클래스의 인스턴스에서 primive type 데이터를 꺼내는 과정
+
+											: AutoBoxing과 AutoUnBoxing
+												: 자동형변환. Wrapper 타입 변수에 primivite 값 할당하면 new 연산자를 쓰지 않아도 해당 값을 기반으로 wrapper 클래스 인스턴스가 생성되고, primitive 타입 변수에 wrapper 클래스 객체를 할당하면 자동ㅇ로  값이 꺼내진다.
+
+
+								: Optional 사용 지향과 지양 >> 그냥 직접 Optional 로 뭔갈 선언해서 쓰진 말고, 제공되는 API 를 이렇게 사용 가능하구나 정도를 알아두자.
+									: 오버헤드(공간적, 시간적 비용 ) 증가 를 감안해도 사용했을 때 확실히 효율 좋으면 사용
+										: 단순 값을 얻으려는 목적으로는 사용 x
+										: 반환 타입으로만 사용 ( 파라미터 타입으로는 Optional 사용x ) 
+									: https://mangkyu.tistory.com/203
+
+
+		
+								: Optional 변수 선언 >> Optional<T> 변수명
+									: T == 담을 객체 타입
+									: 제네릭을 제공하기 때문에, 변수를 선언할 때 명기한 타입 파라미터에 따라서 감쌀 수 있는 객체의 타입이 결정된다
+									: 보통 변수명은 XXXXOptional 로 하는 편
+									ex)  Optional<Member> optMember; // Member 타입의 객체를 가질 수 있는 Optional 타입의 변수
+
+
+								: JPA 제공 메서드 중 반환 타입이 Optional<T> 인 메서드( findByID(Id id ) , ..  )들의 반환값을 단순 T 타입 변수로 받아도 무방하다. but Optional 클래스의 null 관련 메서드를 활용하고 싶다면 그대로 Optional<T> 타입 변수로 받아야된다
+									: autoUnbixing 되어서 그냥 T 타입으로 받아도 문젠 없는것.
+									: ex ) 
+										Member member = memberRepository.findById(id);  // 그냥 T 타입으로 받아도 되는데, 더이상 Optional 메서든 못쓴다
+										Optional<Member> memberOptional = memberRepository.findById(id); // Optional 메서드를 사용할 수 있다
+
+										if (memberOptional.isPresent()) {
+  										 ... 
+										}
+
+									: https://ykh6242.tistory.com/entry/Java8-Optional-%EC%9D%98-ifPresent-%ED%99%9C%EC%9A%A9#google_vignette
+
+
+									
+
+								: 제공 메서드 
+									1. Optional 객체 생성 : null 을 저장할거냐 안저장할거냐 따라 갈림
+										: 죄다  stataic 임
+										(1) Optional.empty( ) : null 을 담고 있는 "Optional" 객체 생성
+											: 주의 >> Optional 변수에 Null 할당 하는거 != Optional.empty( ) 
+												: Optional 변수 자체에 null 을 할당하는건 Optional 객체 자체가 참조하는 대상이 없는거고, Optional.empty( ) 는 null 값을 가지는 객체를 참조하고 있는거.
+
+											: null 값 가지는(비어있는) Optional 객체는 Optional 클래스 내부서 싱글턴으로 구현되어 메모리 낭ㅂㅣ를 방지
+											public final class Optional<T> {
+
+   											 private static final Optional<?> EMPTY =  final Optional<?> EMPTY = new Optional<>(null);
+
+     											 private Optional(T value) { this.value = value; }
+
+        										public static<T> Optional<T> empty() {
+       											      Optional<T> t = (Optional<T>) EMPTY;
+           											return t;
+       											       }
+
+
+   											 ...
+
+											}
+
+										(2) Optional.of( T t ) : null이 "확실히 아닌" 객체를 담고 있는 Optional 객체 생성 
+											: null이 넘어올 경우, NPE를 던지기 때문에 주의해서 사용
+
+									*******(3) Optional.ofNullable(T t) : null 일 수도 아닐 수도 있는 객체를 담고 있는 Optional 객체 생성
+											:  null이 넘어오면 NPE를 던지지 않고 Optional.empty()와 동일하게 빈 객체 얻어옴.  해당 객체가 null인지 아닌지 모르면 이 메소드를 사용해야됨
+
+									2. Optional 객체 값의 null 여부 확인 	
+										: https://jong-bae.tistory.com/69
+										(1) boolean isPresent( ) : 대상 optional 객체가 null 값 가지면 false , (객체)값가지면 true 를 반환한다
+											: 암ㅁ기 tip >> 현역이냐?
+
+
+										(2)  void ifPresent(Consumer<? super T> action) : 대상 optional 객체가 null 값을 wrap 하고 있지 않으면 arg 로 주어진 함수를 실행시켜준다. (null 값 일 경우 암것도 안한다)
+ 											:  isPresent()-get() 조합을 대체하는 좋은 방법
+											: arg 인터페이스가 Consumer 이기 때문에 람다식에 param 이 하나 있어야되고, 이 param 의 arg 로 자동적으로 대상 optional 객체를 대상으로 .get( ) 가 실행되어 값을 활용 가능
+												: ex ) 
+   												    	Optional<Integer> intOptional1 = Optional.ofNullable(100);
+     												 	intOptional1.ifPresent(x->System.out.println("optionalVal: "+x)); // optionalVal: 100 이 출력된다.
+
+
+
+									3. Optional 객체 접근 >>Optional이 담고 있는 객체가 존재할 경우 모두 동일하게 그 객체를 반환하지만, Optional이 비어있는 경우(null) 다르게 작동
+										: 죄다  인스턴스 대상으로 쓰이는 매서드
+										(1) get( )  : 비어있는 Optional 객체를 대상으로  접근시 예외 발생시킴
+										(2) orElse( T other )   : 비어있는 Optional 객체를 대상으로 접근시 arg 로 줬던 "객체"를 그대로 반환
+											: 주의 >> 함수를 arg 에 대입하는 경우 해당 함수는 null 이건 말건 항상 불린다
+												: 그러니까 
+												public User findByUsername(String name) {	
+												return userRepository.findByName(name).orElse(createUserWithName(name));   // userRepository 가 null 이든 아니든, 일단 createUserwithName ( name ) 은 무조건 호출되어 실행된다.
+												}
+
+												private User createUserWithName(String name) {
+													User newUser = new User();
+													newUser.setName(name)
+													return userRepository.save(user);
+												}
+
+												는 결국
+
+												public User findByUsername(String name) {
+													User newUser = createUserWithName(name); // ㅠㅠ
+													return userRepository.findByName(name).orElse(newUser);
+												}
+
+												private User createUserWithName(String name) {
+													User newUser = new User();
+													newUser.setName(name)
+													return userRepository.save(user);
+												}
+
+												과 같다. 위의 경우 만약 해당 column 이 unique 였다면 중복된 값이 save 되는 꼴이라 ㅈ됬을거다
+
+											: 객체 자체가 아닌 함수를 arg 로 주는 경우엔 orElse 보다는 orElseGet 를 써라 >> 	 https://cfdf.tistory.com/34	
+
+	
+										(3) orElseGet(Supplier<? extends T> supplier) :  비어있는 Optional 객체를 대상으로 접근시 arg 로 줬던 함수의 결과값을 반환
+											: null 일때만 arg 의 함수가 실행된다.
+
+										(4) orElseThrow( Supplier<? extends X> exceptionSupplier )   : 비어있는 Optional 객체를 대상으로 접근시 arg 로 줬던 "함수" (함수형 인자) 로 생성한 "예외" 를 throw 함.
