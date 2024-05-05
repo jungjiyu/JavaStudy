@@ -338,20 +338,95 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 								: T == 관리대상 엔티티 클래스
 								: ID == 해당 엔티티의 대푯값 타입 . 주로 PK의 타입.
 
+							: 중간 중간 나오는 Supplier<? extends T> Consumer<? super T> : 함수형 인터페이스
 							: 정의 부분에 반환 타입으로 되있는 Optional
 								: java.util.Optional
-								: NullPointerException 처리 부담을 줄여주는 Wrapper 클래스. null 값이 할당된 객체를 참조하더라도 에러가 나지 않도록 해주
+								:  'null일 수도 있는 객체'를 감싸는 일종의 Wrapper 클래스
+									: null 값이 할당된 객체를 참조하더라도 에러가 나지 않도록 해준다 (NPE Null Pointer Exception 방지)
+									: 명시적으로 해당 변수가 null일 수도 있다는 가능성을 표현할 수 있다
+									: null 일 수도 있는 객체를 다룰 수 있는 API 여러 API 제공한다
+									: wrapper class
+										: A type 의 데이터를 B type객체로 포장해주는 클래스
+										: java.lang.XXX										
+										: 산술 연산을 위한 클래스는 아니라 인스턴스에 저장된 값을 변경할 수 없고, 단순 생성 및 참조만 가능
+										: Boxing 과 Unboxing
+											: Boxing >> primive type 데이터를 wrapper 클래스의 인스턴스로 변환하는 과정
+											: Unboxing >> wrapper 클래스의 인스턴스에서 primive type 데이터를 꺼내는 과정
+
+											: AutoBoxing과 AutoUnBoxing
+												: 자동형변환. Wrapper 타입 변수에 primivite 값 할당하면 new 연산자를 쓰지 않아도 해당 값을 기반으로 wrapper 클래스 인스턴스가 생성되고, primitive 타입 변수에 wrapper 클래스 객체를 할당하면 자동ㅇ로  값이 꺼내진다.
+
+								: Optional 변수 선언 >> Optional<T> 변수명
+									: T == 담을 객체 타입
+									: 제네릭을 제공하기 때문에, 변수를 선언할 때 명기한 타입 파라미터에 따라서 감쌀 수 있는 객체의 타입이 결정된다
+									: 보통 변수명은 XXXXOptional 로 하는 편
+									ex)  Optional<Member> optMember; // Member 타입의 객체를 가질 수 있는 Optional 타입의 변수
+
+								: JPA 제공 메서드 중 반환 타입이 Optional<T> 인 메서드( findByID(Id id ) , ..  )들의 반환값을 단순 T 타입 변수로 받아도 무방하다. but Optional 클래스의 null 관련 메서드를 활용하고 싶다면 그대로 Optional<T> 타입 변수로 받아야된다
+									: autoUnbixing 되어서 그냥 T 타입으로 받아도 문젠 없는것.
+									: ex ) 
+										Member member = memberRepository.findById(id);  // 그냥 T 타입으로 받아도 되는데, 더이상 Optional 메서든 못쓴다
+										Optional<Member> memberOptional = memberRepository.findById(id); // Optional 메서드를 사용할 수 있다
+
+										if (memberOptional.isPresent()) {
+  										 ... 
+										}
+
+									: https://ykh6242.tistory.com/entry/Java8-Optional-%EC%9D%98-ifPresent-%ED%99%9C%EC%9A%A9#google_vignette
+
+
+									
+
+								: 제공 메서드 
+									1. Optional 객체 생성 : null 을 저장할거냐 안저장할거냐 따라 갈림
+										: 죄다  stataic 임
+										(1) Optional.empty( ) : null 을 담고 있는 "Optional" 객체 생성
+											: null 값 가지는(비어있는) Optional 객체는 Optional 클래스 내부서 싱글턴으로 구현되어 메모리 낭ㅂㅣ를 방지
+											public final class Optional<T> {
+
+   											 private static final Optional<?> EMPTY =  final Optional<?> EMPTY = new Optional<>(null);
+
+     											 private Optional(T value) { this.value = value; }
+
+        										public static<T> Optional<T> empty() {
+       											      Optional<T> t = (Optional<T>) EMPTY;
+           											return t;
+       											       }
+
+
+   											 ...
+
+											}
+
+										(2) Optional.of( T t ) : null이 "확실히 아닌" 객체를 담고 있는 Optional 객체 생성 
+											: null이 넘어올 경우, NPE를 던지기 때문에 주의해서 사용
+
+									*******(3) Optional.ofNullable(T t) : null 일 수도 아닐 수도 있는 객체를 담고 있는 Optional 객체 생성
+											:  null이 넘어오면 NPE를 던지지 않고 Optional.empty()와 동일하게 빈 객체 얻어옴.  해당 객체가 null인지 아닌지 모르면 이 메소드를 사용해야됨
+
+									2. Optional 객체 값의 null 여부 확인 
+										(1) boolean isPresent() : 해당 optional 객체가 null 값 가지면 false , 다른 객체값가지면 true 
+											: 암ㅁ기 tip >> 현역이냐?
+										(2)
+									3. Optional 객체 접근 >>Optional이 담고 있는 객체가 존재할 경우 모두 동일하게 그 객체를 반환하지만, Optional이 비어있는 경우(null) 다르게 작동
+										: 죄다  인스턴스 대상으로 쓰이는 매서드
+										(1) get( )  : 비어있는 Optional 객체를 대상으로  접근시 예외 발생시킴
+										(2) orElse( T other )   : 비어있는 Optional 객체를 대상으로 접근시 arg 로 줬던 "객체"를 (그대로) 반환
+										(2) orElseThrow( Supplier<? extends X> exceptionSupplier )   : 비어있는 Optional 객체를 대상으로 접근시 arg 로 줬던 "함수" (함수형 인자) 로 생성한 "예외" 를 throw 함.
+
 								: https://mangkyu.tistory.com/70
+								: https://www.daleseo.com/java8-optional-after/
 								: https://dev-coco.tistory.com/178
 
 							: 새롭게 정의 가능한 메서드
+								: https://recordsoflife.tistory.com/1228
 								: https://devfunny.tistory.com/426
-								: tip
-									1. 메서드 명에 And , Or, Between ... 등을 명시하여 where ~ and||Or||Between ...  효과를 낼 수 있다
-									2. 
-								(1) Optional findBy컬럼명( 컬럼타입  임의의파라미터명 )
-									: 기본정의된 findById 의 변형 버전으로 특정COLUMN 을 기준으로 찾을 수 있게 해준다.
-									: 컬럼명을 findBy컬럼명1And컬럼명2  와 같이 하면 (컬럼타입1  파라미터명1 ,컬럼타입2 파라미터명2 ) 과 같이 내부에 두개의 파라미터를 정의하여  두 arg 값을 모두 만족하는 결과를 반환 받을 수 있다
+								: 규칙
+									1. XXXXBy@@@( A @@ ) 꼴의 메서드의 경우 @@부분 즉 column 명을 entity 의 속성명으로 수정하여 정의 가능하다 ( 정의만 하면 알아서 구현해준다 )
+									2. 메서드 명의 컬럼명 부분에 And , Or, Between ... 등을 명시하여 where ~ and||Or||Between ...  효과를 낼 수 있다
+								: ex)  Optional  findBy컬럼명1And컬럼명2 (컬럼타입1  파라미터명1 ,컬럼타입2 파라미터명2 )
+								: ex) Optional deleteByName(String name);
+								
 
 							: 기본 정의되있는 메서드 << 대부분의 핵심 메서드가 CrudRepository 에 정의되어있다
 								: https://bibi6666667.tistory.com/283
@@ -359,31 +434,41 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 								: return 값이 T (엔티티타입) 인건 테이블 자체(?)를 반환한다는게 아니라 해당 조건을 만족하는 record 의 집합을 반환한다는거다
 									: entity 가 table 자체를 나타내기도 하지만 record 의 집합을 의미하기도 하니까
 
-    								(1) <S extends T> S save(S entity) : 엔티티에 대한 저장
-    								(2) <S extends T> Iterable<S> saveAll(Iterable<S> entities) : 
+
 								
 
-								: 종류
-									1. read
-    								(1) Optional<T> findById(ID id) :주어진 id값을 가지는 entity"들" 을 Optional 타입으로 랩핑해서 반환
-									: 반환값이 Optional 이기 때문에 검색 결과가 없다면 null 이 아닌 Optional#empty( ) 가 반환된다 
+								: 종류 << update 카테고리의 메서드는 따로 없다!!
+									1. save
+    										(1) <S extends T> S save(S entity) : 엔티티에 대한 저장
+    										(2) <S extends T> Iterable<S> saveAll(Iterable<S> entities) : 
 
-    								(2) boolean existsById(ID id) : 주어진 id값을 가지는 entity 의 존재 여부를 true/false 로 반환
+									2 read
+    										(1) Optional<T> findById(ID id) :주어진 id값을 가지는 entity"들" 을 Optional 타입으로 랩핑해서 반환
+											: 반환값이 Optional 이기 때문에 검색 결과가 없다면 null 이 아닌 Optional#empty( ) 가 반환된다 
 
-    								(3) Iterable<T> findAll(); : 
+    										(2) boolean existsById(ID id) : 주어진 id값을 가지는 entity 의 존재 여부를 true/false 로 반환
 
-    								(6) Iterable<T> findAllById(Iterable<ID> ids);
+    										(3) Iterable<T> findAll(); : 
+		
+    										(4) Iterable<T> findAllById(Iterable<ID> ids);
+		
+   										(5) long count( ) : 가용 엔티티의 개수 반환. 페이징 할 때 유용하다. 
 
-   								(7) long count( ) : 가용 엔티티의 개수 반환. 페이징 할 때 유용하다. 
-   								(8) void deleteById(ID id) : 주어진 PK 를 가지는 "엔티티"( 즉 테이블 )를 삭제한다
-									: 구현 내용을 보면 findById(ID id) 를 통하여 해당 id 값을 가지는 
-    								(9) void delete(T entity) : 주어진 entity 를 삭제한다. 
+									3.delete
+   										(1) void deleteById(ID id) : 주어진 PK 를 가지는 엔티티( 레코드 집합 )를 삭제한다	
+											: Id == null 이어도 오류메세지만 출력하게 예외처리되어있다
+											: 구현 내용을 보면 findById(ID id) 를 통하여 해당 id 값을 가지는 entity 를 get 한 후 delete( T entity) 를 자체적으로 호출함을 알 수 있다.
 
-    								(10) void deleteAllById(Iterable<? extends ID> ids);
+    										(2) void delete(T entity) : 주어진 entity 를 삭제한다. 
+											: 보통 delete 할 때 id 를 기준으로 하기 때문에 대부분 deleteById(Id id) 를 사용하는 편이지만 Id 값이 null 일때의 예외처리를 customizing 하고 싶은 경우 사용한다.
+											: https://hwanchang.tistory.com/7
 
-   								 void deleteAll(Iterable<? extends T> entities);
+    										(3) void deleteAllById(Iterable<? extends ID> ids);
+											: 
 
-    								void deleteAll();
+   										(4) void deleteAll(Iterable<? extends T> entities);
+
+    										(5) void deleteAll();
 
 
 						(2) interface JpaRepository< T, ID > 
