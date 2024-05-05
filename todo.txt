@@ -3,6 +3,6 @@
 2. reflection 이란?
 3. dao 와 mapper
 4. https://happycloud-lee.tistory.com/94
-5. 프록시란? >> https://giron.tistory.com/129
+5. 프록시란? >> https://giron.tistory.com/129 , https://bombo96.tistory.com/47
 6. 람다식의 '::'
 7. 함수형 프로그래밍적 표현 연습
