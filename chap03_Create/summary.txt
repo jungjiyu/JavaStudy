@@ -1,4 +1,3 @@
-https://dololak.tistory.com/479
 
 https://www.latera.kr/blog/2019-07-02-effective-optional/
 
@@ -246,7 +245,7 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 							: 백업 != 스냅샷
 								: 백업은 원본 데이터를 그대로 복사해 storage 상에 저장해두는거고, 스냅샷은 메타데이터를 복사하는거고 별도이 변경이 있기 전까진 storage 상에 저장해두진 않는다
 
-				2. 쓰기 지연 >> 쿼리를 바로 db 로 전송하는게 아니라(수행되는게 아니라) 쓰기지연 저장소에 저장해놨다가 flush( ) 시점에 전송한다
+				2. 쓰기 지연 (트랜젝션 지원)>> 쿼리를 바로 db 로 전송하는게 아니라(수행되는게 아니라) 쓰기지연 저장소에 저장해놨다가 flush( ) 시점에 전송한다
 					: 잦은 I/O 발생을 방지한다
 					: 캐시 데이터가 저장되는 곳(db서읽어왔던데이터저장) != 쓰기지연저장소(전송될쿼리문저장)
 
@@ -310,17 +309,26 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 		: @SequenceGenerator >> 해당 엔티티 전용 시퀀스 객체 생성
 			: @Entity 밑에 명시한다
+			: 완전 정확하진 않은데( 지금 실습 중인 H2 DB 가 서버 재시작 하면 걍 날아가버려서 : (  ) 이 어노테이션이 항상 시퀀스 객체를 새로 생성해내는 것은 아니다. @Entity 도 db 상에 해당 name 의 테이블이 존재하지 않을 떄만 db에 새로 table 을 생성하는거지, 이미 있는 경우 그냥 있는 것 쓰는 것처럼 DB 자체에 해당 이름(sequnceName 속성값)과 일치하는 시퀀스 객체가 있으면 (또 새로 생성하는게 아니라) 그 시퀀스 객체를 사용하는거다.
+			: 시퀀스 객체 관련 주의
+				: 오라클과 마찬가지로 시퀀스 객체라는 개념이 존재하지만 사용되는 일부 쿼리문은 그 형태가 약간 다르다
+					다음값 조회 >> SELECT NEXT VALUE FOR 시퀀스객체명
+					현재값 조회 >> SELECT CURRENT VALUE FOR 시퀀스객체명
+
+
 			: 속성
 				1. name : 시퀀스 "생성기"의 이름 결정 << 필수
 				2. sequenceName : db에 등록되는 시퀀스 객체명. 
 					: default 값은 "hibernate_sequence"
-				3. initailValue : 시퀀스의 시작 값
+				3. initialValue : 시퀀스의 시작 값
 					: defualt 값은 1
-				4. allocationSize : JPA에서 가상으로 관리할 시퀀스 할당 범위
-					:  DB에 매번 시퀀스를 호출하지 않기 위해서 최적화를 위해 존재하는 속성
-						: 값을 바꾸지 않는다면 최초에 DB에 시퀀스를 호출한 이후 n 까지는 메모리에서 현재 시퀀스 값을 저장한 이후 가상으로 증가시키며 관리하고 n+1이 되는 시점에 DB의 시퀀스를 한번 더 호출한 이후 그 값으로부터 n만큼인 2n까지 가상으로 시퀀스 식별자를 관리
-						: 그러니까 1 이면 매번 insert 할 때마다 db 의 시퀀스가 호출되는거임
-					: default 값은 50
+				4. allocationSize : 묻지도 따지지도 말고 increment 값으로 설정
+					: JPA에서 가상으로 관리할 시퀀스 할당 범위로,  DB에 매번 시퀀스를 호출하지 않기 위해서 최적화를 위해 존재하는 속성(이라고 한다.. )
+					: 해당 시퀀스 객체가 db 상에 존재하지 않아 @SequenceGenerator 에 따라 새로 객체가 생성될 경우 increment by 는 자동적으로 allocationSize 로 해준다.
+						: 하지만 allocationSize != increment 이다,
+							: allocationSize >> 애플리케이션이 체감하는(?) 시퀀스 객체의 증감정도
+							: increment >> db 서 실제로 시퀀스 객체 호출 시 증가되는 정도
+					: default 값은 50 << increment 값이 50 이 아니라면 반드시 명시 필요
 					: https://dololak.tistory.com/479
 					
 
@@ -342,6 +350,8 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 			:  name 속성 >> 엔티티 이름을 지정한다
 					: 그냥 name 속성을 명시하지 않고 사용 가능하다
+
+
 
 
 
@@ -398,9 +408,15 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 				(1) strategy	
 					: 속성명이 strategy 라 할당하는 속성값 따라 @GeneratedValue 를 IDENTITY 전략, SEQUENCE 전략 ,.. 이런식으로 칭한다
 					: 할당 가능한 값
-						: https://lordofkangs.tistory.com/358
+						: https://devcamus.tistory.com/16
 						1. GenerationType.IDENTITY > 기본키 생성을 데이터베이스에 위임
 							: MY_SQL 용
+							: 애플리케이션 상에서 직접 id 를 자동으로 set해주는게 아니라 "entityManager.persist( 엔티티객체)" 로 객체를 영속화 시키는 시점에 "곧바로" insert 쿼리( 아니 생각해보면 id 값 설정하는건 insert 문 쓸 때잖아)를 db 로 전송시키고, db에서 반환받은 식별자 값( MySql 의 경우 식별자 자동생성하면 AUTO_INCREMENT 를 활용하여 생성해낸다)으로 1차 캐시에 엔티티를 등록하여 관리한다.
+								: "곧바로" 쿼리가 전송되기 떄문에 IDENTITY 전략의 경우 지연쓰기 가 불가능하다 단점이 있다. 
+								: 굳이 JPA 가 곧바로 전송 시키는 이유 >> JPA 입장에선 db 의 AUTO_INCREMENT (자동증가정도)를 알 방도가 없다
+ 
+
+							: https://lordofkangs.tistory.com/358
 
 						2. GenerationType.SEQUNCE >> 시퀀스 오브젝트로 기본키 생성하는 전략	
 							 : ORACLE , H2-DB 용
@@ -410,9 +426,12 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 								: DB 에 여러 트랜젝션이 동시 접근 시 "동시성이슈"( 동일한 키가 중복되어 생성되는 것 ) 발생 가능한데, JPA 는 해당 트랜잭션에게 디폴트로 50개의 pk 를 미리 생성함으로써 이를 방지해준다고 한다. 
 						: 
 
-						3. GenerationType.TABLE 
+						3. GenerationType.TABLE >> 성능적 손해가 있어( SEQUENCE 전략 보다 한 번 더 통신해야됨 ) 잘 안쓴다
 							: 모든 DB 용
+							:  키 생성 전용 테이블을 하나 만들어서 데이터베이스 시퀀스를 흉내내는 전략
+
 						4. GenerationType.AUTO : 방언 따라 자동으로 전략값 선택 << default
+							: 근데 비추인 것은 버전 따라 잘못된(?) 선택을 해주기도 한다고 한다.
 
 				(2) generator 
 					: strategy=GenerationType.SEQUENCE 인데 @SequenceGenerator를 별도로 사용하는 경우 명시
