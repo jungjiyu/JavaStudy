@@ -450,6 +450,12 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 				@Temporal(TemporalType.TIMESTAMP)
 				private Date createdDate;
 
+		: @CreationTimestamp : insert 쿼리 발생시 해당 필드에 현재시간값을 디폴트로 할당해준다 
+			: @Temporal 과 함께 쓰인다
+
+		: @UpdateTimeStamp : update 쿼리 발생시 수정이 발생할 때마다 현재 시간값을 할당해준다
+			: @Temporal 과 함께 쓰인다
+	
 		: @Enumerated >> 자바의 enum 타입을 매핑할 때 사용
 			: value 속성 >> 저장할 값 지정. 
 				: 할당 가능한 값
