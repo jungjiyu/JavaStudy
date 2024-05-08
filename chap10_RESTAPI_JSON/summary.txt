@@ -111,83 +111,12 @@ SSR, CSR
 				: 비동기 처리중 젤 먼저 완료된 것을 반환하고, 다음 then( ) , catch( ) 로 간다	
 				: any 와 다르게 성공 실패 여부가 중요하지 않다
 
- 
- 
-
-
-
-
-
-
-
 
 	: https://inpa.tistory.com/entry/JS-%F0%9F%93%9A-%EB%B9%84%EB%8F%99%EA%B8%B0%EC%B2%98%EB%A6%AC-Promise#%EC%BD%9C%EB%B0%B1_%EC%A7%80%EC%98%A5%EC%9D%84_%ED%83%88%EC%B6%9C%ED%95%98%EB%8A%94_%EC%83%88%EB%A1%9C%EC%9A%B4_%EB%AC%B8%EB%B2%95
 
-REST API 
-	: REST 기반 API
-	: 서버의 자원을 클라이언트에 구애받지 않고 사용할 수 있게하는 설계 방식.
-		: 클라이언트는 웹 브라우저만 있는게 아니라 스마트폰 , 스마트워치 ... 등 다양하고, 서버는 이러한 다양한 클라이언트로부터의 요청에 응답해야한다. 
 
-	: HTTP request 대한 response 로 "특정기기에 종속되지 않는 서버의 자원"을 반환한다.
-		: view 가 아닌 data 를 response 하고, 이때 응답되는 데이터가 JSON , XML 이다
-			: (사람과 기계 모두 이해하기 쉬우며 용량이 작아서) 요즘엔 JSON 으로 통일되는 추세
+------------------------------------------------------------------------------------------------------------------
 
-	: 모든 HTTP 메서드를 지원한다.
-		: fetch >> HTTP request 전송 기능을 제공하는 클라이언트 사이드 web API . 즉 , 서버와의 통신을 통해 CRUD 를 구현할 수 있게 하는 함수
-
-			: 브라우저에 내장되어있다.
-			: 사용법 >> const promise = fetch( '경로' , 옵션객체 )
-				: 파라미터 
-					: ' 경로 ' >> HTTP request 를 전달할 URL
-					: 옵션객체 >> HTTP 요청 메서드 , HTTP 요청 헤더, payload 등
-						: 필요 없으면 생략 가능
-				: 반환 >> HTTP 응답을 나타내는 response 객체를 wrapping 한 객체 반환
-					: response 객체 >> HTTP response status/header/body 등을 읽어올 수 있다
-
-		: 기본 형태
-			(1) fetch('URL')
-
-				
-
-
-			: https://velog.io/@dev-redo/REST-API%EC%99%80-Fetch-api
-
-
-		1. Create --> post 
-		2. Read --> get
-			: 형식 
-			: method 속성의 default 값은 get 이므로 get 쓸 떄는 method 속성 생략 가능하다
-				
-				.then(( response ) => response.json)
-				.then(( json ) => console.log(json));
-
-					: fetch('URL')
-						
-					: .then(( response ) => response.json) 
-						: JSON 형태로 클라이언트에게 response 한다
-
-					: .then(( json ) => console.log(json));
-						: 클라이언트에게 반환한 내용을 로그 찍는다.
-
-		3. Update --> put 혹은 patch
-			: put >> 전체 변경
-			: patch >> 부분 변경
-		4. Delete --> delete
-
-
-
-
-	: JSON 기반 REST API 연습 사이트 >> place holder ( https://jsonplaceholder.typicode.com/ )
-		: 가짜 API 이다
-		: Routes
-			모든 게시글 조회>> 	/posts  
-			1번 게시글 조회 >>	/posts/1
-			1번 개시글의 모든 댓글 조회 방법1 >>	/posts/1/comments
-			1번 개시글의 모든 댓글 조회 방법2>>	/comments?postId=1
-			게시글 생성 >>	/posts
-			1번 게시글 수정 >> 	/posts/1
-			1번 게시글 수정 >>	/posts/1
-			1번 게시글 삭제 >>	/posts/1
 
 XML eXtensible Markup Language : 사용자 정의형 HTML
 
@@ -197,6 +126,7 @@ JSON JavaScript Object Notation >> 데이터의 교환/저장을 쉽게 해주�
 		: Notation == 표기법
 		: Javascript에서 객체를 만들 때 사용하는 표현식을 사용한다
 	
+
 	: 문법		
 		: object >> key 와 value 로 구성된 정렬되지 않은 property( 속성 ) 의 집합
 			: 객체 생성 형식 >> javascript 랑 표현 방식이 같다
@@ -254,13 +184,118 @@ JSON JavaScript Object Notation >> 데이터의 교환/저장을 쉽게 해주�
 
 
 		: 제공 메서드 
-			1. JSON.stringfy ( 변수 ) >> 객체를 문자열로 변환해준다
+			1. JSON.stringfy ( 변수 ) >> 직렬화. 객체를 문자열로 변환해준다
 				ex )	 var str = {"test" : "value"}
 					var parsingData = JSON.parse(str); //  '{ "test" : "value" }' 
 
-			2. JSON.parse( 변수 ) >> 문자열을 객체로 변환해준다
+			2. JSON.parse( 변수 ) >> 역직렬화. 문자열을 객체로 변환해준다 
 				ex )	 var str = '{ "test" : "value" }';
 					var parsingData = JSON.parse(str); // {"test" : "value"}
 
 	: https://codingazua.tistory.com/4
 	: https://lxxyeon.tistory.com/153
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
+REST API 
+	: REST 기반 API
+	: 서버의 자원을 클라이언트에 구애받지 않고 사용할 수 있게하는 설계 방식.
+		: 클라이언트는 웹 브라우저만 있는게 아니라 스마트폰 , 스마트워치 ... 등 다양하고, 서버는 이러한 다양한 클라이언트로부터의 요청에 응답해야한다. 
+
+	: HTTP request 대한 response 로 "특정기기에 종속되지 않는 서버의 자원"을 반환한다.
+		: view 가 아닌 data 를 response 하고, 이때 응답되는 데이터가 JSON , XML 이다
+			: (사람과 기계 모두 이해하기 쉬우며 용량이 작아서) 요즘엔 JSON 으로 통일되는 추세
+
+	: 모든 HTTP 메서드를 지원한다.
+		: 기본 형태
+			(1) fetch('요청URL', 옵션객체)
+				: fetch >> HTTP request 전송 기능을 제공하는 클라이언트 사이드 web API . 즉 , 서버와의 통신을 통해 CRUD 를 구현할 수 있게 하는 함수
+				: 브라우저에 내장되어있다.
+				: 파라미터 
+					: ' 경로 ' >> HTTP request 할 URL
+					: 옵션객체 >> HTTP 요청 메서드 , HTTP 요청 헤더, payload 등
+						: 필요 없으면 생략 가능
+				: 반환 >> HTTP 응답을 나타내는 response 객체를 wrapping 한 객체 반환
+					: Response 객체 >> HTTP response status/header/body 등을 읽어올 수 있다	
+					: Response.ok == HTTP 응답 성공 여부를 나타내는 속성
+						true = 200 (응답 성공)
+						false = not (응답 실패)
+				
+					: Response.status = 서버가 어떻게 response 했는지 알려줌
+						상태코드 클래스
+							1XX >> Informational ( 처리중 )
+							2XX	>> SUCCESS (정상처리)
+							3XX >> Redirection (추가 request 필요)
+							4XX >> Clinet Error ( 잘못된 request )
+							5XX >> Server Error (서버측에서 처리하다 에러남)			
+					: Response.prototype
+						: Response 객체의 활용 위한 다양한 메서드 제공
+						: Response.prototype.json 메서드 >> Response 객체에서 HTTP BODY ( response.body) 를 취득해 역직렬화 ( JSON 포맷 문자열을 객체화 )
+
+			(2) .then( (response) => response.json( ) ) 
+				: response는 HTTP 응답을 나타내는 Response 객체.
+				: json( ) 메서드를 활용해 역직렬화 한다
+
+			(3) .then((json) => console.log(json)) 
+				: json 은 역직렬화된 HTTP response Body
+
+			: https://velog.io/@seul06/fetch-API
+			: https://velog.io/@dev-redo/REST-API%EC%99%80-Fetch-api
+
+
+
+		: REST API 의 구성 3요소
+			(1) resource : 자원 --> URL 로 표현
+				: URL 은 되도록 동사형이 아닌 명사형을 쓰는게 좋다
+					ex ) GET /getTodos/1 <-- 좋지 않다
+					      GET /todos/1 <-- 좋다
+
+			(2) verb : 자원에 대한행위 --> HTTP Request method 로 표현
+				:  HTTP Request method 는 밑에 자세히 적음
+
+			(3) representation : 자원에 대한 행위의 구체적 표현.내용  --> payload 로 표현
+
+
+	: HTTP request method >> 클라이언트가 서버에게 request 종류와 목적(리소스에 대한 행위)를 알리는 방법
+		1. Create --> post 
+			: 페이로드 O
+
+		2. Read --> get
+			: 페이로드 X
+			: 형식 
+				fetch('URL')
+				.then(( response ) => response.json)
+				.then(( json ) => console.log(json));
+
+				: method 속성의 default 값은 get 이므로 get 쓸 떄는 method 속성 생략 가능하다
+
+				
+		3. Update --> put 혹은 patch
+			: put >> 기존 데이터를 전체 변경 . 만약 기존 데이터가 없다면 새로 생성
+				: 페이로드 O
+
+			: patch >> 기존데이터를 부분적 변경
+				: patch 라는게 작은 조각 뭐 이런 뜻이다
+				: 페이로드 O
+
+		4. Delete --> delete
+			: 페이로드 X
+
+
+
+
+	:  REST API 실습
+		 >> place holder ( https://jsonplaceholder.typicode.com/ )
+			: 가짜 API. 서버 역할을 해준다
+			: 모든 게시글 조회 ex) 	/posts  
+			: 특정 게시글 조회 ex)	/posts/1
+
+		 >> Talend API Tester 크롬 확장 프로그램 
+			: request 보내게 해준다 
+
+
