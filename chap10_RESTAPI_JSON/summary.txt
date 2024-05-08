@@ -198,6 +198,24 @@ JSON JavaScript Object Notation >> 데이터의 교환/저장을 쉽게 해주�
 
 ------------------------------------------------------------------------------------------------------------------
 
+HTTP 메세지
+	: 요청할 때는 HTTP request Message, 응답할때는 HTTP respnose Message 에 데이터가 실려 전송된다
+	: 구성
+		1. 시작라인 start line >> HTTP request / response 내용을 나타내는 한 줄
+			request ex ) GET /posts/1/comments HTTP/1.1
+				: HTTP/1.1 버전을 사용하여 get 방식으로 "/posts/1/comments" 로 요청했다 
+
+			response ex )   HTTP/1.1 200
+				: HTTP/1.1 버전을 사용하여 response 하였고, 성공적으로 처리 되었다
+
+		2. 헤더 header >> HTTP 전송에 필요한 metadata 가 있다
+			ex) Host: jsonplaceholder.typicode.com
+				:  jsonplaceholder.typicode.com (서버) 로 request 보내겠다.
+
+
+		3. 빈라인 blank line >> 헤더의 끝을 알리는 빈 줄
+		4. 본문 body >> 실제(본질적인) 데이터.
+ 
 
 ------------------------------------------------------------------------------------------------------------------
 
@@ -218,8 +236,26 @@ REST API
 				: 브라우저에 내장되어있다.
 				: 파라미터 
 					: ' 경로 ' >> HTTP request 할 URL
-					: 옵션객체 >> HTTP 요청 메서드 , HTTP 요청 헤더, payload 등
+					: 옵션객체 >> { method , headers, body } 
 						: 필요 없으면 생략 가능
+						: 주의 ) 요청 코드 자체는 json 이 아니라 자바스크립트이므로 자바스크립트의 표현법을 따른다. 따라서 객체의 속성은 문자열( 이건 JSON 의 객체에서 key 표현법 )이 아닌 걍글자(?) 로 표현한다.
+						: method >> HTTP 요청 메서드
+							: 'HTTP 요청 메서드' 를 할당
+							ex) method='post'
+
+						: headers >> HTTP 헤더 
+							: "Content-Type": "application/json" 
+								:JSON 형식으로 데이터를 보내달란 뜻
+
+						: body >> payload 작성
+							:  아래에서 "data" 가 실질적인 데이터 즉 payload
+ 							{ "status" : "OK"
+  							"from": "localhost",
+  							"to": "https://hanamon.kr/users/1",
+  							"method": "GET",
+ 							 "data":{ "username" : "하나몬" }
+							}
+
 				: 반환 >> HTTP 응답을 나타내는 response 객체를 wrapping 한 객체 반환
 					: Response 객체 >> HTTP response status/header/body 등을 읽어올 수 있다	
 					: Response.ok == HTTP 응답 성공 여부를 나타내는 속성
@@ -262,10 +298,9 @@ REST API
 
 
 	: HTTP request method >> 클라이언트가 서버에게 request 종류와 목적(리소스에 대한 행위)를 알리는 방법
-		1. Create --> post 
-			: 페이로드 O
 
-		2. Read --> get
+
+		1. Read --> get
 			: 페이로드 X
 			: 형식 
 				fetch('URL')
@@ -274,7 +309,27 @@ REST API
 
 				: method 속성의 default 값은 get 이므로 get 쓸 떄는 method 속성 생략 가능하다
 
-				
+		
+
+		2. Create --> post 
+			: 페이로드 O
+			: 형식
+				fetch("https://jsonplaceholder.typicode.com/posts", {
+				method: "POST",
+  				headers: {
+ 				   "Content-Type": "application/json",
+ 				 },
+  				body: JSON.stringify({
+  				  title: "Test",
+  				  body: "I am testing!",
+  				  userId: 1,
+  				}),
+				})
+ 				 .then((response) => response.json())
+ 				 .then((data) => console.log(data));
+
+				: 
+		
 		3. Update --> put 혹은 patch
 			: put >> 기존 데이터를 전체 변경 . 만약 기존 데이터가 없다면 새로 생성
 				: 페이로드 O
@@ -297,5 +352,6 @@ REST API
 
 		 >> Talend API Tester 크롬 확장 프로그램 
 			: request 보내게 해준다 
+			: 밑에 HTTP 탭을 택하면 HTTP request/response message 의 내용 볼 수 있다
 
 
