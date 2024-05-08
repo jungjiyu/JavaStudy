@@ -154,6 +154,8 @@ MVC 패턴
 													id 가 200 인 사용자 >> localhost:8080/member/200
 													id 가 10 인 사용자 >> localhost:8080/member/10 
 
+											: 변수는 해당 애플리케이션에 실제로 존재하는 필드를 쓰는게 아니라, 즉석에서(?) 만들어내는 거다.@PathVariable
+
 										: 정규식 적용 가능
 											1. 중간에 삽입되는 변수에 정규식 적용 >> { 변수명:쌩정규식패턴 }
 											2. 경로 자체에 정규식 적용 >> 경로 표현 중간에 * , ** , ? 그 자체를 삽입
@@ -225,6 +227,16 @@ MVC 패턴
 
 
 							: 파라미터를 대상으로 하는 유명한 어노테이션 
+								@PathVariable 
+									: 경로변수의 값을 해당 파라미터에 매핑준다
+									: 속성 >> name .
+										: @PathVariable(name ="변수명") 뿐 아니라 @PathVariable( "변수명") 으로도 사용 가능하다
+										: 해당 파라미터명이 변수명과 같지 않아도 되지만, @PathVariable 에 명시되는 "변수명" 은 반드시 URL 의 "{ 변수명} " 과 일치해야된다
+											ex) @GetMapping("/member/{id}/{name}")	
+												public String findByNameAndId(
+													@PathVariable("id") String idid, @PathVariable("name") String namename)
+												{  return "ID: " + idid + ", name: " + namename;    }
+
 								@Qualifier
 									: 해당 메서드에 @Autowired 적용했는데 (해당 타입의 빈이 여러개라 )식별자 구분이 필요한 경우 써준다
 									: 속성 >> name .
