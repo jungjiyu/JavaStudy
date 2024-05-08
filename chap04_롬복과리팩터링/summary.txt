@@ -1,1 +1,65 @@
+리팩터링 refactoring >> 코드의 기능 변화 없이 구조||성능을 개선하는 작업
+
+로깅 logging >>서버의 수행 내역을 블랙박스처럼 기록으로 남기는 것.
+	: println 으로 하는건 사실 노답인거다
+		: println 은 바로 확인하긴 좋지만 , 나중에 다시 찾아볼 수 없다.
+
+--------------------------------------------------------------------------------------------------------------------
+
+롬복 lombok
+	: 필수적인 코드를 간소화해주는 라이브러리
+		: getter( ), setter( ) , constructor( ) , toString( ) 과 같은 필수 메서드를 간략화해 쓸 수 있게 함
+
+	: 롬복 설치 >>  file-setting-plugin에서 설치
+		: build.gradle 의 dependencies 에 다음을 추가하여 롬복을 추가할 수도 있는데 제대로 설치 안되는 경우가 있으므로 걍 file-setting-plugin에서 설치해라
+			compileOnly 'org.projectlombok:lombok'
+			annotationProcessor 'org.projectlombok:lombok'
+
+	: 제공 기능
+
+		(1) 리팩터링 : 
+			1. 생성자 관련
+				:  클래스 위에 명시한다
+
+				@NoArgsConstructor : 해당 클래스의 디폴트 생성자를 리펙터링한다.
+	
+				@AllArgsConstructor : 해당 클래스의 모든 필드를 arg 로 받는 생성자를 리펙터링한다.
+					 
+
+			2. getter/setter 관련
+				: 클래스 레벨에 명시하면 해당 클래스의 모든 필드에 대하여, 필드 레벨에 명시하면 해당 필드에 대해서만 만들어준다  
+				@Getter >> getter 생성
+				@Setter >> setter 생성
+
+			3. toString 
+				@ToString : 해당 클래스의 모든 필드 정보를 문자열로 반환하는 public String toString( ) 을 리펙터링한다
+					: "해당클래스명( 필드1=값1 , 필드2=값2 ... )"  의 꼴로 출력된다
+					:  exclude 속성 >> 특정 필드를 toString 의 결과에서 제외시킬수 있다
+						ex) @ToString(exclude="password") // password 를 제외한 필드 정보 출력 
+
+			4. 종합 >> @Data
+				:  @Getter, @Setter, @RequiredArgsConstructor, @ToString, @EqualsAndHashCode을 한꺼번에 설정해주는 매우 유용한 어노테이션
+				: 따로 세부설정 속성 없으므로 세부 설정이 필요할 경우 사용을 지양하고 일일이 써라. 
+
+		(2) 로깅 >>@Slf4j : Simple Logging Facade For Java 
+			: 로깅찍을 수 있는 기능 제공하는 어노테이션
+			:  클래스 위에 명시한다
+			: Facade 퍼사드 == 외관, 건물의 정면.
+				: 퍼사드 패턴 Facade Pattern >>  (여러 서브 클래스의 사용, 라이브러리 사용과 같은) 복잡한 코드에 대한 간략화된 인터페이스를 제공하는것.
+				: https://velog.io/@bagt/Design-Pattern-Facade-Pattern-%ED%8D%BC%EC%82%AC%EB%93%9C-%ED%8C%A8%ED%84%B4
+
+			: log 객체
+				: @Slf4j static final 로 선언되어있고, 바로 사용할 수 있다
+				: 제공 메서드 >> 로그를 찍는 기능 
+					: https://programmer93.tistory.com/64
+					1. trace( "메시지") : 젤 디테일한 로그. 
+					2. warn( "메시지") :: 경고 용
+				******3. info( "메시지") : 젤 자주 씀. 정보성 로그.
+					4. debug( "메시지") : 디버깅용
+					5. error( "메시지") : 에러 용
+
+				: log 객체에 빨간 줄 찍히는 에러 >> 롬복이 제대로 설치 안되서 그렇다. build.gradle 에 직접 적어서 다운 받지 않고 setting 의 plugin 탭에서 확실히 다운받으면 된다.
+
+
+
 
