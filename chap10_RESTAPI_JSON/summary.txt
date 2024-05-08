@@ -5,6 +5,124 @@
 	: transfer == 전송
 
 
+
+SSR, CSR
+	SSR Server Side Rendering >> 서버에서 페이지를 모두 구성하여 사용자에게 response 하는 방식
+		: 벡엔드 분야에서 사용
+		: 과정
+			1. 서버가 이미 렌더된 인덱스 파일을 response 하고, 클라이언트가 이를 다운 받음
+				: 볼 수는 있지만 Viewable 상호 작용 Interactable 은 아직 불가
+			2 클라이언트가 JS 를 다운 받음
+				: 이제 상호작용 가능
+
+
+	CSR Client SIde Rendering >> 서버가 아닌 클라이언트 사이드에서 웹 페이지를 렌더링하는 기술
+		: 프론트 분야에서 사용
+		: 과정
+			1. 서버가 인덱스 파일을 response 하고, 클라이언트가 다운 받음
+				: 여기엔 내용이 없어 아무것도 보지 못한다
+				
+			2. 받아온 자바 스크립트 링크로 자바스크립트를 서버에 요청하여 클라이언트 로직과 렌더링 코드를 받아온다
+			3. 자바스크립트로 결과를 렌더링하여 Viewable and Interactable 해진다
+
+
+
+
+자바스크립트 Promise 개념
+	: 비동기 처리 >> 현재 실행중인 작업과 별도로( 병렬적으로 ) 다른 작업을 수행하는 것,
+	: 콜백 함수 >> 비동기 작업이 완료되면 호출되는 함수. 비동기 함수의 매개변수로 함수 객체를 넘기는 기법. 
+		: 중첩되면 개복잡 해진다. 콜백 지옥.
+
+		function increaseAndPrint(n, callback) {
+		  setTimeout(() => {
+ 		   const increased = n + 1;
+  		  console.log(increased);
+  		  if (callback) {
+  		    callback(increased); // 콜백함수 호출
+  		  }
+ 		 }, 1000);
+		}
+
+		increaseAndPrint(0, n => {
+		  increaseAndPrint(n, n => {
+  		  increaseAndPrint(n, n => {
+  		    increaseAndPrint(n, n => {
+    		    increaseAndPrint(n, n => {
+   		       console.log('끝!');
+  		      });
+ 		     });
+ 		   });
+		  });
+		});
+	
+	: Promise 객체 >> 비동기 작업의 최종완료||실패 결과 를 나타내는 객체
+		: 비동기 작업의 결과를 반드시 반환하겠단 의미서 Promise 라 이름 지어졌다
+		: 콜백 지옥을 벗어나게 해준다
+		: 비동기 작업 갯수가 많아져도 코드가 깊어지지 않는다
+		: Promise 객체 생성 방법 
+			const myPromise = new Promise((resolve, reject) => {
+				const data = fetch('요청할URL');
+
+   				 if(data) resolve(data); // 요청 성공하여 데이터가 있다면
+ 				 else reject("Error");
+			})
+
+				: arg 로 들어가는 콜백함수의 0번째 인수는 성공(resolve) 를 나타내는 객체, 1번째 인수는 실패(reject) 를 알려주는 객체.
+					: Promise 생성자 안에 들어가는 콜백함수를 executor 라고 부른다
+				: fetch 의 결과로 데이터가 있다면 if 문이 실행되어 resolve 함수가, 그렇지 않다면 reject 함수가 실행된다. 이때 resolve 함수의 경우 arg 로 data, 즉 fetch( ) 의 결과를 넣어준다
+
+		
+		: Promise 객체 처리 방법 
+			: 생성된 Promise 객체를 이용하여 비동기 작업 완료 이후에 다음 작업을 연결시켜, 체인처럼 , 진행할 수 있다
+				: 줄줄이 이어 쓰는걸 체이닝이라고 한다
+			: 프로미스 핸들러  << promise 객체 활용하는 메서드들 
+				then( (value) => { 실행내용 .. } )  --> 비동기작업성공했을 경우 실행되고, 새로운 Promise 객체를 반환한다
+					: resolve 에서 fetch( ) 의 결괏값을 arg로 주기 떄문에 then 내부의 함수 객체에서 해당 결괏값을 활용 가능하다 ( then 내부서 받은 파라미터 변수명으로 )
+				catch( ( error ) => { 실행내용 .. } ) --> 비동기 작업 실패했을경우 실행되고, 새로운 Promise 객체를 반환한다
+
+				
+				fianlly( ( ) => { 실행내용 }  ) --> 무조건 실행시키고, 새로운 Promise 객체를 반환한다.
+
+		: promise 객체 state  ) Pending - Fulfilled - Ejected 
+			Pending >> 대기 상태. 처리가 완료되지 않은, 진행중인 상태
+			Fullfilled >> 성공적으로 처리가 완료된 상태
+			Ejected >> 처리가 실패적으로 끝난 상태
+
+		: promise 객체는 보통 코드 자체에서 직접 생성 안하고, 함수를 만들고 반환하게 하여 사용하는 편이다
+			: 결국 " 함수명( ).then( 어쩌구 ).then( 어쩌구 ) ... " 이런식으로 쓰게 되는거다
+			: 프로미스 객체를 생성하여 반환하는 이러한 함수를 "프로미스 팩토리 함수" 라고 부른다
+			: 대표적으로 fetch( ) 함수가 "프로미스 팩토리 함수" 이다
+				fetch( "요청경로" ) // response 객체 반환 
+ 				.then((response) => response.json()) // response 객체 받고 JSON 데이터 반환
+  				.then((data) => console.log(data)); // 받은 JSON 데이터를 출력
+
+		: 여러개의 비동기 처리를 한번에 하는 법 >>
+			: 공통적으로 fetch( ) 를 요소로 하는 배열을 Promies.all(  )메서드의 arg 로 한다
+
+			1.  Promise.all( [ fetch( "경로1 " ) ,fetch( "경로2 " ) , ... ]  ) 
+				: all( ) 내부의 "모든" 비동기 처리가 완료되어야 이 뒤의 then( ), catch( )로 넘어간다.
+
+			2. Promise.any(  [ fetch( "경로1 " ) ,fetch( "경로2 " ) , ... ]  ) 
+				: all( ) 내부의  비동기 처리 중 하나라도 "성공적으로" 완료되면 바로 뒤의 then( ), catch( )로 넘어간다.
+					: 그러니까 아무리 처음에 반환된 결과라도 그게 실패이면 무시되는거다
+					: 모두 성공적이지 않을 시 최종적으론 실패 결과를 반환
+		
+			3. Promise.race(  [ fetch( "경로1 " ) ,fetch( "경로2 " ) , ... ]  ) 
+				: 비동기 처리중 젤 먼저 완료된 것을 반환하고, 다음 then( ) , catch( ) 로 간다	
+				: any 와 다르게 성공 실패 여부가 중요하지 않다
+
+ 
+ 
+
+
+
+
+
+
+
+
+	: https://inpa.tistory.com/entry/JS-%F0%9F%93%9A-%EB%B9%84%EB%8F%99%EA%B8%B0%EC%B2%98%EB%A6%AC-Promise#%EC%BD%9C%EB%B0%B1_%EC%A7%80%EC%98%A5%EC%9D%84_%ED%83%88%EC%B6%9C%ED%95%98%EB%8A%94_%EC%83%88%EB%A1%9C%EC%9A%B4_%EB%AC%B8%EB%B2%95
+
 REST API 
 	: REST 기반 API
 	: 서버의 자원을 클라이언트에 구애받지 않고 사용할 수 있게하는 설계 방식.
@@ -15,12 +133,47 @@ REST API
 			: (사람과 기계 모두 이해하기 쉬우며 용량이 작아서) 요즘엔 JSON 으로 통일되는 추세
 
 	: 모든 HTTP 메서드를 지원한다.
+		: fetch >> HTTP request 전송 기능을 제공하는 클라이언트 사이드 web API . 즉 , 서버와의 통신을 통해 CRUD 를 구현할 수 있게 하는 함수
+
+			: 브라우저에 내장되어있다.
+			: 사용법 >> const promise = fetch( '경로' , 옵션객체 )
+				: 파라미터 
+					: ' 경로 ' >> HTTP request 를 전달할 URL
+					: 옵션객체 >> HTTP 요청 메서드 , HTTP 요청 헤더, payload 등
+						: 필요 없으면 생략 가능
+				: 반환 >> HTTP 응답을 나타내는 response 객체를 wrapping 한 객체 반환
+					: response 객체 >> HTTP response status/header/body 등을 읽어올 수 있다
+
+		: 기본 형태
+			(1) fetch('URL')
+
+				
+
+
+			: https://velog.io/@dev-redo/REST-API%EC%99%80-Fetch-api
+
+
 		1. Create --> post 
 		2. Read --> get
+			: 형식 
+			: method 속성의 default 값은 get 이므로 get 쓸 떄는 method 속성 생략 가능하다
+				
+				.then(( response ) => response.json)
+				.then(( json ) => console.log(json));
+
+					: fetch('URL')
+						
+					: .then(( response ) => response.json) 
+						: JSON 형태로 클라이언트에게 response 한다
+
+					: .then(( json ) => console.log(json));
+						: 클라이언트에게 반환한 내용을 로그 찍는다.
+
 		3. Update --> put 혹은 patch
 			: put >> 전체 변경
 			: patch >> 부분 변경
 		4. Delete --> delete
+
 
 
 
@@ -111,5 +264,3 @@ JSON JavaScript Object Notation >> 데이터의 교환/저장을 쉽게 해주�
 
 	: https://codingazua.tistory.com/4
 	: https://lxxyeon.tistory.com/153
-
-
