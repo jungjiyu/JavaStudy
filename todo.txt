@@ -1,4 +1,7 @@
 0. member pj 마저 하기 (4단원 이후)
+1. jwt 토큰 발급
+2. spring security
+3. rest api
 
 
 1. 어노테이션의 작동원리
