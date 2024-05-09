@@ -193,6 +193,10 @@
 						: application.properties 처럼 spring initializer 가 자동 생성해주진 않아 직접 만들어야한다 (아님 걍 .properties 확장자를 .yml 로 바꾸든가) 
 						: 같은 프로젝트 내 appilcation.properties 가 있을 시 갤 오버라이드 하므로 얘가 우선시 된다고 보면 된다.
 
+					▶ data.sql : 더미데이터 생성용 파일
+						: 직접 만들어야된다
+						: 스프링부트에서 지원사는 db 초기화를 위한 스크립트 파일로, 애플리케이션이 실행될 때 자동 실행된다
+
 
 
 					▼static : 뷰텝플릿이아닌정적파일(html ,css , js) 저장위치
