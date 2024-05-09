@@ -22,6 +22,10 @@ tip >> 뷰텝플릿엔진 쪽이 좀 특이한거지 , 일반적으론 다 "/" �
 				▼layouts
 					▶header.mustache
 
+	5. "/URL/{변수}" vs "/URL/"+변수
+		: "/URL/{변수}" 는 @RequestMapping 에서 쓰이는 표현으로, 변수는 reqeust URL 뒤에 붙어있는 정보를 할당받는다
+		: "/URL/"+변수 는 서버 내부적으로 존재하는 변수를 활용해 return 할 경로를 완성하는 것이다. 주로 뷰네임 return 할 떄 쓰인다
+
 
 				
 
