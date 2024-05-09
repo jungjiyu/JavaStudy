@@ -6,8 +6,21 @@ https://www.latera.kr/blog/2019-07-02-effective-optional/
  삭제 수정 기능 컨트롤러에 메서드 추가
 
 
+https://hstory0208.tistory.com/entry/ModelAttribute-%EA%B0%9D%EC%B2%B4%EA%B0%80-%EB%B0%94%EC%9D%B8%EB%94%A9-%EB%90%98%EC%A7%80-%EC%95%8A%EB%8A%94-%EC%98%A4%EB%A5%98
+아니 왜 script 문에서는 null 값이나 '' 이나 다 무시되는거지? 왜 아예 나타나지도 않는거지?
 
 -----------------------------------------------------------------------------------------------------
+
+폼데이터 form data
+	: html <form> 태그에 실려 서버로 전송되는 데이터	
+
+
+update 목적의 form 이라도 method 가 patch 가 아닌 이유
+	: form 은 워낙 옛날에 만들어져서 patch 를 지원하지 않고 , post 와 get 만 지원한다.
+
+-----------------------------------------------------------------------------------------------------
+
+
 link 링크
 	: redirect 가 아닌 것. 딱 그 '페이지'만 response 하는 문자열
 	: 언제 하는가 ? >> 리다이렉트 할 필요가 없을 때
@@ -41,6 +54,7 @@ redirect
 				: String 타입 값 뿐 아니라 다양한 타입 값을 전달 가능하다
 				: 주소 창에 표기되지 않으므로 addAttribute( ) 보다 보안이 좋다
 				: 리다이렉트 되어 @GetMapping된 다음 메서드에서는 일반적인 객체값 받을 떄처럼 해당 attribute 를 @ModelAttribute 로 받으면 된다
+				: 경고/완료 메세지 보낼때 유용하다
 
 
 			2. addAttribute( ) : 값을 지속적으로 전달 시 사용
@@ -198,14 +212,6 @@ ArrayList 클래스: 배열 처럼 index 기반 접근 but 사이즈가 동적�
 		(2)Map 인터페이스 : (순서가 없고) 키와 값의 쌍으로 이루어진 데이터 집합
 			▶ HashMap 구현 클래스
 
-
-
------------------------------------------------------------------------------------------------------
-
-CRUD Create생성 Read조회 Update수정 Delete삭제
-
-폼데이터 form data
-	: html <form> 태그에 실려 서버로 전송되는 데이터	
 
 
 -----------------------------------------------------------------------------------------------------
@@ -954,6 +960,94 @@ ex ) 										Member member = memberRepository.findById(id);  // 그냥 T �
 				: 개발자가 Repository 인터페이스를 별도의 구현하지 않아도 JPA 가 인터페이스에 선언된 메서드 따라 직접 구현하여 만들어주기 떄문에 그냥 사용 가능.
 
 
+-----------------------------------------------------------------------------------------------------
+
+더미 데이터 Dummy : (테스트 목적으로) 단순히 공간만 차지하는 의미 없는 데이터. 
+	: 더미 데이터 생성 방법
+		sol1. schema.sql, data.sql 스크립트 파일 사용
+			:둘 다 처음부터 존재하는 파일은 아니고 src/main/resources 에 data.sql 이란 파일을 직접 만들어야된다
+			: 스프링부트에서 지원하는 db 초기화를 위한 스크립트 파일로, 애플리케이션이 실행될 때  schema.sql --> data.sql 순으로 자동 실행된다
+
+			(1) schema.sql
+				1. drop table
+				2. 테이블 schema 정의 
+
+			(2)  data.sql >> Insert 문 작성
+			(3) application.properties  에 다음을 작성	
+				spring.jpa.hibernate.ddl-auto=none
+				spring.sql.init.mode=always
+			: https://wildeveloperetrain.tistory.com/228
+
+			
+
+		sol2. @PostConstruct 로 초기화
+		sol3. @ApplicationRunner 로 초기화
+
+
+-----------------------------------------------------------------------------------------------------
+
+JPA 를 활용한 CRUD Create생성 Read조회 Update수정 Delete삭제
+	: 기본 셋팅 >> Entity 클래스와 Repsitory 인터페이스(CrudRepository 를 상속받은)를 준비 
+	(1)Create 생성
+		1. get mapping으로 폼 페이지 반환
+			: 해당 페이지의 form 은 post 방식 
+
+		2. post mapping으로 폼 데이터 처리
+			(1) DTO 객체를 파라미터로 하여 한꺼번에 받음
+			(2) DTO 객체를 바탕으로 엔티티 객체 생성
+			(3) repository.save( 생성한엔티티객체 )
+			(4) 완료페이지로 리다이렉트 	
+
+
+	(2) Read 조회
+		case1. 특정 record 조회
+			(0) "/URL{id}" 로 getmapping
+			(1) @PathVariable 등을 이용해 id 를 받고, Model 객체도 파라미터로 받음
+			(2) 엔티티타입 변수명 = repository.findById( id ).orElse( null ) ; 으로 특정 record 대한 엔티티 얻음
+			(3) model.addAttribute( "변수명" , 변수명 );  
+			(4) 모델에 저장한 데이터를 변수명.필드명 으로 사용하는 페이지로 이동
+
+		case2. 전체 record 조회
+			(0) getMapping
+			(1) Model 객체만 파라미터로 받음
+			(2)  List<엔티티타입> 변수명 = (List<엔티티타입>)repository.findAll( ) ; 으로 반환 결과를 리스트로 받음
+			(3) model.addAttribute( 변수명 );
+			(4) model.addAttribute( "변수명" , 변수명 );  
+			(5) 모델에 저장한 데이터를 반복문 과 함께 변수명.필드명 으로 사용하는 페이지로 이동
+
+	(3) Update 수정
+		: JPA 에 Update 대한 메서드는 따로 없다. 기존 데이터와 똑같은 id 를 가지는 데이터가 저장(save)되면 , 수정작업이라 간주하고(걍 생각해보면 똑같은 id 가 존재할 순 없잖아) 업데이트해준다.
+			: id 를 주고 받고 하는게 매우 중요
+			: 변경된 내용으로 새로운 entity 를 만들어서 save 하는게 아니라 , 기존 id 를 기반으로 find 한 entitiy 를 직접 "수정"한 것을 save 해야함을 주의 
+
+		1. "/URL{id}"로 getMapping 으로 수정 페이지 반환
+			(1) @PathVariable 등으로 id 를 받고, Model 객체도 파라미터로 받음
+			(2) 엔티티타입 변수명 = repository.findById( id ).orElse( null ); 으로 특정 record 대한 데이터를 얻음  
+				: 그냥 이동 페이지로 id 만 넘기는게 아닌, 엔티티를 직접 넘기는 것은 일반적으로 수정 페이지의 placehold, default 값으로 기존 입력 사항 나오니까
+			(3) model.addAttribute( "변수명", 변수명 );
+			(4) 모델에 저장한 데이터를 변수명.필드명 으로 사용하는 페이지로 이동
+				: 해당 페이지의 form 은 post 방식이고, hidden 으로 id 를 보낸다
+					: post 방식은 URL 뒤에 단순 붙여서 못보내니까 "/URL/{{id}}" 같은건 불가하다
+			
+		2. postMapping 으로 폼 데이터 처리
+			: 내 방법
+			(1) form 데이터를 dto 로 받을 순 있어도 entity 로 바로 받진 못하니까 @ModelAttribute 로 dto 받고,  dto 에는 id 필드를 만들어두지 않았으므로 @RequestParam 으로 id 를 별도로 받는다.
+			(2) 엔티티타입 변수명 = repository.findById( id ).orElse( null ) ; 으로 해당 객체를 얻어낸다
+			(3) 변수명.setXXX( dto.getXXX( )); 로 수정한다
+			(4) repository.save( 변수명 ); 한다 
+			(5) 완료 URL 로 redirect
+
+
+			: 교재 방법
+			(1) dto 에 id 필드 추가
+			(2) form 데이터를 @ModelAttribute dto 로 받음
+			(3) dto.toEntity( ) 로 entitiy 화
+			(4) 엔티티타입 변수명 = repository.findById( dto.getId( ) ).orElse( null ) ; 해서 기존 객체 뽑음 << 꼭 해야되나? 바로 save( entity화한거) 하면 안되나?
+			(5) (변수명 != null) 이면 repository.save(entity화한거) 한다
+			(6) 완료 URL 로 redirect
+ 
+					
+			: 기타 인터넷 추천 방식도 사용해보기
 
 -----------------------------------------------------------------------------------------------------------------
 
@@ -999,8 +1093,9 @@ H2 DB
 		1. 대소문자를 구분하지 않으나 통상적으로 테이블, 속성명 등은 소문자로 작성한다 (sql 기본 키워드는 대문자)
 		2. 문장의 끝 마다 되도록 ; 붙인다
 		3. 쿼리문
-			(1) 조회
-				: SELECT 속성명 FROM 테이블명; 
+			: WHERE 문 생략시 모든 레코드 대해 적용됨
+			(1) 조회 SELECT 속성명 FROM 테이블명 WHERE 조건문;
+				 
 			(2) 삽입
 				: https://coding-factory.tistory.com/424
 				: pk 값은 필수적으로 대입해야된다
@@ -1010,7 +1105,7 @@ H2 DB
 				2. INSERT INTO 테이블명 VALUES (값1 , 값2 , 값 3 .. )
 					: 테이블의 "전체" column 에 대하여 순서를 지켜 바인딩될 값을 명시한다.
 				
-			(3) 
+			(3) 수정 UPDATE 테이블명 SET 속성명='값' , .. WHERE 조건문
 				
 		4. 속성명에 
 			* == 전체 선택
