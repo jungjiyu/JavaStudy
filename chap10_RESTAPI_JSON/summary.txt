@@ -300,7 +300,8 @@ REST API
 	: HTTP request method >> 클라이언트가 서버에게 request 종류와 목적(리소스에 대한 행위)를 알리는 방법
 
 
-		1. Read --> get
+		1. Read --> HTTP get 메서드 
+			: sql 문으로는 select
 			: 페이로드 X
 			: 형식 
 				fetch('URL')
@@ -311,7 +312,8 @@ REST API
 
 		
 
-		2. Create --> post 
+		2. Create --> HTTP post 메서드
+			: sql 문으로는 insert
 			: 페이로드 O
 			: 형식
 				fetch("https://jsonplaceholder.typicode.com/posts", {
@@ -330,7 +332,8 @@ REST API
 
 				: 
 		
-		3. Update --> put 혹은 patch
+		3. Update --> HTTP put 혹은 patch 메서드
+			: sql 문서 update 
 			: put >> 기존 데이터를 전체 변경 . 만약 기존 데이터가 없다면 새로 생성
 				: 페이로드 O
 
@@ -339,6 +342,7 @@ REST API
 				: 페이로드 O
 
 		4. Delete --> delete
+			: sql 문서 delete
 			: 페이로드 X
 
 
