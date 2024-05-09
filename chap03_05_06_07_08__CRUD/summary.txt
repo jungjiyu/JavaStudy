@@ -514,7 +514,7 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 			: entity 클래스는 보통 entity 패키지에 따로 저장하고, 딱히 XXXEntity 처럼 이름을 짓진 않는다 (그냥 Person , Member 이런식으로 심플 이름).
 			: 클래스 제한 사항
 			*******0. 테이블에 저장할 필드는 final 키워드 사용 불가
-				1. 기본생성자가 있어야된다
+			*******1. 기본생성자가 반드시 있어야된다
 					: JPA 도 Reflection API 를 사용하기 때문
 				2. final, enum, interface, inner 클래스에는 사용 불가
 
@@ -737,8 +737,8 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 		아 이거 모르겠음			>>	: JPA 제공 메서드 중 반환 타입이 Optional<T> 인 메서드( findByID(Id id ) , ..  )들의 반환값을 단순 T 타입 변수로 받아도 무방하다. but Optional 클래스의 null 관련 메서드를 활용하고 싶다면 그대로 Optional<T> 타입 변수로 받아야된다
 									: autoUnbixing 되어서 그냥 T 타입으로 받아도 문젠 없는것.
-									: ex ) 
-										Member member = memberRepository.findById(id);  // 그냥 T 타입으로 받아도 되는데, 더이상 Optional 메서든 못쓴다
+									: 
+ex ) 										Member member = memberRepository.findById(id);  // 그냥 T 타입으로 받아도 되는데, 더이상 Optional 메서든 못쓴다
 										Optional<Member> memberOptional = memberRepository.findById(id); // Optional 메서드를 사용할 수 있다
 
 										if (memberOptional.isPresent()) {
@@ -797,6 +797,7 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 									3. Optional 객체 접근 >>Optional이 담고 있는 객체가 존재할 경우 모두 동일하게 그 객체를 반환하지만, Optional이 비어있는 경우(null) 다르게 작동
 										: 죄다  인스턴스 대상으로 쓰이는 매서드
+										: 추천 >> orElse(null) 을 사용하자 . 반환결가 있으면 그 결과 반환하고 없으면 null 을 반환하게 하자
 										(1) get( )  : 비어있는 Optional 객체를 대상으로  접근시 예외 발생시킴
 										(2) orElse( T other )   : 비어있는 Optional 객체를 대상으로 접근시 arg 로 줬던 "객체"를 그대로 반환
 											: 주의 >> 함수를 arg 에 대입하는 경우 해당 함수는 null 이건 말건 항상 불린다
@@ -864,7 +865,7 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 									2 read
     										(1) Optional<T> findById(ID id) :주어진 id값을 가지는 entity를 Optional로 랩핑해서 반환
-											: 반환값이 Optional 이기 때문에 검색 결과가 없다면 null 이 아닌 Optional#empty( ) 가 반환된다 
+											: 반환값이 그냥 T가 아닌 Optional<T> 인것을 주의. T 타입의 값을 반환받기 위해서  findById(ID id).orElse( null ) 을 사용하자.
 
     										(2) boolean existsById(ID id) : 주어진 id값을 가지는 entity 의 존재 여부를 true/false 로 반환
 
