@@ -1,26 +1,36 @@
-Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'memberServiceImpl' defined in file [C:\Backend\SpringBootCoJa\chap01\chap01\build\classes\java\main\com\coja\chap01\service\MemberServiceImpl.class]: 
-
-Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'memberRepository' defined in com.coja.chap01.repository.MemberRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Could not create query for public abstract java.util.Optional com.coja.chap01.repository.MemberRepository.findByID(java.lang.Integer); Reason: Failed to create query for method public abstract java.util.Optional com.coja.chap01.repository.MemberRepository.findByID(java.lang.Integer); No property 'ID' found for type 'Member'; Did you mean 'id'
-
 
 
 https://www.latera.kr/blog/2019-07-02-effective-optional/
 
 
-이전 버튼 추가하기
+ 삭제 수정 기능 컨트롤러에 메서드 추가
 
-조회 삭제 수정 기능 컨트롤러에 메서드 추가
+
 
 -----------------------------------------------------------------------------------------------------
-redirect 하기
+link 링크
+	: redirect 가 아닌 것. 딱 그 '페이지'만 response 하는 문자열
+	: 언제 하는가 ? >> 리다이렉트 할 필요가 없을 때
+	: <a>, <form>
+
+
+redirect 
+	: 클라이언트에게 '특정URL'을 response 후, 클라이언트가 자동적으로 해당URL을 후속 request 하여 또다른 response 를 받게 하는 문자열.
+	: 리다이렉트를 언제, 왜 쓰는가?  >>  POST request 와 매핑된 로직을 안전하게 분리하기 위해.
+		1. POST 방식이든 GET 방식이든 새로고침 하면 해당 방식으로 또 request 된다. 브라우저에서 새로고침이나 뒤로 가기를 했을 경우 이전에 보내진 POST 요청이 다시 보내져(== 결제 로직이 또 진행되어) 중복 결제와 같은 버그가 일어날 수 있다.
+		2. POST 요청은 URL을 복사하더라도 다른 사람과 공유할 수 없다
+
+		: PRG 패턴 >> POST 방식으로 온 요청에 대해서 GET 방식의 웹페이지로 리다이렉트 시키는 패턴
+			:  Post 방식으로 온 request 대해서 , 리다이렉트하도록 response 하고, reponse 받은 경로로 get 방식 request 하는 것	
+			: https://programmer93.tistory.com/76
+
+
+
 	: "redirect:/경로"
 	: 리다이렉트 원리
 		1. 클라이언트에게 특정 리다이렉트경로를 response 한다
 		2. 클라이언트가 response받은 경로 ( 리다이렉트하라는 경로) 로 get 방식으로 request 한다
 		3. request 한 경로로 getMapping 된다
-
-	: PRG 패턴 >> Post 방식으로 온 request 대해서 , 리다이렉트하도록 response 하고, reponse 받은 경로로 get 방식 request 하는 것
-		: https://programmer93.tistory.com/76
 
 	: 리다이렉트 할 떄 해당 메서드에서 받은 데이터를 전달하고 싶으면 param 에 별도로 RedirectAttributes 추가
 		: RedirectAttributes 메서드
@@ -870,6 +880,17 @@ ex ) 										Member member = memberRepository.findById(id);  // 그냥 T �
     										(2) boolean existsById(ID id) : 주어진 id값을 가지는 entity 의 존재 여부를 true/false 로 반환
 
     										(3) Iterable<T> findAll( ) : 
+											: 반환값 받는 법
+											******sol1. 강제형변환 >> List<T> list = (List<T>)repository.findAll( ) ;
+												sol2. 오버라이딩 >> 아예 해당 리파지토리 인터페이스에  public List< 엔티티타입 > findAll( ) ; 으로 오버라이드 시켜둔다.
+													: 오버라이딩 할 때 반환형은 자식 타입까지는 허용된다.
+												sol3. 그냥 Iterable 로 받는다 >> 
+													Iterable<T> iterable = repository.findAll( ) ;
+													Iterator<T> iter = iterable.iterator( )  ;
+													List<T> list = new ArrayList<>();
+													while(iter.hasNext( ) ){
+														list.add( iter.next( ));
+													}
 		
     										(4) Iterable<T> findAllById(Iterable<ID> ids) : 
 		
@@ -904,6 +925,7 @@ ex ) 										Member member = memberRepository.findById(id);  // 그냥 T �
     									(2) List<T> findAll( );
 										: (조건 없이) 테이블 전체값 가져오기
 										: Test에선 쓰이지만 실제서비스에선 성능 때문에( 모든 데이터 다 조회하는데는 시간이 오래 걸리니까 ) 잘 사용하지 않음.
+
 
     									(3) List<T> findAllById(Iterable<ID> ids);
 										: arg 로 주어진 Iterable 객체에 대응하는 엔티티를 조회한다.
