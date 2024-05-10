@@ -248,6 +248,10 @@ MVC 패턴
 								@RequestParam
 									: 단순 값( DTO 같은 복합적인 객체가 아니라 int , String 같은 값 ) 같은거 받을 때 자주 사용한다
 									: 아무리 기본 int, boolean 등의 값을 저장할 용도더라도, 모종의 이유로 값이 전달되지 않을 경우( required =false 의 상황에서 ) null 을 저장할 수 있어야되기 떄문에 Wrapper 클래스를 써야된다
+								********: 주의 >> 파라미터명이 명시됬을 경우 별 내용이 없어도 null 값이 들어가는게 아니라, 빈 문자열 혹은 0 같은 값이 들어간다
+										: 아예 파라미터 명이 명시되지 않아야 @RequestParam 이 전담하는 파라미터가 null값으로 채워진다.
+										ex ) "/URL?name" >> @RequestParam String name 의 경우 "" 가 할당된다
+										ex ) "/URL" >> @RequestParam(required=false) String name 의 경우 null이 할당된다
 
 									: 원리 >> HttpServletRequest 객체를 쉽게 이용하는 것.
 										접근제한자 반환값 메서드명( HTTPServletRequest request , ... ){
@@ -282,7 +286,7 @@ MVC 패턴
 											*******(2) false : 해당 파라미터가 넘어오지 않으면 에러를 발생시키진 않고, 해당 파라미터에 null 값을 대신 할당한다
  													주의)  “/주소?username=” 와 같이 파라미터의 이름만 있고 값이 없으면 값을 ""(빈 문자열) 로 하는 파라미터가 넘어온거다.  아예 파라미터명 자체가 명시되지 않고 request 되어야 파라미터가 없는거다
 
-										3.  defaultValue : 파라미터가 없는 경우 할당할 기본값을 설정
+										3.  defaultValue : 파라미터가 "없는" 경우 할당할 기본값을 설정
 											: 이 속성을 적용한 경우 어케해서든 해당 파라미터는 존재하게 되므로 required 속성은 별로 쓸모가 없어진다
  											주의) 똑똑하게도 빈 문자열이 들어와도 defaultValue 를 적용해준다
 
