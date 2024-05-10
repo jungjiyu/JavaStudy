@@ -378,16 +378,13 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 
 
 	
-	:  REST API 구현하기
-		1. REST API 의 URL 을 설계 >> 그러니까 request 할 수 있는 URL 작명하고, 각 URL 이 어떤 HTTP 메서드 와 매핑할 건지 생각한다.
-		2. 결과를 JSON 으로 반환해 줄 컨트롤러 ( REST 컨트롤러 ) 를 설계한다.
-		3. 적절한 상태코드 반환을 위한 엔티티 클래스도 설계한다.
 
 	: Talend API Test 로 확인해보기 >> 메서드를 택하고 URL 을 "http://localhost:8080/특정위치" 로 기재하여 send 한다.
-		: 참고로 @Controller 에 매핑되어있는 URL 로도 request 가능하고, 이 경우 HTML 과 같은 페이지 가 리턴 되는 것을 알수 있따
+		: 참고로 일반 @Controller 에 매핑되어있는 URL 로도 request 가능하고, 이 경우 HTML 과 같은 페이지 가 리턴 되는 것을 알수 있따
 
 	: REST 컨트롤러
 		: REST API 로 request 받고, response 가능한 컨트롤러로, JSON 을 반환한다.
+		: REST 컨트롤러에선 일반 컨트롤러에서 사용 가능하던 어노테이션 모두 사용 가능하고, 여기에 + α 로 몇 개 더 사용 가능하다.
 		: 구현 
 			0. api 패키지 생성 
 			1. 클래스 만들고 @RestController 를 위에 적음 
@@ -395,11 +392,16 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 				: @Controller 가 아님을 주의
 
 			2. 메서드 생성
-				(1) URL 맵핑  >> 일단 크게 다를건 없는 듯?
+				(1) URL 맵핑  >> @GetMapping, @PostMapping 뿐 아니라 @PatchMapping , @PutMapping 도 이제 할 수 있다
+
 				(2) 파라미터 설정 >> 
+					: 참고로 @PathVariable 은 여기서도 유용하게 사용하지만, @ModelAttribute 는 그닥 사용 안한다(JSON 으로 데이터 주고받으니까)
 					@RequestBody
-						: json 기반 request 데이터를 받을 경우 @ModelAttribute 이 아니라 @RequestBody 임을 주의
-						: 
+						: json 기반 request 데이터를 받을 경우 @ModelAttribute 이 아니라 @RequestBody 를 쓴다
+						: 암기 tip >> HTTP request 메세지의 body 부분 데이터를 가져온다
+							
+						: 주의  >> @ModelAttribute 과는 다르게 @RequestBody 를 생략한다고 해서 그 파라미터 객체에 자동으로 @RequestBody 가 달리진 않는다. 직접 명시해줘야 json 데이터를 받을 수 있다.
+
 			******(3) (뷰네임이 아닌) 데이터를 리턴
 
 			
