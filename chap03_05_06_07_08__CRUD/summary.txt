@@ -404,7 +404,33 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 			>> 객체 간 상속관계를 표현가능하다
 			>> 객체 간 연관관계(클래스가 다른 클래스타입의 필드를 가짐)를 표현가능하다
 
+	: JPA 로깅 설정
+		: resources/application.properties
+			1. logging.level.org.hibernate.SQL=DEBUG
+				: 로깅 레벨을 디버그로 설정 
+			2. spring.jpa.properties.hibernate.format_sql=true
+				: 쿼리를 보기 좋게 줄바꿈
 
+	: JPA 로깅 읽는 tip
+		: ? 는 쿼리문이 만들어 진 후 set 되는 얘들 혹은 db에 의해 자동 생성되게 만들어진 얘들이다
+			: set 되는 내용은 해당 쿼리문 로그의 좀 윗 부분으로 올라가면 알 수 있다.
+			: db 에 의해 자동 생성 되어 삽입되는 얘들( TIMESTAMP 나 ID 같은 )은 아쉽지만 로그 상에선 안보이는 듯 ?
+			: ex ) 아래에서 name, password 가 각각 "hong" , "1111" 로 setString 되는 것을 알 수 있고, 값이 명시되지 않은 last_connected_time , created_time , id 는 db 상에서 자동 생성 됨을 알 수 있다.
+				2024-05-10T21:11:50.779+09:00  INFO 23892 --- [chap01chap02] [io-8080-exec-10] c.c.chap01.controller.ArticleController  : ArticleDTO(id=null, name=hong, password=1111)
+				2024-05-10T21:11:50.780+09:00 DEBUG 23892 --- [chap01chap02] [io-8080-exec-10] org.hibernate.SQL                        : 
+    				insert 
+    				into
+				        article
+   				     (created_time, last_connected_time, name, password, id) 
+    				values
+    				    (?, ?, ?, ?, ?)
+
+	: DB URL 설정
+		: resources/application.properties
+			1. spring.datasource.generate-unique-name=false
+				: 유니크 URL 해제
+			2. spring.datasource.url=jdbc:h2:mem:testdb
+				: 고정 URL 설정
 
 	: @Entity,  @Table , @Column 같은 어노테이션들은 JPA 가 제공하는거고 , jakarta.persistence.* 에서 import 함 된다.
 
@@ -1063,18 +1089,32 @@ JPA 를 활용한 CRUD Create생성 Read조회 Update수정 Delete삭제
 					
 			: 기타 인터넷 추천 방식도 사용해보기
 
+
 -----------------------------------------------------------------------------------------------------------------
-
-
 H2 DB 
+
+	: DB URL 설정 >> 필수는 아니지만 매번 DB 주소 입력 하고 싶지 않으면 하는게 좋다
+		: resources/application.properties
+			1. spring.datasource.generate-unique-name=false
+				: 유니크 URL 해제
+			2. spring.datasource.url=jdbc:h2:mem:testdb
+				: 고정 URL 설정
+
 	: 접속 하는 법
 		1. application.properties 에 spring.h2.console.enabled=true 추가
 			:  spring.h2.console.enabled=true >> 웹 콘솔 기능 활성화 
 			: 웹 콘솔 기능을 활성화 하면 localhost:8080/h2-console 를 통해 H2 DB 페이지 접속 가능
 		2. 서버재시작
 		3. localhost:8080/h2-console 해서 DB 페이지에 접속
-		4. 이클립스 콘솔 클릭후 ctrl+f 해서 jdbc 검색하여 나온 url ( H2 console available at '/h2-console'. Database available at 옆에 뜨는 url ) 을 db 페이지의 JDBC URL 에 복붙 후 connect
-			: 서버 실행할 때마다 바뀌므로 매번 이 짓을 반복해야된다
+		4. 
+			case 1 . application.properties 에서 DB URL 대한 별다른 설정 안함
+				: 이클립스 콘솔 클릭후 ctrl+f 해서 jdbc 검색하여 나온 url ( H2 console available at '/h2-console'. Database available at 옆에 뜨는 url ) 을 db 페이지의 JDBC URL 에 복붙 후 connect
+				: 서버 실행할 때마다 바뀌므로 매번 이 짓을 반복해야된다
+
+			case 2. . application.properties 에서 DB URL 대한  설정 함
+				: 최초 접속할 떄만URL 입력하면 그 후엔 자동으로 들어가짐
+
+
 	: 공식 문서 >> https://www.h2database.com/html/cheatSheet.html
 	: 모드 
 		(1) server mode 
@@ -1103,24 +1143,37 @@ H2 DB
 			: 모든 입출력을 메모리 모드 (이게 뭐임?)에서 돌려서 서버 재시작 시 저장됬던 내용이 다 날라간다
 
 	: ctrl + enter >> 해당 라인 쿼리문 실행
+
 	: 기본적인 문법
 		1. 대소문자를 구분하지 않으나 통상적으로 테이블, 속성명 등은 소문자로 작성한다 (sql 기본 키워드는 대문자)
 		2. 문장의 끝 마다 되도록 ; 붙인다
 		3. 쿼리문
 			: WHERE 문 생략시 모든 레코드 대해 적용됨
-			(1) 조회 >> SELECT 속성명 FROM 테이블명 WHERE 조건문;
+			(0) 테이블 생성 >>
+				CREATE TABLE 테이블명 ( 
+					column명 타입 옵션,
+					column명 타입 옵션,
+					column명 타입 옵션,
+					...
+					PRIMARY KEY( column 명) 
+				);
+
+			(1) 레코드 조회 >> SELECT 속성명 FROM 테이블명 WHERE 조건문;
 				 
-			(2) 삽입
+			(2) 레코드 삽입
 				: https://coding-factory.tistory.com/424
 				: pk 값은 필수적으로 대입해야된다
+				: VALUES 다음에 여러개의 ( ) 묶음 명시할 수 있고, 이경우 여러 레코드가 삽입된다
+					ex )  INSERT INTO 테이블명( 속성명1, 속성명2 , ..  ) VALUES (값1 , 값2 , 값 3 .. ) , (값1 , 값2 , 값 3 .. ) , (값1 , 값2 , 값 3 .. )
+
 				1. INSERT INTO 테이블명( 속성명1, 속성명2 , ..  ) VALUES (값1 , 값2 , 값 3 .. )
 					: 대입 원하는 column 만 명시하고 ( 테이블의 전체 column 을 명시할 필욘 x), 바인딩될 값을 values 뒤에 명시한다
 
 				2. INSERT INTO 테이블명 VALUES (값1 , 값2 , 값 3 .. )
 					: 테이블의 "전체" column 에 대하여 순서를 지켜 바인딩될 값을 명시한다.
 				
-			(3) 수정 UPDATE 테이블명 SET 속성명='값' , .. WHERE 조건문	
-			(4) 삭제 >> DELETE [FROM] 테이블명 WHERE 조건; 
+			(3) 레코드 수정 >> UPDATE 테이블명 SET 속성명='값' , .. WHERE 조건문	
+			(4) 레코드 삭제 >> DELETE [FROM] 테이블명 WHERE 조건; 
 
 
 		4. 속성명에 
