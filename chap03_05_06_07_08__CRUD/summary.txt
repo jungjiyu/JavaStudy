@@ -6,6 +6,12 @@ https://www.latera.kr/blog/2019-07-02-effective-optional/
  삭제 수정 기능 컨트롤러에 메서드 추가
 
 
+1. Model 의 자식이 RedirectAttribute 라고? 같이 쓰면 model 이 무시된다고?
+2. flashattribute 하면 session 에 저장되고, ModelAttribute 로 받아야된다고 하는데 만약 복잡한 객체가 아니라면 @RequestParam 으로 받으면 안되나? 근데 어떤 예제 보면 또 아예 받지도 않고 넘어가서 막쓰던데?
+3. mustache 에서는 null 이면 실행안시키고, null 아니면 실행시켜주는거 아닌가?
+
+
+
 https://hstory0208.tistory.com/entry/ModelAttribute-%EA%B0%9D%EC%B2%B4%EA%B0%80-%EB%B0%94%EC%9D%B8%EB%94%A9-%EB%90%98%EC%A7%80-%EC%95%8A%EB%8A%94-%EC%98%A4%EB%A5%98
 아니 왜 script 문에서는 null 값이나 '' 이나 다 무시되는거지? 왜 아예 나타나지도 않는거지?
 
@@ -47,19 +53,22 @@ redirect
 
 	: 리다이렉트 할 떄 해당 메서드에서 받은 데이터를 전달하고 싶으면 param 에 별도로 RedirectAttributes 추가
 		: RedirectAttributes 메서드
+			: 리다이렉트값을 리턴하는 메서드( PpstMapping ) 에서 addAttribute||addFlashAttribute 로 저장하고, 리다이렉트 결과로 맵핑된 메서드 ( GetMapping ) 에서 이를 받아서 @RequestParam 혹은 @ModelAttribute 로 받아서 활용한다.
 			1. addFlashAttribute( ) : 일회성으로 값을 전달 시 사용
 				: 애플리케이션의 session 객체에 저장하고, 다음 요청에서만 접근 가능하게 한다
 					: 클라이언트쪽에 리다이렉트 경로와 함꼐 response 하는게 아니라, 애플리케이션 상에서만 접근 가능한 것이다.
-					: 다음 요청 이후엔 자동으로 삭제된다.
+					: 다음 요청 이후엔 자동으로 삭제된다. ( 심지어 새로고침 해도 없어짐 !)
 				: String 타입 값 뿐 아니라 다양한 타입 값을 전달 가능하다
 				: 주소 창에 표기되지 않으므로 addAttribute( ) 보다 보안이 좋다
-				: 리다이렉트 되어 @GetMapping된 다음 메서드에서는 일반적인 객체값 받을 떄처럼 해당 attribute 를 @ModelAttribute 로 받으면 된다
+				: 리다이렉트 되어 @GetMapping된 다음 메서드의 model 객체에 자동 등록된다
+					: 직접 파라미터에 model 객체를 만들어주지 않아도, 리다이렉트된 메서드에서 model 객체를 자동 생성해서 addAttribute 해준다.
+					: getMapping 되어 이동한 페이지에서 addFlashAttribute( )  할 떄 저장했던 변수명으로 뷰페이지에서 사용 가능하다
 				: 경고/완료 메세지 보낼때 유용하다
 
 
 			2. addAttribute( ) : 값을 지속적으로 전달 시 사용
 				: URL 뒤에 값을 추가하여 클라이언트에게 response 하고, 그 값을 다시 클라이언트가 URL 뒤에 추가하여 해당 경로로 request 하게 한다
-				: 리다이렉트되어 @GetMapping 된 다음 메서드에서는 해당 attribute 을 일반적으로 넘어오는 값과 마찬가지로 @ReqeustParam 을 이용하여 받을 수 있다 >> URL 뒤에 추가되어 전달되는 String 타입 값이기때문에 @ModelAttribute 가 아님을 주의
+				: 리다이렉트되어 @GetMapping 된 다음 메서드에서는 해당 attribute 을 일반적으로 넘어오는 값과 마찬가지로 @ReqeustParam 을 이용하여 받을 수 있다 >> URL 뒤에 추가되어 전달되는 String 타입 값이기때문
 
 		: https://bactoria.github.io/2019/05/28/ModelAttribute%EC%99%80-RedirectAttributes/
 		: https://jake-seo-dev.tistory.com/484
@@ -532,7 +541,12 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 			*******0. 테이블에 저장할 필드는 final 키워드 사용 불가
 			*******1. 기본생성자가 반드시 있어야된다
 					: JPA 도 Reflection API 를 사용하기 때문
-				2. final, enum, interface, inner 클래스에는 사용 불가
+				 2. final, enum, interface, inner 클래스에는 사용 불가
+			*******3. Entity 클래스에는 setter 를 되도록 명시하지 않는다
+					(1) setter 는 public 이라 어디서든 수정당할 수 있다
+					(2) 이게 수정을 하는건지 생성을 하는건지 의도 파악이 잘 안된다. 
+					: https://hstory0208.tistory.com/entry/JPA-Entitiy%EC%97%90%EC%84%9C-%EC%99%9C-Setter%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EC%A7%80-%EB%A7%90%EB%9D%BC%EA%B3%A0-%ED%95%A0%EA%B9%8C
+					: https://ittrue.tistory.com/269
 
 			: nullable=true 적용 원하는 필드는 reference type 으로 선언해야된다.
 
@@ -1030,7 +1044,7 @@ JPA 를 활용한 CRUD Create생성 Read조회 Update수정 Delete삭제
 					: post 방식은 URL 뒤에 단순 붙여서 못보내니까 "/URL/{{id}}" 같은건 불가하다
 			
 		2. postMapping 으로 폼 데이터 처리
-			: 내 방법
+			: 내가 시도했던 방법 >> 실행은 되지만 entity 의 setter 를 사용하므로 비추천
 			(1) form 데이터를 dto 로 받을 순 있어도 entity 로 바로 받진 못하니까 @ModelAttribute 로 dto 받고,  dto 에는 id 필드를 만들어두지 않았으므로 @RequestParam 으로 id 를 별도로 받는다.
 			(2) 엔티티타입 변수명 = repository.findById( id ).orElse( null ) ; 으로 해당 객체를 얻어낸다
 			(3) 변수명.setXXX( dto.getXXX( )); 로 수정한다
@@ -1094,7 +1108,7 @@ H2 DB
 		2. 문장의 끝 마다 되도록 ; 붙인다
 		3. 쿼리문
 			: WHERE 문 생략시 모든 레코드 대해 적용됨
-			(1) 조회 SELECT 속성명 FROM 테이블명 WHERE 조건문;
+			(1) 조회 >> SELECT 속성명 FROM 테이블명 WHERE 조건문;
 				 
 			(2) 삽입
 				: https://coding-factory.tistory.com/424
@@ -1105,8 +1119,10 @@ H2 DB
 				2. INSERT INTO 테이블명 VALUES (값1 , 값2 , 값 3 .. )
 					: 테이블의 "전체" column 에 대하여 순서를 지켜 바인딩될 값을 명시한다.
 				
-			(3) 수정 UPDATE 테이블명 SET 속성명='값' , .. WHERE 조건문
-				
+			(3) 수정 UPDATE 테이블명 SET 속성명='값' , .. WHERE 조건문	
+			(4) 삭제 >> DELETE [FROM] 테이블명 WHERE 조건; 
+
+
 		4. 속성명에 
 			* == 전체 선택
 			속성명1, 속셩명2 , 속성명3  == 3가지 속성 선택
