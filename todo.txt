@@ -2,6 +2,8 @@
 1. jwt 토큰 발급
 2. spring security
 
+
+3. 빌더 패턴 https://growth-coder.tistory.com/172
 3. enum 타입 사용 및 정의 방법
 1. 어노테이션의 작동원리
 2. 제네릭 복습
