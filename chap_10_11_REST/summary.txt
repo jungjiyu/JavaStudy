@@ -200,34 +200,52 @@ JSON JavaScript Object Notation >> 데이터의 교환/저장을 쉽게 해주�
 
 HTTP 메세지
 	: 요청할 때는 HTTP request Message, 응답할때는 HTTP respnose Message 에 데이터가 실려 전송된다
-	: 구성
-		1. 시작라인 start line >> HTTP request / response 내용을 나타내는 한 줄
-			request ex ) GET /posts/1/comments HTTP/1.1
-				: HTTP/1.1 버전을 사용하여 get 방식으로 "/posts/1/comments" 로 요청했다 
+	: HTTP request 메세지 구성
+		1. 요청 라인 (시작라인) >> 요청방식 URL HTTP버전
+			ex ) GET /posts/1/comments HTTP/1.1
 
-			response ex )   HTTP/1.1 200
+		2. 헤더 header >> HTTP 전송에 필요한 metadata 가 있다
+			ex )  Content-type : application/json
+			      Host: jsonplaceholder.typicode.com
+				:  jsonplaceholder.typicode.com (서버) 로 request 보내겠다.
+
+		3. 본문 body >> 실제(본질적인) 데이터.
+			ex ) 
+			{ 
+				"title" : "미미미미누",
+				"body" : "유튜버"
+			}
+
+	: HTTP response 메세지 구성
+		1. 상태 라인(시작라인) >> HTTP버전 상태코드
+			 ex )   HTTP/1.1 200
 				: HTTP/1.1 버전을 사용하여 response 하였고, 성공적으로 처리 되었다
 
 		2. 헤더 header >> HTTP 전송에 필요한 metadata 가 있다
-			ex) Host: jsonplaceholder.typicode.com
-				:  jsonplaceholder.typicode.com (서버) 로 request 보내겠다.
+			ex) date: TUE , 30, Nov 2022 06:  .. 
+			     content-type: application/json
 
+		3. . 본문 body >> 실제(본질적인) 데이터.
+			: REST API 에서는 HTTP response 표준을 JSON 으로 한다
+			ex ) 
+			{ 
+				"title" : "미미미미누",
+				"body" : "유튜버",
+				"id":2
+			}
 
-		3. 빈라인 blank line >> 헤더의 끝을 알리는 빈 줄
-		4. 본문 body >> 실제(본질적인) 데이터.
  
 
 ------------------------------------------------------------------------------------------------------------------
 
 
-REST API 
+REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 해당 자원을 CRUD 할 수 있게 하는 인터페이스. 
 	: REST 기반 API
-	: 서버의 자원을 클라이언트에 구애받지 않고 사용할 수 있게하는 설계 방식.
-		: 클라이언트는 웹 브라우저만 있는게 아니라 스마트폰 , 스마트워치 ... 등 다양하고, 서버는 이러한 다양한 클라이언트로부터의 요청에 응답해야한다. 
-
-	: HTTP request 대한 response 로 "특정기기에 종속되지 않는 서버의 자원"을 반환한다.
+	: 효과 >> 서버의 자원을 클라이언트에 구애받지 않고 사용할 수 있게한다 . 즉 ,  HTTP request 대한 response 로 "특정기기에 종속되지 않는 서버의 자원"을 반환한다.
 		: view 가 아닌 data 를 response 하고, 이때 응답되는 데이터가 JSON , XML 이다
 			: (사람과 기계 모두 이해하기 쉬우며 용량이 작아서) 요즘엔 JSON 으로 통일되는 추세
+		: 클라이언트는 웹 브라우저만 있는게 아니라 스마트폰 , 스마트워치 ... 등 다양하고, 서버는 이러한 다양한 클라이언트로부터의 요청에 응답해야한다. 
+
 
 	: 모든 HTTP 메서드를 지원한다.
 		: 기본 형태
@@ -348,7 +366,7 @@ REST API
 
 
 
-	:  REST API 실습
+	:  HTTP 메서드 연습
 		 >> place holder ( https://jsonplaceholder.typicode.com/ )
 			: 가짜 API. 서버 역할을 해준다
 			: 모든 게시글 조회 ex) 	/posts  
@@ -357,3 +375,41 @@ REST API
 		 >> Talend API Tester 크롬 확장 프로그램 
 			: request 보내게 해준다 
 			: 밑에 HTTP 탭을 택하면 HTTP request/response message 의 내용 볼 수 있다
+
+
+	
+	:  REST API 구현하기
+		1. REST API 의 URL 을 설계 >> 그러니까 request 할 수 있는 URL 작명하고, 각 URL 이 어떤 HTTP 메서드 와 매핑할 건지 생각한다.
+		2. 결과를 JSON 으로 반환해 줄 컨트롤러 ( REST 컨트롤러 ) 를 설계한다.
+		3. 적절한 상태코드 반환을 위한 엔티티 클래스도 설계한다.
+
+	: Talend API Test 로 확인해보기 >> 메서드를 택하고 URL 을 "http://localhost:8080/특정위치" 로 기재하여 send 한다.
+		: 참고로 @Controller 에 매핑되어있는 URL 로도 request 가능하고, 이 경우 HTML 과 같은 페이지 가 리턴 되는 것을 알수 있따
+
+	: REST 컨트롤러
+		: REST API 로 request 받고, response 가능한 컨트롤러로, JSON 을 반환한다.
+		: 구현 
+			0. api 패키지 생성 
+			1. 클래스 만들고 @RestController 를 위에 적음 
+				: 클래스명은 주로 XXXXApiController.java
+				: @Controller 가 아님을 주의
+
+			2. 메서드 생성
+				(1) URL 맵핑  >> 일단 크게 다를건 없는 듯?
+				(2) 파라미터 설정 >> 
+					@RequestBody
+						: json 기반 request 데이터를 받을 경우 @ModelAttribute 이 아니라 @RequestBody 임을 주의
+						: 
+			******(3) (뷰네임이 아닌) 데이터를 리턴
+
+			
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------
+
