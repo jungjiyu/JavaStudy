@@ -927,7 +927,7 @@ ex ) 										Member member = memberRepository.findById(id);  // 그냥 T �
 											: null 일때만 arg 의 함수가 실행된다.
 
 										(4) orElseThrow( Supplier<? extends X> exceptionSupplier )   : 비어있는 Optional 객체를 대상으로 접근시 arg 로 줬던 "함수" (함수형 인자) 로 생성한 "예외" 를 throw 함.
-
+											ex) articleRepository.findById(id).orElseThrow(()->new IllegalArgumentException("결제 실패"));
 
 								: https://www.daleseo.com/java8-optional-after/
 								: https://dev-coco.tistory.com/178
