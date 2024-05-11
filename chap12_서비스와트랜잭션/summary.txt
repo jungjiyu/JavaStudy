@@ -1,1 +1,71 @@
+ 서비스 Service
+	: controller 와 repository 사이에 위치하는 계층
+	: 비즈니스 로직( 내부적인 처리 .  본질적인 작업 . 보통 db 관련 작업 ) 처리
+	: 클라이언트가 손님(요리주문),  (REST) Controller 가 웨이터 (주문전달),  Service가 헤드 쉐프( 메인 요리 ), Repository가 보조쉐프( 재료가져옴 ) , DB 가 창고(재료창고) 라고 보면 된다.
+
+	: 트랜잭션 Transaction >> 비즈니스 로직 처리의 단위
+		: 모두 성공해야하는 일련의 과정. 
+			: 중간에 실패하면 지금까지 진행된 작업은 모두 취소. 무효처리 ( rollback )
+			: 최종적으로 성공하면 DB 반영.
+
+	: 서비스 계층은 db 접근 , 컨트롤러에는 서비스계층의 처리 결과 따른 상태코드 및 데이터 반환을 하게 한다
+
+ 	: 서비스 클래스 구현하기
+		0. service 패키지 생성
+		1. XXXService.java "인터페이스" 생성 및 추상 메서드 선언
+			: 보통 컨트롤러 메서드 프로토타입 복붙하면 된다.
+		2.  XXXService 인터페이스를 구현하는 XXXServiceImpl.java 클래스 생성 및 @Service 어노테이션 추가
+
+
+	: 주의 >> 
+		: post 메서드는 create"만" 수행할 수 있어야된다. post 메서드로 update 까지 "가능"하면 안된다. 
+			: 아래와 같이 
+			ArticleApiController.java 에 
+
+    				@PostMapping("/new")
+  				 public ResponseEntity<Article> create(@RequestBody ArticleDTO dto){
+  			   		Article created = articleService.create(dto);
+  			      		return created !=null? ResponseEntity.status(HttpStatus.OK).body(created): ResponseEntity.status(HttpStatus.OK).build();
+ 			   }
+
+			ArticleServiceImpl.java 에 
+
+    				@Override
+      				  public Article create(ArticleDTO dto) {
+       				 	Article article =dto.toEntity();
+        		 	 	Article saved = articleRepository.save(article);
+        				log.info(saved.toString());
+          			 	return saved;
+        			}
+
+
+			선언해놓은 경우 문제의 발생 과정
+				step1. 클라이언트가 name , password 와 같은 데이터 뿐 아니라 (이미 존재하는) id값까지 보낸다
+				step2. 컨트롤러는 해당 id 정보까지 포함하여 dto 객첼 생성하고 articleService.create(dto)를 통해 서비스계층에 보낸다
+				step3. 서비스 계층에선 이를 기반으로 entity 객체를 생성하여 save 한다. id 필드가 null 이 아닌 dto 를 대상으로 dto.toEntity( ) 되는거라 ( auto increment로 새로운 아이디 값이 적용되는게 아니라 ) create 가 아닌 update 가 되버린다.
+
+
+
+			: 해결 방안 >> Service 계층의 해당 메서드에 if( dto.getId( )  != null ) return null;  을 추가하여,  id 값이 포함되어 컨트롤러 단에서 넘어온 경우 null 을 리턴한다.
+				ArticleServiceImpl.java 에 
+
+    				@Override
+      				  public Article create(ArticleDTO dto) {
+					if( dto.getId( )  != null ) return null;
+
+       				 	Article article =dto.toEntity();
+        		 	 	Article saved = articleRepository.save(article);
+        				log.info(saved.toString());
+          			 	return saved;
+        			}
+
+
+
+
+
+
+
+
+		
+
 
