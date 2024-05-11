@@ -438,10 +438,11 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 			: ResponseEntity<T> , RequestEntity<T> 가 이를 상속한다.
 
 
-		ResponseEntity<T>
+		ResponseEntity< 전달하고자하는실질적인데이터타입 >
 			: REST API 기반 reuqest  의 응답을 위해 사용하는 클래스
 			: HttpHeaders, HttpBody 와 HttpStatus을 포함한다.
 			: HttpEntity 를 extends 한다.
+			: ex ) List < Member > 데이터를 실질적으로 반환하고 싶다면 ResponseEntity< List< Member > > 타입을 리턴타입으로 하나   
 			: 객체 생성 방법
 				sol1. 생성자
 					: 결론적으론 (1) , (2) 의 경우  arg 로 들어가지 않은 얘들은 다 null 로 간주해 내부적으로 다 있는 생성자( (3) )을  this( X , X, X ) 로 호출한다. 
@@ -551,16 +552,9 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 						: https://cheershennah.tistory.com/179
 
 				
+ 
+			******(3) (뷰네임이 아닌) 데이터를 리턴 >> 주로 ResponseEntity< 엔티티타입 > 혹은  ResponseEntity< List < 엔티티타입 > >  
 
-			******(3) (뷰네임이 아닌) 데이터를 리턴
-					: GET 메서드 
-						단일 레코드 정보 >> 엔티티 타입의 객체 
-						레코드 집합 정보 >> List<엔티티타입> 객체
-
-					: POST 메서드 >> 엔티티타입 객체
-
-					: PATCH 메서드 >> ResponseEntity< 엔티티타입> 객체
-				
 												
 
 			
