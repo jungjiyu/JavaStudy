@@ -23,6 +23,7 @@
 		: 원본리스트를 변형하는건아니다
 		list.stream( ).forEach( list의요소변수명을파라미터로하여작업하는화살표함수 );
 			: ex ) articleList.stream() .forEach( article -> articleRepository.save( article ) );
+				: 근데 솔직히 이것보단 articleRepository.savAll( articleList ); 쓰면 되지 뭘 굳이 이렇게 까지 하냐
 			: 이는
 				for( int i = 0 ; i < list.size( ) ; i++ ){
 					타입 변수명 = list.get( i );
@@ -107,7 +108,11 @@
 
 
 
-		: 
+		: @Transactional 
+			: 트랜잭션으로 관리하고 싶은 대상, 그러니까 트랜잭션으로 묶어 일련의 과정으로 처리하고 싶은 대상 위에 명시하면 트랜잭션으로 관리할 수 있다
+				: 보통 트랜잭션은 서비스 클래스 자체의 윗부분 || 서비스 클래스 내의 메서드 위에 쓰인다
+					: 서비스 클래스에서 CRUD 하고, orElseThrow 같은걸로 exception 발생시킬 수 있으니까
+					: 서비스 클래스 자체의 윗 부분에 명시하면 해당 서비스 클래스 내의 모든 메서드에 대해 @Transactional 이 적용된다.
 
 
 
