@@ -59,6 +59,9 @@
 					레벨4. debug( "메시지") : 디버깅용
 					레벨5. error( "메시지") : 에러 용
 
+				: tip >> 메세지 중간 중간에  { } 를 삽입하고 그 뒤에 값들을 나열하면 printf 처럼 나열한 값들이 알아서 {} 로 들어가서 로그 찍한다.
+ 					ex) log.info("잘못된 요청 > id: {}, article: {}",id,article.toString()); //  잘못된 요청 > id: 100, article: Article(id=null, name=FFFFF, password=null, createdTime=null, lastConnectedTime=null) 와 같이 찍힌다.
+
 				: log 객체에 빨간 줄 찍히는 에러 >> 롬복이 제대로 설치 안되서 그렇다. build.gradle 에 직접 적어서 다운 받지 않고 setting 의 plugin 탭에서 확실히 다운받으면 된다.
 
 
