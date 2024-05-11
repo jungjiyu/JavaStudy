@@ -391,13 +391,6 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 
 
 
-
-
-
-
-
-
-
 	: Talend API Test 로 확인해보기 >> 메서드를 택하고 URL 을 "http://localhost:8080/특정위치" 로 기재하여 send 한다.
 		: 참고로 일반 @Controller 에 매핑되어있는 URL 로도 request 가능하고, 이 경우 HTML 과 같은 페이지 가 리턴 되는 것을 알수 있따
 
