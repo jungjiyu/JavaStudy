@@ -244,11 +244,18 @@ DTO Data Trasfer Object
 						: @RequestBody 나 JPA 에 Reflection API 가 사용되고, Reflection API 는 생성자와 getter 를 필요로 한다고 한다.
 			3. getter / setter << 필수
 			4. toEntity( ) 구현 
+				    public 엔티티타입 toEntity() {
+				        return new 엔티티타입( this.id, this.입력가능필드1 , this.입력가능필드2 , ..);
+  				  }
+
 				: JPA 사용시 DTO객체를 entity 객체로 변환하는 역할이다
-				: 이름은 꼭 toEntity( ) 로 해야되는건진 모르겠다.
 				: 내부적으로는 해당 DTO 객체의 필드를 entity클래스의 생성자의 arg 로 하여  entity클래스객체를 생성하여 반환한다
 					: 일단 해당 entity클래스가 존재해야 사용 가능하므로, entity 클래스를 먼저 만든 후 작업한다.
-				
+						: 해당 entity 클래스에 엔티티타입( this.id, this.입력가능필드1 , this.입력가능필드2 , ..) 꼴의 생성자를 만드는 거 잊지 말아야된다
+					: entity 만들때 ( 시간처럼 자동생성 되는 값을 할당받는 필드가 아닌 ) 입력해야되는필드( name , phone 같은)와  id필드를 arg 로 해야된다.
+						: 해당 dto 객체가 별도로 값을 입력받지 못해 필드가 null 값인 상태로 entity 객체를 생성할 경우 , 즉  new 엔티티타입( null , 값1 , null  , ..) ; 꼴 인경우 ,  null 값애 대응되는 엔티티의 필드는 엔티티 클래스의 default 값이 적용된다. (에러가 나진 않는다.)
+						: id 필드도 arg 로 하는 이유는 , 그 id 를 가지는 객체를 생성해 db 에 반영하겠단 의도가 아니라 ( id 는 대부분 auto increment ) , 그냥 계층간 데이터 전송할 때 id 값도 많이 필요로 하니까 편의성 차원에서 넣어두는 거다. 
+							: 새로운 record 생성 위해 클라이언트로부터 데이터를 dto 객체로 받을 때는 id 값을 따로 받지 않으므로 id 필드는 null 값이고, new 엔티티타입( null , 값1 , 값2  , ..) ; 의 꼴이 되어 id 는 entity 클래스 측의 auto 값이 적용된다.
 
 	: DTO 를 Entitiy 화
 		: 과정
@@ -256,7 +263,6 @@ DTO Data Trasfer Object
 			1. entity패키지에 Entity 클래스 만든다
 			2. DTO 클래스에 toEntity() 를 구현한다
 			3. Controller 클래스에서 DTO 객체를 param으로 하여  클라이언트에게 데이터를 받고, 해당 DTO 의 필드를 arg 로 하여 Entity 객체를 생성한다
-			4. 
 
 
 
@@ -1110,17 +1116,18 @@ JPA 를 활용한 CRUD Create생성 Read조회 Update수정 Delete삭제
 
 
 			: 교재 방법1 >> 비추. 변경 데이터가 들어오지 않으면 null 값이 들어감
-				(1) dto 에 id 필드 추가
-				(2) form 데이터를 @ModelAttribute dto 로 받음
-				(3) dto.toEntity( ) 로 entitiy 화
-				(4) 엔티티타입 변수명 = repository.findById( dto.getId( ) ).orElse( null ) ; 해서 기존 객체 뽑음 << 꼭 해야되나? 바로 save( entity화한거) 하면 안되나?
-				(5) (변수명 != null) 이면 repository.save(entity화한거) 한다
-				(6) 완료 URL 로 redirect
+				(1) form 데이터를 @ModelAttribute dto 로 받음
+				(2) dto.toEntity( ) 로 entitiy 화
+				(3) 엔티티타입 변수명 = repository.findById( dto.getId(  id) ).orElse( null ) ; 해서 기존 객체 뽑음 << 꼭 해야되나? 바로 save( entity화한거) 하면 안되나?
+				(4) (변수명 != null) 이면 repository.save(entity화한거) 한다
+				(5) 완료 URL 로 redirect
 
 		*******: 교재 방법2 >> 개추. setter 를 사용하지도 않고 변경 데이터가 들어오지 않으면 기존 데이터 유지
-				(1)
-				(2)
- 
+				(1) 엔티티클래스에 patch( 엔티티타입파라미터 ) 선언 
+				(2) 엔티티타입 변경데터담은변수 = dto.toEntity( ) 해서 변경데이터 담은 dto 객체를 앞서 구현한 patch 함수의 arg 로 넣을 준비를 함
+				(3) 엔티티타입 db데터담은변수 = repository.findById( dto.getId( id ) ).orElse( null ) ; 해서 기존 객체 뽑음
+				(4) db데터담은변수.patch( 변경데터담은변수 ) 하여 null 값이 아닌 필드에 대해 수정 반영
+				(5) repository.save(db데터담은변수); 해서 update 된 entity 객체를 db에 저장 
 					
 
 
