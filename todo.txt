@@ -3,6 +3,8 @@
 2. spring security
 
 
+3. aspectJ https://velog.io/@kyu0/Spring-Boot-AOPAspect-Oriented-Programming-%EC%A0%81%EC%9A%A9
+4. tansactional 자세히
 3. 빌더 패턴 https://growth-coder.tistory.com/172
 3. enum 타입 사용 및 정의 방법
 1. 어노테이션의 작동원리
