@@ -537,7 +537,11 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 
 
 				(2) 파라미터 설정 >> 
-					: 참고로 @PathVariable 은 여기서도 유용하게 사용하지만, @ModelAttribute 는 그닥 사용 안한다(JSON 으로 데이터 주고받으니까)
+					: tip 
+						1.  @PathVariable 은 여기서도 유용하게 사용하지만, @ModelAttribute 는 그닥 사용 안한다(JSON 으로 데이터 주고받으니까)
+						2. 객체 하나가 아니라 여러 객체( 객체를 요소로 하는 배열 ) 을 받을 경우 파라미터 타입을 List< dto타입> 으로 해서 받으면 된다		
+							: 단일 데이터 받을 때는 단순 dto 타입으로 받았었으니까
+
 					@RequestBody
 						: http request body 부분을 그대로 전달받고 해당 파라미터 객체에 맵핑해준다
 						: json 기반 request 데이터를 받을 경우 @ModelAttribute 이 아니라 @RequestBody 를 쓴다							
