@@ -955,6 +955,8 @@ ex ) 										Member member = memberRepository.findById(id);  // 그냥 T �
 									1. save
     										(1) <S extends T> S save(S entity) : 엔티티 변경 내용 저장 && 저장된 엔티티를 반환
     										(2) <S extends T> Iterable<S> saveAll(Iterable<S> entities) : 엔티티"들"의 변경 내용 저장 && 해당 엔티티들을 반환
+											: List< 엔티티타입> 객체를 한꺼번에 저장하고 결과를 반환 받는 법 >> param은 List 의 부모타입인 Iterable 이니까 걍 'List<엔티티타입> ' 타입 객체 그대로 넣음되고, 반환형을 List< 엔티티타입> 로 받고 싶으면 부모타입인  Iterable<S> 을 List< 엔티티타입> 로 강제형변환해서 받으면 된다
+												ex )  List<Member> saved = (List<Member>) memberRepository.saveAll(memberList);
 
 									2 read
     										(1) Optional<T> findById(ID id) :주어진 id값을 가지는 entity를 Optional로 랩핑해서 반환
