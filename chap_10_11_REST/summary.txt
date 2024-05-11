@@ -1,3 +1,8 @@
+빌더 패턴 >> (생성자를 통한 객체 생성이 아닌) 메서드 체이닝으로 객체 생성을 구현 하는 것.
+	: (생성자패턴보다) 유지보수성 좋고 직관성 좋음
+	: https://stir.tistory.com/343
+
+------------------------------------------------------------------------------------------------------------------
 : REST REpresentational State Transfer >>  자원을 이름으로 구분하여 해당 자원의 상태를 주고받는 모든 것
 	: 자원을 이름(URI)로 구분하여 HTTP Method(POST, GET, PUT, DELETE)를 통해 해당 자원에 대한 CRUD Operation을 적용하는 것
 	: representational == 표현적인.  
@@ -239,6 +244,8 @@ HTTP 메세지
 ------------------------------------------------------------------------------------------------------------------
 
 
+
+------------------------------------------------------------------------------------------------------------------
 REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 해당 자원을 CRUD 할 수 있게 하는 인터페이스. 
 	: REST 기반 API
 	: 효과 >> 서버의 자원을 클라이언트에 구애받지 않고 사용할 수 있게한다 . 즉 ,  HTTP request 대한 response 로 "특정기기에 종속되지 않는 서버의 자원"을 반환한다.
@@ -246,6 +253,7 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 			: (사람과 기계 모두 이해하기 쉬우며 용량이 작아서) 요즘엔 JSON 으로 통일되는 추세
 		: 클라이언트는 웹 브라우저만 있는게 아니라 스마트폰 , 스마트워치 ... 등 다양하고, 서버는 이러한 다양한 클라이언트로부터의 요청에 응답해야한다. 
 
+	: REST 는 소프트웨어 아키텍쳐이고, HTTP 는 웹 환경에서 정보 송수신할 때 사용하는 규약이다. 반드시 HTTP 를 사용할 필요는 없지만 대부분의 웹 환경이 HTTP 를 사용하기 떄문에 REST 는 대부분 HTTP 기반.
 
 	: 모든 HTTP 메서드를 지원한다.
 		: 기본 형태
@@ -379,30 +387,184 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 
 	
 
+
+
+
+
+
+
+
+
+
+
+
 	: Talend API Test 로 확인해보기 >> 메서드를 택하고 URL 을 "http://localhost:8080/특정위치" 로 기재하여 send 한다.
 		: 참고로 일반 @Controller 에 매핑되어있는 URL 로도 request 가능하고, 이 경우 HTML 과 같은 페이지 가 리턴 되는 것을 알수 있따
+
 
 	: REST 컨트롤러
 		: REST API 로 request 받고, response 가능한 컨트롤러로, JSON 을 반환한다.
 		: REST 컨트롤러에선 일반 컨트롤러에서 사용 가능하던 어노테이션 모두 사용 가능하고, 여기에 + α 로 몇 개 더 사용 가능하다.
+
+
+		: Http response message 의 body 에 담길 데이터를 설정하는 방법
+			: ResponseEntity<T>  는 부가적인 데이터까지 포함할 수 있어 사용이 지향된다
+			sol1.  단순 엔티티 타입 객체 반환 >> response body 만 반환		
+				: @ResponseStatus 를 사용하여 상태코드도 같이 전송할 순 있으나 "헤더" 는 반환 못한다.
+			**** sol2. ResponseEntity<T> 반환 >> response body + 상태코드 + 헤더 반환
+
+			: https://ksh-coding.tistory.com/89
+
+
+		HTTPStatus
+			: HTTP 상태코드를 관리하는 클래스로, 다양한 ENUM 타입 관련 메서드를 가짐.
+				: ENUM 타입 >> 열거형. 여러 상수로 이뤄진 고정 집합.
+					: 추후 더 정리하겠음
+					시용법 >> ENUM타입명.상수명
+			: 종류
+				1. HTTPStatus.OK == 200
+				2. HTTPStatus.CREATED == 201
+				3. HTTPStatus.BAD_REQUEST == 400
+
+
+
+	
+		HttpEntity<T>
+			: HTTP Request, HTTP Response 에 대응하는 HttpHeader , HttpBody 를 포함하는 클래스
+				public class HttpEntity<T> {
+
+					private final HttpHeaders headers;
+
+					@Nullable
+					private final T body;
+
+					. . . 
+		
+				}
+
+			: ResponseEntity<T> , RequestEntity<T> 가 이를 상속한다.
+
+
+		ResponseEntity<T>
+			: REST API 기반 reuqest  의 응답을 위해 사용하는 클래스
+			: HttpHeaders, HttpBody 와 HttpStatus을 포함한다.
+			: HttpEntity 를 extends 한다.
+			: 객체 생성 방법
+				sol1. 생성자
+					: 결론적으론 (1) , (2) 의 경우  arg 로 들어가지 않은 얘들은 다 null 로 간주해 내부적으로 다 있는 생성자( (3) )을  this( X , X, X ) 로 호출한다. 
+					(1) HttpStatus 만 받는 생성자
+						public ResponseEntity(HttpStatus status) 
+
+					(2) body  (T 타입 객체)와 HttpStatus 받는 생성자
+						public ResponseEntity(@Nullable T body, HttpStatus status) 
+
+					(3) HttpHeaders, HttpBody 와 HttpStatus 다 있는 생성자
+  						public ResponseEntity(@Nullable T body, @Nullable MultiValueMap<String, String> headers, HttpStatusCode statusCode)    					 
+
+
+			*******sol2. 빌더 패턴>>
+				: https://00h0.tistory.com/88
+				: https://velog.io/@injoon2019/%EC%8A%A4%ED%94%84%EB%A7%81-ResponseEntity
+
+				: ResponseEntity 를 대상으로 하여 필요에 따라 조합해서 사용하면 된다
+				*******: build( ) 혹은 body( 내용 ) 은 반드시 포함해야된다
+						: build( ) ,  body( 내용 )이 ResponseEntity 객체를 생성하는 기능이 있기 때문
+					ex) ResponseEntity.status( HTTPStatus.OK ).body( 내용 ).header( 내용 )
+			
+   
+				(1) static ok( ) >> 상태를 HttpStatus.OK 로 설정한다
+    				(2) static ok(@Nullable T body) >> 상태를 HttpStatus.OK 로 설정 및 body 에 담을 내용도 함께 설정한다.
+					: ok( ) 의 경우 성공적인 상태로 body 에 담을 내용이 있으니까 오버로딩 되어있는 거지 badRequest, notFound 는 딱히 body 를 담을 필요가 없으므로 메서드가 오버로딩 되어있지 않은 것이다
+
+				(2) static badRequest( ) >>상태를 HttpStatus.BAD_REQUEST 로 설정한다 
+				(3) static notFound( ) >>상태를 HttpStatus.NOT_FOUND 로 설정한다 
+
+				(4) static status( HttpStatus status )  >> 상태코드를 arg로 명시한다. 
+					: 숫자코드 와 enum ( HttpStatus.OK  같은 )  모두 가능
+
+
+
+				(5)  body( 담을내용 )  
+					: ResponseEntity 객체를 생성하고 body 에 담을 내용을 설정 헤준다
+					: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/http/ResponseEntity.BodyBuilder.html
+
+     				   public <T> ResponseEntity<T> body(@Nullable T body) {
+        				    return new ResponseEntity(body, this.headers, this.statusCode);
+       				 }
+
+
+				(6) static build( ) 
+					: body 에 담을 내용이 없을 떄 사용한다. body 의 값을 null 로 설정해준다. 
+						: body( 내용 ) 이 결국 ResponseEntity 객체 생성하는 거라 얘도 결국 ResponseEntity를 생성하는 역할을 하게 된다.
+
+					: https://00h0.tistory.com/88
+					 public <T> ResponseEntity<T> build() {
+   					          return this.body((Object)null);
+   					 }
+
+				(6) static created( URI location ) 
+					: Http response 메세지의 header 부분에 표시할 location 키값의 value 를 설정할 수 있게 한다
+	  				  public static BodyBuilder created(URI location) {
+  					      return (BodyBuilder)status(HttpStatus.CREATED).location(location);
+   					 }
+
+				(7) header( 담을내용 )
+     				   public BodyBuilder header(String headerName, String... headerValues) {
+        				String[] var3 = headerValues;
+        				int var4 = headerValues.length;
+        				for(int var5 = 0; var5 < var4; ++var5) {
+        					String headerValue = var3[var5];
+        					this.headers.add(headerName, headerValue);
+        				}
+            				        return this;
+            				    }
+
+
+
+
+
+
+
 		: 구현 
 			0. api 패키지 생성 
 			1. 클래스 만들고 @RestController 를 위에 적음 
 				: 클래스명은 주로 XXXXApiController.java
 				: @Controller 가 아님을 주의
+				: @RestController
+					: 일반적인 @Controller 기능 + 내부의 모든 메서드에 자동으로 @ResponseBody 를 추가해줌.
 
 			2. 메서드 생성
-				(1) URL 맵핑  >> @GetMapping, @PostMapping 뿐 아니라 @PatchMapping , @PutMapping 도 이제 할 수 있다
+				(0) URL 맵핑  >> @GetMapping, @PostMapping 뿐 아니라 @PatchMapping , @PutMapping 도 이제 할 수 있다
+
+				(1) 메서드 위에 사용할 어노테이션 명시 
+					@ResponseBody
+						: 메서드에서 리턴되는 자바객체를 HTTP response 메세지의 body 에 담아 전송시켜준다.
+						: @RestController 에서는 자동적으로 내부 메서드에 @ResponseBody 가 붙기 때문에 생략해도 괜찮긴 하다. 
+						: https://velog.io/@nomonday/Spring-RequestBody-ResponseBody-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0
+
 
 				(2) 파라미터 설정 >> 
 					: 참고로 @PathVariable 은 여기서도 유용하게 사용하지만, @ModelAttribute 는 그닥 사용 안한다(JSON 으로 데이터 주고받으니까)
 					@RequestBody
-						: json 기반 request 데이터를 받을 경우 @ModelAttribute 이 아니라 @RequestBody 를 쓴다
-						: 암기 tip >> HTTP request 메세지의 body 부분 데이터를 가져온다
-							
-						: 주의  >> @ModelAttribute 과는 다르게 @RequestBody 를 생략한다고 해서 그 파라미터 객체에 자동으로 @RequestBody 가 달리진 않는다. 직접 명시해줘야 json 데이터를 받을 수 있다.
+						: http request body 부분을 그대로 전달받고 해당 파라미터 객체에 맵핑해준다
+						: json 기반 request 데이터를 받을 경우 @ModelAttribute 이 아니라 @RequestBody 를 쓴다							
+						: 주의  	
+							0. @ResponseBody 랑 다른거다
+							1. @ModelAttribute 과는 다르게 @RequestBody 를 생략한다고 해서 그 파라미터 객체에 자동으로 @RequestBody 가 달리진 않는다. 직접 명시해줘야 json 데이터를 받을 수 있다.
+						: https://cheershennah.tistory.com/179
+
+				
 
 			******(3) (뷰네임이 아닌) 데이터를 리턴
+					: GET 메서드 
+						단일 레코드 정보 >> 엔티티 타입의 객체 
+						레코드 집합 정보 >> List<엔티티타입> 객체
+
+					: POST 메서드 >> 엔티티타입 객체
+
+					: PATCH 메서드 >> ResponseEntity< 엔티티타입> 객체
+				
+												
 
 			
 
