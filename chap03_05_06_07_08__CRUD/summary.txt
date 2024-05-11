@@ -584,7 +584,26 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 			:  name 속성 >> 엔티티 이름을 지정한다
 					: 그냥 name 속성을 명시하지 않고 사용 가능하다
 
+		********: patch 메서드를 별도로 만들어둔다 >> 그래야 update 를 쉽고, 효율적이게 할 수 있다
+				: 활용 >> service 클래스에서  patch 구현 메서드에 다음을 작성한다.
+					1. 엔티티타입  변경데이터담은객체명 = 뱐경데이터담은dto객체.toEntity();
+						: patch( ) 의 arg 로 넣기 위해 수정데이터가 담긴 dto 객체를 entity 화 한다.
+					2. 엔티티타입 db에서가져온객체명 = respository객체.findById(id).orElse(null);
+						: 수정당할원본객체를 db 에서 뽑아온다
+					3. db에서가져온객체명.patch( 변경데이터담은객체명 ); 
+						: 변경데이터딤은객체에서 null 이 아닌 값을 가진 필드만 해당 값으로 db에서가져온객체의 필드값을 수정해준다. 
+						: 주의 >> 변경데이터담은객체명.patch( db에서가져온객체명 ); 가 아니다
 
+					4. respository객체.save( db에서가져온객체명 );
+						: 수정이 반영된 객체를 save 한다
+
+				: public void patch( 수정데이터를가진엔티티타입객체 ){ 
+					(if 수정데이터를가진엔티티타입객체.필드1 != null ) this.필드1 = 수정데이터를가진엔티티타입객체.필드1;
+					(if 수정데이터를가진엔티티타입객체.필드2 != null ) this.필드2 = 수정데이터를가진엔티티타입객체.필드2;
+					(if 수정데이터를가진엔티티타입객체.필드3 != null ) this.필드3 = 수정데이터를가진엔티티타입객체.필드3;
+					. . .
+
+				} 
 
 
 
@@ -1078,24 +1097,27 @@ JPA 를 활용한 CRUD Create생성 Read조회 Update수정 Delete삭제
 					: post 방식은 URL 뒤에 단순 붙여서 못보내니까 "/URL/{{id}}" 같은건 불가하다
 			
 		2. postMapping 으로 폼 데이터 처리
-			: 내가 시도했던 방법 >> 실행은 되지만 entity 의 setter 를 사용하므로 비추천
-			(1) form 데이터를 dto 로 받을 순 있어도 entity 로 바로 받진 못하니까 @ModelAttribute 로 dto 받고,  dto 에는 id 필드를 만들어두지 않았으므로 @RequestParam 으로 id 를 별도로 받는다.
-			(2) 엔티티타입 변수명 = repository.findById( id ).orElse( null ) ; 으로 해당 객체를 얻어낸다
-			(3) 변수명.setXXX( dto.getXXX( )); 로 수정한다
-			(4) repository.save( 변수명 ); 한다 
-			(5) 완료 URL 로 redirect
+			: 내가 시도했던 방법 >>  변경 데이터가 들어오지 않으면 기존 데이터가 유지되긴 해도 entity 의 setter 를 사용하므로 비추천
+				(1) form 데이터를 dto 로 받을 순 있어도 entity 로 바로 받진 못하니까 @ModelAttribute 로 dto 받고,  dto 에는 id 필드를 만들어두지 않았으므로 @RequestParam 으로 id 를 별도로 받는다.
+				(2) 엔티티타입 변수명 = repository.findById( id ).orElse( null ) ; 으로 해당 객체를 얻어낸다
+				(3) if(dto.getXXX( ) != null) 변수명.setXXX( dto.getXXX( )); 로 새로 입력된 데이터 대해서만 수정한다
+				(4) repository.save( 변수명 ); 한다 
+				(5) 완료 URL 로 redirect
 
 
-			: 교재 방법
-			(1) dto 에 id 필드 추가
-			(2) form 데이터를 @ModelAttribute dto 로 받음
-			(3) dto.toEntity( ) 로 entitiy 화
-			(4) 엔티티타입 변수명 = repository.findById( dto.getId( ) ).orElse( null ) ; 해서 기존 객체 뽑음 << 꼭 해야되나? 바로 save( entity화한거) 하면 안되나?
-			(5) (변수명 != null) 이면 repository.save(entity화한거) 한다
-			(6) 완료 URL 로 redirect
+			: 교재 방법1 >> 비추. 변경 데이터가 들어오지 않으면 null 값이 들어감
+				(1) dto 에 id 필드 추가
+				(2) form 데이터를 @ModelAttribute dto 로 받음
+				(3) dto.toEntity( ) 로 entitiy 화
+				(4) 엔티티타입 변수명 = repository.findById( dto.getId( ) ).orElse( null ) ; 해서 기존 객체 뽑음 << 꼭 해야되나? 바로 save( entity화한거) 하면 안되나?
+				(5) (변수명 != null) 이면 repository.save(entity화한거) 한다
+				(6) 완료 URL 로 redirect
+
+		*******: 교재 방법2 >> 개추. setter 를 사용하지도 않고 변경 데이터가 들어오지 않으면 기존 데이터 유지
+				(1)
+				(2)
  
 					
-			: 기타 인터넷 추천 방식도 사용해보기
 
 
 -----------------------------------------------------------------------------------------------------------------
