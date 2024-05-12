@@ -169,6 +169,8 @@
 
 
 				▼resources : 외부 파일(html 등)이 저장됨
+					▼ META-INF : 원래 있는건 아니고 직접 만들어야된다. 
+						▶ orm.xml : 직접 만들어줘야된다. 네이티브 쿼리 메서드가 실행할 쿼리문을 작성한다.
 
 					▶ application.properties : 애플리케이션 설정 파일	
 						: https://blog.naver.com/seek316/222377933856
