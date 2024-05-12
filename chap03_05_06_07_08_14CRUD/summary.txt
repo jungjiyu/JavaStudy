@@ -386,8 +386,8 @@ DDL DML , DCL
 key
 	인조키: 데이터를 테이블 화 했을 떄 테이블 내에서 딱히 식별자로 사용할 수 있는 Column 이 없어서 행을 식별하기 위해 추가한 Column
 	후보키 Candidate Key : 식별자로 사용될수 있는 Column. 
-	기본키 Primary Key  : 실제로 해당 테이블의 식별자로 사용하는 Column
-	대체키 Alternate Key : Candidate Key 이지만 Primary Key 로 발탁되지 않은 Column 들
+	기본키 . 대표키 Primary Key  : 실제로 해당 테이블의 식별자로 사용하는 Column
+	대체키 Alternat e Key : Candidate Key 이지만 Primary Key 로 발탁되지 않은 Column 들
 	중복키 Composite Key :  혼자서는 식별자로 사용될 수 없지만, 그룹핑 했을 때 식별자로 사용될 수 있는 Colum
 	외래키 Foreign Key :  다른 테이블의 PK 값을 나타내는 Column
 
@@ -422,6 +422,7 @@ key
 	: FK
 		: 한 테이블은 여러개의 FK 를 가질 수 있다.  ( 부모 여러명 가능 )
 		: FK 인 Column 명이 꼭 부모 테이블의 PK 명과 똑같을 필욘 없고, 맥락상 이해가 가는 정도로만 작명하면 된다.
+			ex) User 테이블과 Comment 테이블 은 1:n 관계 이고 각각 id column 을 PK 로 한다고 하자. User 테이블과 Comment 테이블은 1: n 관계이므로 Comment 테이블은 User 테이블의 id column 을 FK 로 가져야되는데 그 이름 그대로 쓰면 Comment 테이블 자신의 id column 과 column 명이 겹치므로 user_id column 으로 작명하여 FK 를 마련한다.
 
 
 	(1) 1:1 관계 >>  1:1 관계에서는  의존적인 테이블을 판단하여 FK 를 준다 
@@ -433,9 +434,65 @@ key
 		: https://siyoon210.tistory.com/26
 
 
+
+단방향, 양방향 연관관계
+	: https://velog.io/@conatuseus/%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84-%EB%A7%A4%ED%95%91-%EA%B8%B0%EC%B4%88-2-%EC%96%91%EB%B0%A9%ED%96%A5-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%99%80-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%9D%98-%EC%A3%BC%EC%9D%B8
+	: 한쪽에서만 다른 쪽을 접근 할 수 있는지 , 양쪽에서 모두 서로 접근할 수 있는지.
+	: 객체의 연관관계 >>   주소(참조)로 관계를 맺고, 항상 단방향이다 ( 양쪽에 모두 서로를 참조하는 필드가 있다해도 정확히 말하면 서로 다른 단방향 관계이다. )
+	: 테이블 연관관계 >>  외래키로 관계를 맺고, 외래 키 하나만으로 필요따라 양방향 / 단방향 관계 모두 가능하다.
+		: 양방향 >> 부모 엔티티에 @OneToMany 있으면. 즉, 부모 쪽에서도 자식쪽으로의 접근이 가능할 떄. 
+		: 단방향 >> 부모 엔티티에 @OneToMany 없으면. 즉, 부모 쪽에서는 자식쪽으로의 접근이 불가할 떄. 
+
+	: ex ) 학생과 학교
+		객체 >> 단방향 : Studnet 객체와 School 객체는 단방향 관계이다. Student.school 필드를 통해 학생이 다니는 학교를 알 수 있지만, School 객체에는 student 에 접근하는 필드가 없어 학교에 다니는 학생들을 알 수 없다.
+
+		테이블 >> 양방향 : STUDENT 테이블과 SCHOOL 테이블은 외래키로 연관관계를 맺는다. STUDENT 테이블의 FK 인 SCHOOL_NAME 으로 학생과 학교를 join 할 수 있고, 학교와 학생을 join 할 수 있다.
+
+
+(연관관계) 주인 ownership >> 양방향 연관관계에서의 관리 주체. 관리자.
+	: https://velog.io/@conatuseus/%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84-%EB%A7%A4%ED%95%91-%EA%B8%B0%EC%B4%88-1-i3k0xuve9i
+
+	: 연관관계의 주인만이 데이터베이스 연관관계와 매핑되고 외래 키를 관리(등록, 수정, 삭제)할 수 있다. 반면에 주인이 아닌 쪽은 읽기만 할 수 있다. 
+
+	: 주인 엔티티 != 부모 엔티티는 분명히 다르다.
+		: 부모 엔티티 >> 의존도(부모 없이 자식이 존재할 수 없는 관계)를 통해 정해짐
+		: 주인 엔티티 >> DB에 저장되는 FK를 어떤 엔티티가 관리하게 할지 결정.
+
+	: 주인 결정의 필요성 >> 엔티티를 양방향 관계로 설정하면 객체의 참조는 둘이지만 외래키는 하나이므로 두 엔티티 중 하나를 연관관계의 주인으로 정해야 된다. 
+	: ownership 의 표현 >> 주인쪽에 @JoinColumn 과 mappedBy 속성을 사용하여 주인임을 나타낸다
+
+******: 연관관계의 주인은 자식 엔티티이다. (외래키를 자식 테이블에서 관리하니까.)
+
+	: 양방향 연관관계에서 일단 주인쪽에서는 반드시 주인아닌쪽의 정보( 부모엔티티타입 필드의 값 ) 을 저장해야된다. JPA 를 사용할 경우 주인이 아닌 쪽에서 주인인쪽의 정보( List<자식엔티티>타입 필드의 요소 값 ) 반드시 저장할 필요는 없지만, 주인쪽에만 저장하고 주인이 아닌쪽에 저장하지 않으면 , JPA 없이 순수 자바를 사용할 때 문제가 생길 수 있으므로  주인과 주인이 아닌 쪽 모두에 서로의 값을 저장하는 것이 안전하다. 
+		: 그러니까 주인쪽만 주인이아닌쪽의 정보를 저장할 경우 table 상에는 문제없이 잘 반영되지만, 애플리케이션 내부에서 로그 찍을 때 주인이 아닌쪽으로 주인을 참조하면 null 이 나오므로 (주인인 쪽에 대한 아무런 정보를 저장하지 않았으니) 좀 헷갈리게 된다는 말이다.
+		: 간편하게 양쪽 모두 서로를 저장하게 하는 tip >> 주인쪽에서 주인이 아닌쪽을 저장하는 메서드에 , 주인이 아닌쪽도 주인쪽을 저장하게하는 코드를 추가한다.
+			ex ) 
+			public class Member{ // 자식 엔티티. 주인 엔티티.
+
+				@ManyToOne
+				private Team team;
+
+				public void setTeam(Team team) { // 기본적으로는 주인이 아닌 쪽을 저장하는 용도지만, 편의상 주인이 아닌쪽이 주인을 저장하게 하는 코드도 추가한다
+   					 this.team = team;  
+   					 team.getMembers().add(this); //추가된 부분
+  				}
+				. . .
+
+			}
+		
+
+	: https://velog.io/@conatuseus/%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84-%EB%A7%A4%ED%95%91-%EA%B8%B0%EC%B4%88-2-%EC%96%91%EB%B0%A9%ED%96%A5-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%99%80-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%9D%98-%EC%A3%BC%EC%9D%B8
+
+
+
+
+
+
 -----------------------------------------------------------------------------------------------------
 
 
+
+-----------------------------------------------------------------------------------------------------
 
 JDBC Java DataBase Connectivity >> 자바 언어로 데이터베이스와 통신하기 위한 API. 자바 언어와 DBMS 사이에 연결을 지원하는 표준 . DB 작업을 위한 표준
 	: JDBC 드라이버 
@@ -648,10 +705,10 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 					: 주의 ) @Column 을 명시하는 경우 딱히 primitive type 이런거 인식 안해주고 명시 안된건 걍 default 값 때려버리므로, @Controll 명시할 시 primitive 타입 필드엔 반드시 nullable=false 로 지정해주어야한다.
 				: https://ttl-blog.tistory.com/114
 
-			:  name 속성 >> 엔티티 이름을 지정한다
-					: 그냥 name 속성을 명시하지 않고 사용 가능하다
-
-		********: patch 메서드를 별도로 만들어둔다 >> 그래야 update 를 쉽고, 효율적이게 할 수 있다
+			:  name 속성 >> JPA JPQL 에서 사용하는 엔티티 이름을 지정한다
+				: 그냥 name 속성을 명시하지 않고 사용 가능하다
+				: 주의 ) db 상에서의 테이블명을 지정하는건 @Table 의 name 속성으로 해야된다.
+		******: patch 메서드를 별도로 만들어둔다 >> 그래야 update 를 쉽고, 효율적이게 할 수 있다
 				: public void patch( 수정데이터를가진엔티티타입객체 ){ 
 					(if 수정데이터를가진엔티티타입객체.필드1 != null ) this.필드1 = 수정데이터를가진엔티티타입객체.필드1;
 					(if 수정데이터를가진엔티티타입객체.필드2 != null ) this.필드2 = 수정데이터를가진엔티티타입객체.필드2;
@@ -678,23 +735,27 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 
 
 
-		: @Table >> entity 를 db 상에서 어떠한 테이블로 생성할건지(맵핑할건지) 정한다
+		: @Table >>catalog, schema, uniqueConstaraints 같은 구체적인 DB스키마를 만들때 사용되는 정보를 설정한다.
 			: 주로 @Entity 와 함께 쓰이고, 생략 시 엔티티 이름이 테이블명이 된다
 			: 속성 
 				1. name : 매핑할 테이블 이름 
+					:  @entity의 name 속성은 JPA에서 사용할 엔티티 이름이고, @Table 의 name 속성은 엔티티와 매핑할 테이블 명을 지정
+					: https://mkshin96.github.io/jpa/2021/03/24/Name-attribute-in-@Entity-and-@Table.html
 				2. catalog :  catalog 기능이 있는 데이터베이스에서 catalog 매핑
 					: catalog >> 색인. 즉, 데이터베이스의 메타데이터를 저장하는 객체
 				3. schema : schema기능이 있는 데이터베이스에서 schema를 매핑한다
 					: schema >>도식. 즉, db의 전반적인 명세를 기술한 것.
 				4. uniqueConstraints : DDL 생성 시, 유니크 제약조건을 만든다.
+
+
 		: @NotNull
 			: null 값을 허용하고 싶지않은 필드 위에 명시한다. 
 				: 빈 문자열은 허용되는 거다
-
 			: @NotNull vs @Column(nullable=false)
 				: 기능은 같지만 예외발생 시점이 다르다
 					: @Notnull 은 예외를 쿼리 생성 전에 발생시키고,  @Column(nullable=false) 은 예외를 쿼리 실행 중에 발생시킨다.
 				: 되도록이면  @Column(nullable=false) 를 써라.
+
 
 		: @Column >> 테이블과 필드를 매핑하기 위해 사용. 해당 필드에 대응하는 column을 생성한다
 			: @Entity 내 필드 위에 명시한다
@@ -730,6 +791,50 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 				8. columnDefinition : 직접 해당 COLUMN 정보를 ( sql 문으로 )입력
 					@Column(columnDefinition = "varchar(100) default 'EMPTY'")
 					private String data;
+
+
+		:  @OneToOne, @ManyToOne , @OneToMany , @ManyToMany , @JoinColumn
+			: 주의 >> 대상 필드는 FK 로 사용할, 사용될 column을 바로 정의하는게 아니다	( 해당 필드의 타입은 테이블 상의 FK 값의 타입이 아니고, 해당 필드명은 테이블 상의 FK column 명이 아니다. )	
+
+			: 다양한 관계, 주인의 개념에 대한 정리는 윗 부분에 정리했으므로 참고.
+
+
+		 ******@ManyToOne >> N:1 관계
+ 				: 자식테이블에 "부모테이블"타입의 필드를 선언하고 그 위에 명시한다.
+				: 이 어노테이션을 가지는 테이블이 자식 테이블, 주인 테이블이 된다.
+					: FK 가 있으니까
+				: 속성 
+					1. optional
+					2. fetch
+					3. cascade
+
+		 ******@OneToMany >> 1:N 관계
+				: 부모테이블에 "List<자식테이블>"타입의 필드를 선언하고 그 위에 명시한다.
+				: 이 어노테이션을 가지는 테이블이 부모 테이블, 주인이 아닌 테이블이 된다. 
+					: FK 가 없으니까
+
+
+			@JoinColumn  >> 외래키 컬림 설정 위해 사용 . 보통 FK 컬럼의 name 을 정하고자 사용.
+				: @ManyToOne 명시한 쪽(주인쪽)에 함께 명시한다.
+				: 생략 가능하고, 생략시  name 속성은 디폴트 값인 " 부모엔티티명_기본키명" 이 적용된다.  
+					: 이 어노테이션은 테이블을 join 시키는 역할이 아니라( 이거 없다고 join 안되는게 아니라), FK column 의 이름 같은걸 쉽게 설정하기 위해 존재하는 거다.
+					: https://hyeon9mak.github.io/omit-join-column-when-using-many-to-one/
+
+				: 속성 
+					1. name : 테이블에서 사용될 FK  컬럼명 결정
+						: 기본값 >> 부모엔티티명_기본키명"
+
+					2. referencedColumnName : 부모 테이블의 어떤 column 을 참조할 건지 직접 명시
+					3. unique, nullable , insertable, updatable, columnDefinition, table : @Column 에서 쓰던거 그대로 쓸 수 있음.
+
+
+		 	@ManyToMany , @OneToOne  >> N:M 관계 , 1:1 관계
+				: @ManyToManys는 모테이블과 자식테이블 만으로는 표현이 불가하고, 중간에 mapping 테이블을 따로 두어야하기 때문에 사용이 권장되지 않는다. 
+				: @OneToOne 도 많이 사용하진 않는다
+
+
+			: https://velog.io/@goniieee/JPA-OneToMany-ManyToOne%EC%9C%BC%EB%A1%9C-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84-%EA%B4%80%EB%A6%AC%ED%95%98%EA%B8%B0
+
 
 		: @Id >> Primary Key 로 지정할 필드를 설정
 
@@ -1068,13 +1173,31 @@ ex ) 										Member member = memberRepository.findById(id);  // 그냥 T 타�
 									: T, ID >>   (인터페이스 extends 할 때 명시한) 엔티티 타입, PK 타입
 
     									(1) <S extends T> List<S> saveAll(Iterable<S> entities);
+										: List<엔티티타입> 타입으로 반환해줘서 반환값을 (List<엔티티타입>) 로 강제형변환 할 필요 없게 해준다.
+
     									(2) List<T> findAll( );
 										: (조건 없이) 테이블 전체값 가져오기
 										: Test에선 쓰이지만 실제서비스에선 성능 때문에( 모든 데이터 다 조회하는데는 시간이 오래 걸리니까 ) 잘 사용하지 않음.
 
 
     									(3) List<T> findAllById(Iterable<ID> ids);
-										: arg 로 주어진 Iterable 객체에 대응하는 엔티티를 조회한다.
+										: Id값들을 List로 받아서 한번에 특정 레코드들을 조회 가능
+
+									(4) void flush();
+										: 현재 JPA context 에 있는 쿼리들을 db 에 반영하는 메서드
+
+									(5) <S extends T> S saveAndFlush(S entity)
+										: 해당 엔티티를 JPA context 에 저장하고 바로 db 에 반영
+
+									(6) <S extends T> List<S> saveAllAndFlush(Iterable<S> entities);
+										: 엔티티들을 JPA context 에 저장하고 바로 db 에 반영
+
+									(7) void deleteAllInBatch(Iterable<T> entities);
+										:  조건없이 해당 "테이블"들을 통제로 지운다. 실제로 쓰겠냐 이걸.
+
+									(8)  T getById(ID id);
+										: T getOne(ID id) 는 현재 depreceated 됬다.
+
 
 							: https://velog.io/@minju0426/JPARepository%EC%97%90-%EB%8C%80%ED%95%B4-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90%EC%82%AC%EC%9A%A9%EB%B2%95-Method
 
