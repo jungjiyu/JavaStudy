@@ -549,7 +549,7 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 							: 단일 데이터 받을 때는 단순 dto 타입으로 받았었으니까
 
 					@RequestBody
-						: http request body 부분을 그대로 전달받고 해당 파라미터 객체에 맵핑해준다
+						: http request body 에 실린 내용을 자바 객체로 변환하여 해당 파라미터에 맵핑해준다
 						: json 기반 request 데이터를 받을 경우 @ModelAttribute 이 아니라 @RequestBody 를 쓴다							
 						: 주의  	
 							0. @ResponseBody 랑 다른거다
