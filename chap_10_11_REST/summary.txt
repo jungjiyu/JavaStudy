@@ -559,10 +559,10 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 
 
 			******(4) 실패와 성공에 대한 처리 
-				********sol0 >> 서비스 단에서 예외처리 Exception Handling 해주고, 컨트롤러에서는 성공한 경우만 고려하여 반환하게 함
+				********sol0 >> 예외처리 Exception Handling 해주고, 컨트롤러에서는 성공한 경우만 고려하여 반환하게 함
 
 
-					sol1 >> 서비스 단에서 별다른 예외 처리없이 서비스 단의 반환 값 따라  컨트롤러에서 삼항연산자로 판별하여 결과 반환
+					sol1 >> 별다른 예외 처리없이 서비스 단의 반환 값 따라  컨트롤러에서 삼항연산자로 판별하여 결과 반환
 						List<CommentDTO> dtos = commentService.getCommentsById(articleId);
 						return dtos != null ?  ResponseEntity.status(HttpStatus.OK).body(dtos): ResponseEntity.status(HttpStatus.NOT_FOUND).build();
  
