@@ -542,6 +542,8 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 						0. 클라이언트로부터 데이터 받는건 ' 엔티티타입 || List< 엔티티타입> ' 파라미터가 아니라 ' dto타입 || List<dto타입> '  파라미터이다
 							: 엔티티타입객체는 서버 상에서 일반데이터를 db에 멥핑하기 위해 가공한 객체인거다
 							: 클라이언트에게 데이터를 반환할 때도 ResponseEntity< dto타입 || List<dto타입>  >  꼴을 반환한다.
+						********: 리파지토리 메서드들은 반환할 때  ' 엔티티타입 || List< 엔티티타입> ' 임을 주의 (db 에 직접 쓰이는 거니까)
+
 						1.  @PathVariable 은 여기서도 유용하게 사용하지만, @ModelAttribute 는 그닥 사용 안한다(JSON 으로 데이터 주고받으니까)
 						2. 객체 하나가 아니라 여러 객체( 객체를 요소로 하는 배열 ) 을 받을 경우 파라미터 타입을 List< dto타입> 으로 해서 받으면 된다		
 							: 단일 데이터 받을 때는 단순 dto 타입으로 받았었으니까
@@ -554,11 +556,21 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 							1. @ModelAttribute 과는 다르게 @RequestBody 를 생략한다고 해서 그 파라미터 객체에 자동으로 @RequestBody 가 달리진 않는다. 직접 명시해줘야 json 데이터를 받을 수 있다.
 						: https://cheershennah.tistory.com/179
 
-				
+
+
+			******(4) 실패와 성공에 대한 처리 
+				********sol0 >> 서비스 단에서 예외처리 Exception Handling 해주고, 컨트롤러에서는 성공한 경우만 고려하여 반환하게 함
+
+
+					sol1 >> 서비스 단에서 별다른 예외 처리없이 서비스 단의 반환 값 따라  컨트롤러에서 삼항연산자로 판별하여 결과 반환
+						List<CommentDTO> dtos = commentService.getCommentsById(articleId);
+						return dtos != null ?  ResponseEntity.status(HttpStatus.OK).body(dtos): ResponseEntity.status(HttpStatus.NOT_FOUND).build();
  
 			******(3) (뷰네임이 아닌) 데이터를 리턴 >> 주로 ResponseEntity< dto타입 > 혹은  ResponseEntity< List < dto타입 > > 
-					: dto 가 아닌 엔티티를 반환(  ResponseEntity< 엔티티타입 > 혹은  ResponseEntity< List < 엔티티타입 > > ) 해도 큰 문제가 없지만 엔티티를 그대로 클라이언트에게 준다는 것도 좀 그렇고 보통 계층간 데이터 전송에는 엔티티가 아닌 dto 를 쓴다 (엔티티는 db 에 객체를 쉽게 넣기 위한 것으로 service 계층에서 주로 쓰인디) .
-					: https://hjhng125.github.io/jpa/jpa-entity-by-controller/
+					: dto 가 아닌 엔티티를 반환(  ResponseEntity< 엔티티타입 > 혹은  ResponseEntity< List < 엔티티타입 > > ) 해도 큰 문제가 없지만 엔티티를 그대로 클라이언트에게 준다는 것도 좀 그렇고 보통 계층간 데이터 전송에는 엔티티가 아닌 dto 를 쓴다 (엔티티는 db 에 객체를 쉽게 넣기 위한 것으로 service 계층 내부, repository 에서 주로 쓰인디) .
+						: https://hjhng125.github.io/jpa/jpa-entity-by-controller/
+
+
 
 												
 
