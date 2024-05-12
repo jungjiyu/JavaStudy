@@ -488,8 +488,6 @@ key
 
 
 
------------------------------------------------------------------------------------------------------
-
 
 
 -----------------------------------------------------------------------------------------------------
@@ -949,8 +947,11 @@ JPA Java Persistence API >> Java 진영에서 ORM기술 표준으로 사용하�
 							ex) public interface MemberRepository extends JpaRepository<Member,Integer> 
 
 					: 인터페이스를 꼭 상속받아야되는건 아니지만 보통 상속받는편
-						: 이 인터페이스들이 DAO 의 역할을 수행하기에 상속 받으면 개발자가 DAO를 직접 만들 필요가 없어지기 때문.
+						: 이 인터페이스들이 DAO 의 역할을 수행하기에 상속 받으면 개발자가 DAO를 직접 만들 필요가 없어지기 때문. 
+
 						: 단순 이 인터페이스를 상속 받는 것 만으로 Repository 인터페이스의 구현 클래스를 생성하지 않아도(메서드 내용을 작성하지 않아도) JPA 가 알아서 내부적으로 구현 클래스를 생성해주기 때문.  
+						
+
 
 
 					: 종류
@@ -1098,14 +1099,50 @@ ex ) 										Member member = memberRepository.findById(id);  // 그냥 T 타�
 								: https://www.daleseo.com/java8-optional-after/
 								: https://dev-coco.tistory.com/178
 
-							: 새롭게 정의 가능한 메서드
+
+			
+
+
+
+
+
+
+
+							:  JPA 도움 받아서 쉽게 커스터마이징 네이티브 쿼리 메서드 만드는 법
 								: https://recordsoflife.tistory.com/1228
 								: https://devfunny.tistory.com/426
+
+								:네이티브 쿼리 메서드 native query method 
+									: 쿼리를 메서드의 형태로 작성한 것.
+
 								: 규칙
 									1. XXXXBy@@@( A @@ ) 꼴의 메서드의 경우 @@부분 즉 column 명을 entity 의 속성명으로 수정하여 정의 가능하다 ( 정의만 하면 알아서 구현해준다 )
 									2. 메서드 명의 컬럼명 부분에 And , Or, Between ... 등을 명시하여 where ~ and||Or||Between ...  효과를 낼 수 있다
 								: ex)  Optional  findBy컬럼명1And컬럼명2 (컬럼타입1  파라미터명1 ,컬럼타입2 파라미터명2 )
 								: ex) Optional deleteByName(String name);
+
+
+
+
+							: JPA 도움 없이직접 커스터마이징 네이티브 쿼리 메서드 만드는 법
+								sol1. @Query 어노테이션 
+									: Repository 인터페이스 내부에 작성한 추상 메서드 위에 명시한다
+									: @Query는 SQL 뿐 아니라 JPQL 모두 지원한다
+										:  JPQL Java Persistence Query Language >>  SQL 과 유사한 객체 지향 쿼리 언어를 통해 작동된다.
+									: 속성
+										value  :  실행할 쿼리문을 할당한다
+											: 쿼리문 작성 방법 >> 대체적으로 일반적인 쿼리문과 다를게 없는데, 해당 메서드의 매개변수를 쿼리문에 삽입한 경우 삽입한 매개변수 앞에 ':'를 붙여 매개변수값이 대입되는 부분임을 나타내야된다.
+											EX )    @Query(value="SELECT * FROM comment WHERE article_id = :articleId", nativeQuery = true)
+												  List<Comment> findByArticleId(Long articleId);
+
+										nativeQuery : SQL 문을 사용할 건지, JPQL 을 사용할 건지 결정한다. 
+											true: SQL 문을 사용
+											false: JPQL 문을 사용
+
+								sol2. orm.xml 파일 사용
+									: resource/META-INF 아래의 orm.xml 에  xml 형식으로 쿼리문 mapping.
+
+
 								
 
 							: 기본 정의되있는 메서드 << 대부분의 핵심 메서드가 CrudRepository 에 정의되어있다
@@ -1164,7 +1201,8 @@ ex ) 										Member member = memberRepository.findById(id);  // 그냥 T 타�
     										(5) void deleteAll();
 
 
-						(2) interface JpaRepository< T, ID > 
+						(2) interface JpaRepository< T, ID >
+							: CRUD 기능 + 페이지 정렬 까지 필요할 떄 사용
 							: CrudRepository, ListCrudRepository  의 자식 인터페이스이다 >> CrudRepository 보다 더 많은 기능을 내포
 							: 정의되어있는 메서드
 								: https://velog.io/@stpn94/JPA-Repository-Interface-%EC%83%81%EC%84%B8-1
@@ -1411,3 +1449,30 @@ H2 DB
 
 
 -----------------------------------------------------------------------------------------------------
+
+
+[{
+  "name":"FFFFF",
+  "password":"22222"
+}
+ ,
+ {
+  "name":"FFFFF",
+  "password":"22222"
+}
+ 
+ ,
+ {
+  "name":"FFFFF",
+  "password":"22222"
+}
+ 
+ ,{
+  "name":"FFFFF",
+  "password":"22222"
+}
+ 
+
+ 
+ 
+ ]
