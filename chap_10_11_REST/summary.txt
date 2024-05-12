@@ -402,9 +402,9 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 
 		: Http response message 의 body 에 담길 데이터를 설정하는 방법
 			: ResponseEntity<T>  는 부가적인 데이터까지 포함할 수 있어 사용이 지향된다
-			sol1.  단순 엔티티 타입 객체 반환 >> response body 만 반환		
+			sol1.  단순 dto 객체 반환 >> response body 만 반환		
 				: @ResponseStatus 를 사용하여 상태코드도 같이 전송할 순 있으나 "헤더" 는 반환 못한다.
-			**** sol2. ResponseEntity<T> 반환 >> response body + 상태코드 + 헤더 반환
+			**** sol2. ResponseEntity<dto타입> 반환 >> response body + 상태코드 + 헤더 반환
 
 			: https://ksh-coding.tistory.com/89
 
@@ -442,7 +442,7 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 			: REST API 기반 reuqest  의 응답을 위해 사용하는 클래스
 			: HttpHeaders, HttpBody 와 HttpStatus을 포함한다.
 			: HttpEntity 를 extends 한다.
-			: ex ) List < Member > 데이터를 실질적으로 반환하고 싶다면 ResponseEntity< List< Member > > 타입을 리턴타입으로 하나   
+			: ex ) List < MemberDTO > 데이터를 실질적으로 반환하고 싶다면 ResponseEntity< List< MemberDTO > > 타입을 리턴타입으로 하나   
 			: 객체 생성 방법
 				sol1. 생성자
 					: 결론적으론 (1) , (2) 의 경우  arg 로 들어가지 않은 얘들은 다 null 로 간주해 내부적으로 다 있는 생성자( (3) )을  this( X , X, X ) 로 호출한다. 
@@ -539,9 +539,9 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 
 				(2) 파라미터 설정 >> 
 					: tip 
-						0. 클라이언트로부터 데이터 받는건 엔티티타입 || List< 엔티티타입> 파라미터가 아니라 일반dto타입 || List<일반dto타입>  파라미터이다
+						0. 클라이언트로부터 데이터 받는건 ' 엔티티타입 || List< 엔티티타입> ' 파라미터가 아니라 ' dto타입 || List<dto타입> '  파라미터이다
 							: 엔티티타입객체는 서버 상에서 일반데이터를 db에 멥핑하기 위해 가공한 객체인거다
-							: 근데 또 헷갈리는거는 클라이언트에게 반환하는건  엔티티타입 || List< 엔티티타입> 객체이다. ( 일반dto타입 || List<일반dto타입> 객체가 아니라 ) 
+							: 클라이언트에게 데이터를 반환할 때도 ResponseEntity< dto타입 || List<dto타입>  >  꼴을 반환한다.
 						1.  @PathVariable 은 여기서도 유용하게 사용하지만, @ModelAttribute 는 그닥 사용 안한다(JSON 으로 데이터 주고받으니까)
 						2. 객체 하나가 아니라 여러 객체( 객체를 요소로 하는 배열 ) 을 받을 경우 파라미터 타입을 List< dto타입> 으로 해서 받으면 된다		
 							: 단일 데이터 받을 때는 단순 dto 타입으로 받았었으니까
@@ -556,7 +556,9 @@ REST API 	>> HTTP URL 로 서버의 resource를 명시하고, HTTP 메서드로 
 
 				
  
-			******(3) (뷰네임이 아닌) 데이터를 리턴 >> 주로 ResponseEntity< 엔티티타입 > 혹은  ResponseEntity< List < 엔티티타입 > >  
+			******(3) (뷰네임이 아닌) 데이터를 리턴 >> 주로 ResponseEntity< dto타입 > 혹은  ResponseEntity< List < dto타입 > > 
+					: dto 가 아닌 엔티티를 반환(  ResponseEntity< 엔티티타입 > 혹은  ResponseEntity< List < 엔티티타입 > > ) 해도 큰 문제가 없지만 엔티티를 그대로 클라이언트에게 준다는 것도 좀 그렇고 보통 계층간 데이터 전송에는 엔티티가 아닌 dto 를 쓴다 (엔티티는 db 에 객체를 쉽게 넣기 위한 것으로 service 계층에서 주로 쓰인디) .
+					: https://hjhng125.github.io/jpa/jpa-entity-by-controller/
 
 												
 
