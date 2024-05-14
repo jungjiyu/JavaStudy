@@ -18,6 +18,8 @@
 	: 제공 기능
 
 		(1) 리팩터링 : 
+			0. equals 와 hashcode >> @EqualsAndHashCode : 알아서 알맞게 구현해준다
+
 			1. 생성자 관련
 				:  클래스 위에 명시한다
 
