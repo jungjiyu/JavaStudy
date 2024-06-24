@@ -1,0 +1,224 @@
+https://inpa.tistory.com/entry/MYSQL-%F0%9F%93%9A-JOIN-%EC%A1%B0%EC%9D%B8-%EA%B7%B8%EB%A6%BC%EC%9C%BC%EB%A1%9C-%EC%95%8C%EA%B8%B0%EC%89%BD%EA%B2%8C-%EC%A0%95%EB%A6%AC
+
+
+객체지향프로그래밍 OOP
+	: https://velog.io/@0sunset0/OOP%EC%9D%98-%EB%84%A4%EA%B0%80%EC%A7%80-%ED%8A%B9%EC%A7%95%EC%B6%94%EC%83%81%ED%99%94%EC%BA%A1%EC%8A%90%ED%99%94%EC%83%81%EC%86%8D%EB%8B%A4%ED%98%95%EC%84%B1
+	1. 추상화 : 핵심적인 부분만 보여주고, 자세한 내용은 숨기는 것
+		: 추상클래스와 인터페이스로 객체의 공통적인 속성/기능 을 추출하여 정의하고, 구현을 분리한다. 사용할 당시에는 추상클래스와 인터페이스를 활용하여 자세한 사항은 숨기도록 한다.
+
+	2. 상속 : 기존의 클래스를 재활용하여 새로운 클래스를 작성
+	3. 다형성 : 어떤 객체의 속성/기능이 상황에 따라 여러 가지 형태를 가질 수 있는 성질
+		: 메서드 오버라이딩, 메서드 오버로딩
+
+	4. 캡슐화 :  하나의 캡슐로 만들어 데이터를 외부로부터 보호하되, 필요한 부분만 노출시키는것
+		
+		: 접근제한자(public , protected, private )  로 노출의 정도를 정하고, : getter setter 로 간접적 접근하게 한다
+
+
+
+테이블 join : 두 개의 테이블을 엮어 하나의 결과를 추출할 때 사용
+	: https://velog.io/@newdana01/Database-%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%A1%B0%EC%9D%B8-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0
+	: PK 와 FK 관계로 맺어져야됨 ( 일대다 관계 )
+	: 쿼리문 tip  >> 
+		: 테이블조인에 대한 조건은 "on" << 그러니까 어떤 기준으로 테이블 묶을 건지.
+		: 데이터필터링에 대한 조건은 "where" << 그러니까 어떤 데이터만 표시할지.
+
+	: 종류
+		(1) INNER JOIN 내부 조인: 교집합 데이터를 기준으로 결합하여 조회하는 방법.
+			: 가장 보편적인 조인. 그냥 조인이라고 함 inner join 이다.
+			: 두 테이블에 모두 데이터가 있어야 결과가 나온다.
+SELECT <열 목록>
+FROM <첫 번째 테이블>
+    INNER JOIN <두 번째 테이블>
+    ON <조인 조건>
+[WHERE 검색 조건]
+
+		(2) OUTER JOIN 외부 조인: 공통데이터 뿐 아니라 한쪽에만 존재하는 데이터까지도 함께 결합하여 조회하고자 할 때 사용하는 방법
+			: 순서에 따른 영향을 받는다. 어떤 테이블을 먼저 접근하냐 따라 쿼리 성능에 영향을 미친다.
+			: OUTER JOIN의 종류 : 데이터가 한 쪽에만 존재할 때, 어느 테이블을 기준으로 삼을 것인가
+				1. LEFT OUTER JOIN : 왼쪽 테이블의 모든 값이 출력되는. 그러니까 오른쪽 테이블에 없는 데이터를 가진 열이라도,  출력된다.
+				2. RIGHT OUTER JOIN : 오른쪽 테이블의 모든 값이 출력되는.
+				3. FULL OUTER JOIN : 왼 오 테이블의 모든 값이 출력되는
+SELECT <열 목록>
+FROM <첫 번째 테이블(LEFT 테이블)>
+    <LEFT | RIGHT | FULL> OUTER JOIN <두 번째 테이블(RIGHT 테이블)>
+     ON <조인 조건>
+[WHERE 검색 조건]
+
+		(3) CROSS JOIN 상호 조인 : 한쪽 테이블의 모든 행과 다른 테이블의 모든 행을 조인하는 것.
+			: 상호 조인의 결과의 전체 행 갯수 == 두 테이블의 각 행 갯수를 곱한 숫자. 
+				ex ) A 테이블의 행이 3,  B 테이블의 행이 4 이면 결과는 12 행
+SELECT *
+FROM <첫 번째 테이블>
+    CROSS JOIN <두 번째 테이블>
+
+		(4) SELF JOIN 자체 조인: 자신이 자신과 조인하는 것. 1개의 테이블만 사용된다.
+SELECT <열 목록>
+FROM <테이블> 별칭A
+    INNER JOIN <테이블> 별칭B
+[WHERE 검색 조건]
+
+
+db사용방법
+    : LEV0 ~ 1 까지는 DAO 클래스를 사용
+
+	LEV0. JDBC API 직접 << 가장 저수준
+ 	    step1. 애플리케이션에서 활용하기 위한, db의 테이블에 대한 클래스를 선언
+		ex) 
+			public class Member{
+				private String memberId;
+				private String name;
+				. . .
+			}
+
+	    step 2. db 접근 가능한 DAO 클래스 선언
+		: 내부 메서드로 db에서의 작업을 수행함
+			step1. sql문 직접 작성
+			step2. jdbc api 로 sql 문 직접 실행
+			step3. 반환결과를 직접 애플리케이션의 객체로 맵핑 
+
+		ex ) 
+			public class MemberDAO{ 
+				public Member find(String memberId ){
+					//1. SQL문 직접 작성
+					String query = "SELECT MEMBER_ID, NAME FROM MEMBER M WHERE MEMBER_ID = ? "
+					pstsmt.setString(1, memberId );
+
+
+					// 2. JDBC API 로 SQL 문 실행
+					ResultSet rs = pstsmt.executeQuery(query);
+
+					// 3. 실행결과를 직접 Memeber 객체로 맵핑 
+					String memberId = rs.getString("memberId");
+					String name = rs.getString("name");
+					Member member = new Member( memberId, name );
+				}
+
+			}
+
+
+	LEV1. sql mapper : ibatis(mybatis) , Jdbc template 등 
+		: JDBC API 를 직접 사용하는 것에 비해 코드는 더 단순하지만 여전히 비생산적
+	LEV2. ORM Object Relational mapping 프레임워크
+		: 객체 지향적 개발
+
+
+자바로 개발하는 대부분의 어플리케이션은 RDB 를 데이터 저장소로 사용하고, 그를 활용하기 위해 SQL 문을 사용함. 자바로 작성한 애플리케이션은 JDBC API 를 사용해서 SQL 을 db에 전달.
+
+SQL 을 직접 다룰때의 문제점 : 
+	(1) 매번 직접  mapper 역할을 해야됨: 애플리케이션의 객체와 db 의 데이터의 구조가 다르기 떄문에 개발자가 중간에서 변환작업( 데이터 받고, 객체에 일일이 매치시켜주고. 객체에서 일일이 데이터 꺼내서, 그걸로 쿼리문 날리고. )을 직접 해줘야된다.
+	(2) 유지보수가 어렵다 : 객체에 필드를 추가하면, 자동적으로 이전에 DAO 단에 작성된 쿼리문들까지 수정되는게 아니라 일일이 고쳐줘야된다.
+	(3) 진정한 계층 분할이 이뤄지지 않는다. : 물리적으로는 SQL 과 JDBC API 를 데이터 접근 계층에 숨기는데 성공했을지 몰라도, 논리적으로는 엔티티와 아주 강한 "의존"관계를 가지고 있다.
+		: 그러니까 , 객체가 어떻게 구성되있건 sql 문에 따라 어떻게 작동될지 갈려서 엔티티를 신뢰할 수 없고, dao 를 일일이 열어 어떤 sql 이 실행되는지 확인해야된다. 
+	(4) 엔티티 신뢰 불가 
+	(5) sql 의존적 개발
+
+
+비스지스 요구사항:
+
+도메인 모델: 비즈니스 요구사항을 정의한 것
+
+엔티티 : 비즈니스 요구사항을 모델링한 객체. 도메인 모델을 객체화 한 것(?)
+
+
+
+ 객체와 rdb의 패러다임 불일치 문제 >> 객체와 관계형db의 지향 목적이 서로 다르고, 각 기능과 표현방법이 달라 생기는 문제들
+	: 지속가능한 애플리케이션 개발 위해선 증가하는 복잡성을 제어할 수 있어야됨
+	: 객체지향프로그래밍은 추상화, 캡슐화, 정보은닉, 상속, 다형성 등 복잡성 제어에 유용한 다양한 장치를 제공 >> 그래서 대부분 객체지향언어로 개발
+	: 일단 도메인 모델을 객체로 모델링하고, 관건은 해당 객체를 어떻게 저장할 것인가?
+		: 일단 객체는 필드(속성)와 메서드(기능)를 가지며, 클래스에 정의되어있다. 
+		: 객체 기능인 메서드는 클래스에 정의되어있으니, 메서드까지 저장할 필욘 없고 필드값만, 다른 곳에 영구저장시키면 된다.
+			: (역)직렬화>>  직렬화된 객체를 검색하는데 어려움이 있기에 이는 거의 불가능하다. 
+				직렬화 serialization : 객체를 (다른 환경에서도 사용 가능하도록) 파일로 저장하는 기능
+					: 암기 tip >> 다른 곳에서도 사용 가능하게 곧게 직렬로 나열한다. 
+				역직렬화: 파일을 (애플리케이션에서 사용하기 위해) 객체로 복구하는 기능
+
+			: rdb >> 데이터 중심 구조화. 집합적 사고
+				: 객체지향개념이 따로 없다
+				: 객체와 rdb의 지향 목적이 다르다.
+
+	: 구체적인 문제의 종류들
+		: 각각 개발자 차원에서 해결을 할 수 있지만, 그 과정이 복잡하고 비효율적이다.
+		(1) 상속
+			: 객체에는 상속이라는 개념이 있지만, 테이블에는 그 개념이 없다
+			: 직접 해결하는 방법 >> 슈퍼타입, 서브타입 관계를 사용
+				: 자식과 부모클래스를 따로 만드는데 이때 부모 클래스 쪽에는 자식의 타입을 저장할 컬럼을 정의한다.
+				: ex ) 슈퍼타입을 Item , 서브타입을 Album , Movie 라고 하면
+abstarct class Item{
+	private String itemId;
+	private String name;
+	pirvate Integer Price;
+	private Item DType; // 자식타입 저장할 필드 
+}
+		
+class Album extends Item {
+	private String artist;
+}
+
+class Movie extends Item {
+	private String director;
+	private String actor;
+}
+
+	
+
+
+				: 서브타입 객체를 db 에 저장하기 위해선 두개의 sql 문을 작성해야된다 . JDBC API 를 사용해서 이 SQL 문을 작성하려면 부모 객체에서 부모 데이터만 꺼내서 Item 용 insert SQL을 작성하고 자식 객체에서 자식 데이터만 꺼내서 Album 용 insert SQL 을 작성해야되는데, 작성할 코드량이 만만치 않다. 
+					: ex ) Album 객체를 저장한다고 했을 때
+						INSERT INTO Item ... 
+						INSERT INTO Album ... 
+
+				: 조회할 때도 ㅈㄴ 어렵다. Album 을 조회하기 위해선, Item 과 Album 테이블을 join 해서 조회한 다음, Album 객체를 생성해야된다.
+
+				
+
+
+
+
+ORM Object Relational mapping 프레임워크
+	:  관계형 데이터베이스 와 객체 간의 차이를 중간해서 해결
+
+
+
+
+JPA Java Persistence API 
+	: 자바 진영 ORM 기술 표준
+	: 객체 중심 개발을 가능하게 해줌 >> 생산성/유지보수 증가
+	: CRUD SQL 문을 개발자가 직접 작성하지 않아도 됨	
+		: 따로 네이티브 sql 문을 활용해서 직접 sql 문을 작성할 수도 있음
+	: db시스템 에 종속되지 않고 개발 가능 ( 한 코드를 mysql 에서 돌릴수도 oracle 에서 돌릴수도 있음)
+	: JPA 에서의 "매핑정보" >> 어떤 객체를 어떤 테이블에 관리할지 정의한 정보
+	: JPA 가 제공하는 API 를 사용한다
+		(1) 저장 : .persist( 엔티티객체 )
+ 			:  JPA 가 객체와 매핑정보를 보고, 적절한 insert SQL 문을 생성하여 db 에 전달한다
+				ex ) 
+					Member member = new Member("jojo123" , "jojo");
+					jpa.perisit(member); // 생성
+
+		(2) 조회 : .find( 엔티티클래스명.class , 엔티티의특정필드값 )
+			: JPA 는 객체와 매핑정보를 보고 적절한 select SQL 문을 생성해서 db에 전달하고, 그 결과로 해당 엔티티타입의 객체를 생성하여 반환한다.
+				ex ) 
+					String memberId = "jojo123"; 
+					Member member = jpa.find( Member.class , memberId );  // 조회
+
+	
+		(3) 수정 : 별도의 메서드 X
+			: JPA는 별도의 수정 메서드를 제공하지 않는다. "조회( find )해서 얻은" 객체를 수정하면 트랜잭션을 commit 할 때, db에 적절한 update SQL 문이 전달된다.  << 3장 자세히
+				ex ) 
+					Member member = jpa.find( Member.class , memberId ); 
+					member.setName("johojoho"); // 수정 
+
+		(4) 연관된 객체 조회  : 별도의 메서드 X
+			: 연관된 객체를 "사용"하는 시점에 적절한 select SQL 문을 실행한다. << 8장자세히
+				ex ) 
+					Member member = jpa.find( Member.class , memberId ); 
+					Team team = member.getTeam( ) ; // 연관객체조회
+
+
+ 
+
+
+
+
+
+
