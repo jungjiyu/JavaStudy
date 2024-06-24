@@ -16,47 +16,6 @@ https://inpa.tistory.com/entry/MYSQL-%F0%9F%93%9A-JOIN-%EC%A1%B0%EC%9D%B8-%EA%B7
 
 
 
-테이블 join : 두 개의 테이블을 엮어 하나의 결과를 추출할 때 사용
-	: https://velog.io/@newdana01/Database-%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%A1%B0%EC%9D%B8-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0
-	: PK 와 FK 관계로 맺어져야됨 ( 일대다 관계 )
-	: 쿼리문 tip  >> 
-		: 테이블조인에 대한 조건은 "on" << 그러니까 어떤 기준으로 테이블 묶을 건지.
-		: 데이터필터링에 대한 조건은 "where" << 그러니까 어떤 데이터만 표시할지.
-
-	: 종류
-		(1) INNER JOIN 내부 조인: 교집합 데이터를 기준으로 결합하여 조회하는 방법.
-			: 가장 보편적인 조인. 그냥 조인이라고 함 inner join 이다.
-			: 두 테이블에 모두 데이터가 있어야 결과가 나온다.
-SELECT <열 목록>
-FROM <첫 번째 테이블>
-    INNER JOIN <두 번째 테이블>
-    ON <조인 조건>
-[WHERE 검색 조건]
-
-		(2) OUTER JOIN 외부 조인: 공통데이터 뿐 아니라 한쪽에만 존재하는 데이터까지도 함께 결합하여 조회하고자 할 때 사용하는 방법
-			: 순서에 따른 영향을 받는다. 어떤 테이블을 먼저 접근하냐 따라 쿼리 성능에 영향을 미친다.
-			: OUTER JOIN의 종류 : 데이터가 한 쪽에만 존재할 때, 어느 테이블을 기준으로 삼을 것인가
-				1. LEFT OUTER JOIN : 왼쪽 테이블의 모든 값이 출력되는. 그러니까 오른쪽 테이블에 없는 데이터를 가진 열이라도,  출력된다.
-				2. RIGHT OUTER JOIN : 오른쪽 테이블의 모든 값이 출력되는.
-				3. FULL OUTER JOIN : 왼 오 테이블의 모든 값이 출력되는
-SELECT <열 목록>
-FROM <첫 번째 테이블(LEFT 테이블)>
-    <LEFT | RIGHT | FULL> OUTER JOIN <두 번째 테이블(RIGHT 테이블)>
-     ON <조인 조건>
-[WHERE 검색 조건]
-
-		(3) CROSS JOIN 상호 조인 : 한쪽 테이블의 모든 행과 다른 테이블의 모든 행을 조인하는 것.
-			: 상호 조인의 결과의 전체 행 갯수 == 두 테이블의 각 행 갯수를 곱한 숫자. 
-				ex ) A 테이블의 행이 3,  B 테이블의 행이 4 이면 결과는 12 행
-SELECT *
-FROM <첫 번째 테이블>
-    CROSS JOIN <두 번째 테이블>
-
-		(4) SELF JOIN 자체 조인: 자신이 자신과 조인하는 것. 1개의 테이블만 사용된다.
-SELECT <열 목록>
-FROM <테이블> 별칭A
-    INNER JOIN <테이블> 별칭B
-[WHERE 검색 조건]
 
 
 db사용방법
@@ -142,7 +101,7 @@ SQL 을 직접 다룰때의 문제점 :
 		(1) 상속
 			: 객체에는 상속이라는 개념이 있지만, 테이블에는 그 개념이 없다
 			: 직접 해결하는 방법 >> 슈퍼타입, 서브타입 관계를 사용
-				: 자식과 부모클래스를 따로 만드는데 이때 부모 클래스 쪽에는 자식의 타입을 저장할 컬럼을 정의한다.
+			    step1. 자식과 부모클래스를 따로 만드는데 이때 부모 클래스 쪽에는 자식의 타입을 저장할 컬럼을 정의한다.
 				: ex ) 슈퍼타입을 Item , 서브타입을 Album , Movie 라고 하면
 abstarct class Item{
 	private String itemId;
@@ -163,12 +122,12 @@ class Movie extends Item {
 	
 
 
-				: 서브타입 객체를 db 에 저장하기 위해선 두개의 sql 문을 작성해야된다 . JDBC API 를 사용해서 이 SQL 문을 작성하려면 부모 객체에서 부모 데이터만 꺼내서 Item 용 insert SQL을 작성하고 자식 객체에서 자식 데이터만 꺼내서 Album 용 insert SQL 을 작성해야되는데, 작성할 코드량이 만만치 않다. 
+			    step2. 서브타입 객체를 db 에 저장하기 위해 두개의 sql 문을 작성한다 . JDBC API 를 사용해서 부모 객체에서 부모 데이터만 꺼내서 Item 용 insert SQL을 작성하고, 자식 객체에서 자식 데이터만 꺼내서 Album 용 insert SQL 을 작성한다.
 					: ex ) Album 객체를 저장한다고 했을 때
 						INSERT INTO Item ... 
 						INSERT INTO Album ... 
 
-				: 조회할 때도 ㅈㄴ 어렵다. Album 을 조회하기 위해선, Item 과 Album 테이블을 join 해서 조회한 다음, Album 객체를 생성해야된다.
+			    step3.  Album 관련 데이터를 db에서 뽑아 활용하기 위해, Item 과 Album 테이블을 join 해서 조회한 다음, Album 객체를 생성한다.
 
 				
 
