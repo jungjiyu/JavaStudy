@@ -1,5 +1,10 @@
 https://inpa.tistory.com/entry/MYSQL-%F0%9F%93%9A-JOIN-%EC%A1%B0%EC%9D%B8-%EA%B7%B8%EB%A6%BC%EC%9C%BC%EB%A1%9C-%EC%95%8C%EA%B8%B0%EC%89%BD%EA%B2%8C-%EC%A0%95%EB%A6%AC
 
+
+ "테이블.어쩌구" (. 표시) >> 테이블을 특정하여 컬럼 get 하기
+
+"컬럼명1 컬럼명2" ( 컬럼명 연속으로 2번쓰기 ) >> 컬럼명1의 별칭을 컬럼명2 로 함. select 의 결과로써 컬럼명1 대신 별칭인 컬럼명2 가 표시됨.
+
 테이블 join : 두 개의 테이블을 엮어 하나의 결과를 추출할 때 사용
 	: https://velog.io/@newdana01/Database-%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%A1%B0%EC%9D%B8-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0
 	: PK 와 FK 관계로 맺어져야됨 ( 일대다 관계 )
