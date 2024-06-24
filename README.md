@@ -1,1 +1,1 @@
-# JavaStudy - winter vacation 12.25.2023
+# JPAStudy - summer vacation 06.24.2024
