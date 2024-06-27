@@ -1,1 +1,217 @@
 
+
+교재와 실습 차 >> 교재에선 Maven 을 , 나는 Gradle + spring boot 을 사용했다
+	: Maven 에 비해 Gradle 이 간편하다는건 pom.xml 대신 build.gradle로 의존성 관리를 한다는거지, 모든 xml 설정에 대해 Gradle 이 자유로운건 아니다.
+	:  Maven이든 Gradle이든, hibernate-entitymanager 라이브러리 설치시, 사용을 위한 설정을  persistence.xml 로 해야된다. 그런데 spring boot 의 경우 내부에서 JPA를 만들때 persistence.xml없이 application.properties 로 대체 설정 가능하도록 되어있다. 
+		: https://www.inflearn.com/questions/273750/application-yml-vs-persistence-xml
+		: https://velog.io/@qf9ar8nv/spring-jpa
+
+
+ 
+
+------------------------------------------------------------------------------------------------------------
+tip 
+	: import 되는 대상 >> 패키지
+	: import 하려는데 중간에 가로선 그어진 얘 >> depreceated 된 것.
+
+------------------------------------------------------------------------------------------------------------
+
+
+H2 데이터베이스 : 현재 사용하는 주 db가 있더라도, ㅈㄴ 편하므로 꼭 익혀라
+	: 종류
+		(1) Server Mode : 여느 db들( mySQL , .. ) 처럼 사용
+			: H2 실행 파일을 다운로드 필요.
+			: 데이터가 로컬에 저장된다.
+			:  application.properties에 H2 DB 주소 기입 및 환경 설정
+			:  (애플리케이션 외부에서) 터미널로 H2 DB 를 실행시킨 후 사용 가능
+
+
+		(2) Embedded Mode : 여러모로 편함.
+			: 파일 다운 필요 없고,  build.gradle 로 설정만 함.
+				: In-Memory 로 하든 Embeded 로 하든 똑같이 
+					1. runtimeOnly 'com.h2database:h2'  
+					2. implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+			: 애플리케이션을 실행/종료와 함께 실행/종료되고, 데이터가 로컬에 저장된다.
+			:  application.properties에 H2 환경 설정
+			   : spring.datasource.url 에  "mem" 키워드가 포함이 안되어있고, DB 데이터가 저장될 경로를 입력해야된다. 이외엔 모두 Embeded Mode 와 동일함.
+				: DB데이터저장될경로 >> 해당 경로에 폴더가 새로 생기고( 이미 있다면 그냥 그거 쓰고 ), 거기에 데이터 저장된다. 해당 파일을 직접 삭제하지 않는 이상 데이터는 유지된다.
+					:  . /경로 >> 현재 "작업" 디렉토리의 하위에 저장
+						: ex ) 현재 C:/backend/jpa1 디렉터리에서 작업 중이고, "./h2db/data" 로 설정 하면 -->  C:/backend/jpa1/h2db/data 에 생성됨
+
+					: ~/경로 >> 현재 "사용자" 디렉토리의 하위에 저장.
+						: ex ) 현재 사용자 디렉터리가  C:/users/jiyu 이고, "~/h2db/data" 로 설정 하면 -->   C:/users/jiyu/h2db/data 에 생성됨
+
+				spring.h2.console.enabled=true
+				spring.h2.console.path=/h2-console
+				spring.datasource.driver-class-name=org.h2.Driver
+				spring.datasource.url=jdbc:h2:{DB데이터저장될경로}
+				spring.datasource.username={사용자명}
+				spring.datasource.password={비번}
+
+			: db 접속 방법 >> localhost:{포트}/h2-console 에 접속 후, Driver Class, JDBC URL, User Name, Password를 application.properties 에 설정했던 대로 입력 한다.
+
+
+		(3) In-Memory Mode : 데이터베이스가 일회성으로 필요한 경우에 유용
+			: 파일 다운 필요 없고,  build.gradle 로 설정만 함.
+			:  애플리케이션을 실행/종료와 함께 실행/종료되고,  데이터가 애플리케이션의 "메모리"에만 잠깐 저장됨. 즉, 서버를 재시작하면 데이터가 삭제됨.	
+			:  application.properties에 H2 환경 설정하여 사용
+			   : spring.datasource.url 에 들어간  "mem" 키워드로 유추 할 수 있듯 memory 를 사용하고, DB의 이름을 기입함. 이외엔 모두 Embeded Mode 와 동일함.
+				spring.h2.console.enabled=true
+				spring.h2.console.path=/h2-console
+				spring.datasource.driver-class-name=org.h2.Driver
+				spring.datasource.url=jdbc:h2:mem:{DB명}
+				spring.datasource.username={사용자명}
+				spring.datasource.password={비번}
+
+			: db 접속 방법 >>Embedded Mode와 같다.
+
+
+------------------------------------------------------------------------------------------------------------
+
+데이터베이스 방언 dialect >> SQL 표준이 아닌, 특정 db 만의 고유한 기능.문법.
+	: JPA 는 특정 db 에 종속되지 않은 기술. Hibernate 와 같은 JPA 구현체들은, 다른 db로 쉽게 교체 가능하게 하기 위해, 방언 클래스를 제공한다.
+		: 그러니까 표준 SQL 문 >> 일반적인 JPA 사용
+		: 방언 >> JPA 구현체가 제공하는 방언 클래스로 처리
+	: MySQLDialect , H2Dialect , OracleDialect 
+
+
+JPA 구현체로 Hibernate 사용
+	: https://devlog2829.tistory.com/125
+	step1. gradle 이건 maven 이건, (maven repository 에서 따로 찾아서) hibernate-entitymanager 라이브러리를 다운/의존성 추가한다
+		:  hibernate-entitymanager 를 의존성 추가하면, 다음 핵심 라이브러리도 함께 다운받아진다(따로 또 추가하는게 아님 주의)
+			1. hibernate-core : 하이버네이트 라이브러리
+			2. hibernate-jpa-2.1-api : JPA 표준 API 를 모아둔 라이브러리
+	 
+		: 주의 ) 
+			1.썡 Hibernate 자체를 쓰려면 spring initializer 로 spring data jpa 다운 받는게 아니라 maven repository 에서 따로 찾아서( implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.6.15.Final' )  의존성 추가해야된다. 
+			2. 젤 상단에 뜨는 "hibernate core relocation"이 아닌 "hibernate entitymanager relocation" 을 다운 받아야된다.
+			3. spring data JPA 가 아닌 enitity-manager 를 사용하는 경우, application.properties 로 db 설정과 ddl 설정 하는게 아니라, persistence.xml 로 설정해야된다.
+	
+	step2. hibernate 설정 
+	    : 설정할 내용 >> db 접속 정보 , 편의 설정 
+	    : 방법
+	******: https://www.inflearn.com/questions/273750/application-yml-vs-persistence-xml
+		sol1 . 스프링부트 사용 : application.properties 로 설정
+			: 편의 설정 >> https://lannstark.tistory.com/14
+   
+				(1) spring.jpa.properties.hibernate.show_sql=true >> hibernate 가 실행한 sql 출력
+					: spring.jpa.show-sql=true 는 spring boot 가 제공하는 가장 기본적인 sql 문만 출력하기에, 보다 자세한 확인을 위해 spring.jpa.properties.hibernate.show_sql=true 를 추천.
+    				(2) spring.jpa.properties.hibernate.use_sql_comments=true >> SQL 내부에 /* */의 주석을 추가
+				(3) spring.jpa.properties.hibernate.format_sql=true >> 예쁘게 출력
+    				(4) spring.jpa.properties.hibernate.highlight_sql=true >> 색깔입혀 출력
+    				(5) logging.level.org.hibernate.type.descriptor.sql=trace >> ? 에 어떤 값이 들어가는지 구체적으로 출력
+
+# h2 db 설정
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:./h2db/data
+spring.datasource.username=root
+spring.datasource.password=0000
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+# 편의 설정
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.highlight_sql=true
+spring.jpa.properties.hibernate.use_sql_comments=true
+logging.level.org.hibernate.SQL=debug
+logging.level.org.hibernate.type.descriptor.sql=trace
+
+
+		sol2 . 스프링부트미사용: (gradle 이건 maven 이건) resources/META-INF/persistence.xml로 설정
+			: /META-INF 폴더랑 persistence.xml 파일은 직접 생성해야된다.
+			: 파일 내용
+				: persistence-unit 영속성 유닛 
+					: persistence-unit 에는 고유한 이름을 부여해야됨
+					: 일반적으로 연결할 db 당 하나의 영속성 유닛을 등록한다
+				: 속성
+					javax.persistence.* >> JPA 표준 속성
+					hibernate.dialect >> hibernate 속성
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.1">
+
+<persistence-unit name="jpa1"> <!-- name 은 맘대로 , 고유한 이름 설정 가능 -->
+<!-- 사용될 엔티티(들) 등록 -->
+    <class>com.example.jpa1.entity.Member</class> 
+    <properties>
+<!--필수설정-->
+    <!-- db 설정-->
+        <!-- jdbc 드라이버 중 h2 드라이브를 쓴다.-->
+        <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+        <!-- h2 db 접속 정보 -->
+        <property name="javax.persistence.jdbc.user" value="root" />
+        <property name="javax.persistence.jdbc.password" value="0000" />
+        <property name="javax.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/./h2db/data" />
+        <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+
+<!--옵션설정-->
+    <!--JPA 가 생성하는 SQL 문을 가시화 -->
+        <property name="hibernate.show_sql" value="true"/>
+        <property name="hibernate.format_sql" value="true"/>
+        <property name="hibernate.use_sql_comments" value="true"/>
+        <property name="hibernate.id.new_generator_mappings" value="true"/>
+    </properties>
+</persistence-unit>
+</persistence>
+
+
+	step3. 엔티티매니져 생성 
+		: https://assu10.github.io/dev/2023/09/16/springboot-database-5/
+		sol1. 스프링부트 사용 : 스프링빈으로 자동 생성되어 DI 받기만 함 됨.	
+			: https://sjh9708.tistory.com/60
+			: application.properties에 기입된 정보를 토대로 EntityManagerFactory가 생성됨
+			sol (1) : @Autowired 로 DI 받음 <-- 생성자 주입 필드 주입 다 가능
+				@Autowired
+				private EntityManager em;
+
+			sol (2) : @PersistenceContext 활용 >> 얘도 일반적인 필드에 DI 할때처럼, EntityManager 타입 필드 위에 명시
+				@PersistenceContext
+				private EntityManager em;
+
+
+		sol2. 스프링부트 미사용 : 엔티티매니저 직접 생성
+			step1. 엔티티 매니저 팩토리 생성 : 이건 애플리케이션 통틀어 하나만 있어야됨
+				EntityManagerFactory emf = Persistence.createEntityManagerFactory("설정했던peristence-unit명");
+
+			step2. 엔티티 매니저 팩토리로 엔티티 매니저 생성 : 이건 애플리케이션 내 여러개 생성해도 됨
+ 
+				EntityManager em = emf.createEntityManager();
+
+	step4. 엔티티매니져 활용
+		sol1. 스프링부트 사용 : 
+		sol2. 스프링부트 미사용 : 엔티티매니저 직접 생성
+
+		//트랜잭션 확득
+		EntityTransaction et = em.getTransaction();
+
+
+패키지명 tip
+	JPA 표준 속성 >> javax.peristence.* 
+	Hibernate 속성 >> org.hibernate.* 
+
+
+JPA 가 제공하는 어노테이션
+    : (객체와 테이블간의) 매핑정보 설정 관련
+	(0) @Entity : 해당 클래스를 엔티티, 즉 테이블에 매핑될 대상으로 정의. 
+		: 필수적
+		: 테이블과 매핑시킬 클래스명 위에 명시. 
+		: @Entity가 적용된 클래스를 "엔티티"라고 한다
+
+	(1) @Table : 엔티티에 매핑될 테이블의 구체적 정보 설정
+		: 필수 아님
+		: 속성
+		    1. name : 테이블명 설정
+			: 미설정시 디폴트로 클래스명 자체가 테이블명이 됨.
+
+	(2) @Id : 엔티티의 필드를 테이블의 PK 에 매핑
+		: 엔티티클래스의 대표 필드 위에 명시. 
+		: @Id 가 적용된 필드를 식별자 필드라고 한다
+
+	(3) @Column : 필드에 매핑될 컬럼의 구체적 정보 설정
+		: 필수 아님
+		: 속성
+		    1. name : 컬럼명 설정
+			: 미설정시 디폴트로 필드명이 컬럼명이된다.
+
+
