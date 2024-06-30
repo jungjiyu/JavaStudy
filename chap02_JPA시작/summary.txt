@@ -93,11 +93,92 @@ H2 데이터베이스 : 현재 사용하는 주 db가 있더라도, ㅈㄴ 편�
 
 
 
+동시성 문제 : ( 여러 프로세스나 스레드가) 동시에 같은 데이터에 접근하려 할 때 발생하는 문제
+
+
+thread-safe 하다 : 동시성 문제가 발생하지 않는다. ( 여러 프로세스나 스레드가) 동시에 같은 데이터에 접근하려 해도 그로 인한 문제가 발생 안한다.
+
+
+스프링빈과 싱글톤 
+	: bean 생성시 별다른 설정이 없으면 default로 싱글톤처리됨
+	: @Autowired 적용시 Spring Container에서 관리중인 타입의 bean 생성해 주입해줌
+		: 결국 @Autowired 통해 주입되는 bean 은 거의 싱글톤 관리됨.
+
+
+https://hstory0208.tistory.com/entry/Spring-%EC%8A%A4%ED%94%84%EB%A7%81-AOPAspect-Oriented-Programming%EB%9E%80-Aspect
+
+
+https://kghworks.tistory.com/161
+
+타겟 target >> 클라이언트가 목적지로하는 객체. 
+	:프록시의 대상 객체.
+		: 타겟은 사실 프록시의 존재를 모른디ㅏ. 
+
+프록시 Proxy :  (클라이언트와 타겟 사이에서) 요청을 위임하는 객체. 대리인.
+	: 주로 타겟의 기능을 확장 (Decorator pattern) 하거나, 접근방법을 제어 (Proxy pattern)하기 위해 사용
+
+데코레이터 패턴 (Decorator pattern) :  타깃의 부가기능을 프락시를 통해 추가하는 패턴
+
+프록시 패턴 (Proxy pattern) : 클라이언트가 타겟에 접근하는 방식을 변경하는 패턴
+	: JPA의 lazy loading 시 참조하게 되는 프록시 객체가 대표적
+
+
+관점 지향 프로그래밍 AOP Aspect Oriented Programming >> 애플리케이션을 횡단 관심사 관점으로 보는 것.
+
+	 
+	: 애플리케이션 내 로직을 크게 구분하면
+		(1) 핵심 기능: 해당 객체가 제공하는 고유의 기능
+		(2) 부가 기능 : 핵심 기능을 보조하기 위해 제공되는 기능 ( ex: 로그 추적 기능, 트랜잭션 기능 )
+			: 부가 기능을 횡단 관심사(cross-cutting concerns) 라고도 한다
+
+	: 애플리케이션 내 여러 로직에 중복되는 부가 기능이 있고, 그걸 직접 코드로 집어넣으면 유지보수가 어려워진다. 이를 해결하기 위한것이 AOP 다 
+
+	:  AOP 는  부가 기능을 핵심 기능에서 분리해 한 곳으로 관리하도록 하고, 이 부가 기능을 어디에 적용할지 선택하는 기능을 합한 하나의 모듈
+
+	: 용어
+		(1) Aspect : 비즈니스 로직에 대한 트랜잭션 처리 모듈 (보통 싱글톤으로 관리)
+		(2) Advice : 비즈니스 로직 앞/뒤로 존재하는 트랜잭션 기능 (e.g. 트랜잭션 시작, 커밋, 롤백 등)
+		(3) Pointcut : 트랜잭션 처리 모듈을 적용해야 하는 비즈니스로직 선별 알고리즘 (회원 가입, 송금, 등을 선별)
+		(4) Joinpoint : 어드바이스 적용 위치 
+
+
+    : 프록시 빈 
+	: https://kghworks.tistory.com/161
+    : Dynamic proxy : 동적인 프락시 
+    : Factory bean : 빈으로 등록
+	: advisor
+
 
 
 패키지명 tip
 	JPA 표준 속성 >> javax.peristence.* 
 	Hibernate 속성 >> org.hibernate.* 
+
+
+
+EntityManagerFactory : EntityManager를 생성 가능하게 한다.
+	: persistence.xml || application.properties 정보를 바탕으로 생성되며 , 애플리케이션에 통틀어 1개만 생성하여 "공유"해서 쓴다.
+		: 왜 딱 1개만 ?? >> EntityManagerFactory 만드는 비용이 꽤 크기 때문.
+			: EntityManagerFactory 생성하면 딱 EntityManagerFactory만 생성되는게 아니라,  JPA를 동작시키기 위한 기반 객체와  데이터베이스 커넥션 풀 등도 함께 생성된다.
+				: 기반 객체 == 특정 시스템이나 프레임워크가 작동하기 위해 필수적으로 필요한 기본 구성 요소
+	: 사용이 끝난 엔티티 팩토리는 반드시 종료( .close( ) )시켜줘야된다
+
+
+엔티티매니저 EntityManager : JPA 의 대부분의 기능을 제공하는 객체 
+	: EntityManagerFactory 로 생성 가능하고, 한 애플리케이션에 여러개 존재 가능하다
+		: 엔티티 매니저는 db커넥션과 밀접한 관계가 있어 스레드 간에 공유하거나 재사용하면 안된다.
+	: 내부에 데이터 소스(db커넥션)를 유지하면서 db와 통신함. 가상의 db라고 봐도 무방.
+	: 사용이 끝난 엔티티 매니저는 반드시 종료( .close( ) )시켜줘야된다
+
+
+엔티티트랜잭션 EntityTransaction  :  트랜잭션 제어 객체
+	: JPA 를 사용시 "반드시" 트랜잭션 안에서 데이터 변경해야됨.
+		: 트랜젝션 없이 데이터 변경 시 예외 발생함.
+	: EntityManager 로 EntityTransaction 객체를 얻을 수 있음.
+	: 트랜잭션의 시작( .start( ) )  , 커밋( .commit( ) ) , 롤백( .rollback( ) )  수행 가능
+
+
+
 
 
 JPA 구현체로 Hibernate 사용
@@ -182,15 +263,22 @@ logging.level.org.hibernate.type.descriptor.sql=trace
 	step3. 엔티티매니져 생성 
 		: https://assu10.github.io/dev/2023/09/16/springboot-database-5/
 		: 서비스 클래스에서 수행
-		sol1. 스프링부트 사용 : 스프링빈으로 자동 생성되어 DI 받기만 함 됨.	
+		sol1. 스프링부트 사용 :  자동 생성된 스프링빈을 DI 받아 씀.	
 			: https://sjh9708.tistory.com/60
 			: application.properties에 기입된 정보를 토대로 EntityManagerFactory가 생성됨
-			sol (1) : @Autowired 로 DI 받음 <-- 생성자 주입 필드 주입 다 가능
-				@Autowired
-				private EntityManager em;
+			: 직접 @Autowired 로 DI 받으면 안되는 이유 >> 이경우 EntityManager가 싱글톤관리되어 결국 다른 스레드들끼리 같은 EntityManager 를 공유할 수 있다는 점에서 동시성 문제가 생길 수 있다
+				: https://velog.io/@biddan606/EntityManager%EB%A5%BC-%EC%A3%BC%EC%9E%85%ED%95%A0-%EB%95%8C-Autowired-vs-PersistContext
 
-			sol (2) : @PersistenceContext 활용 >> 얘도 일반적인 필드에 DI 할때처럼, EntityManager 타입 필드 위에 명시
-				@PersistenceContext
+
+
+
+			sol (2) : @RequiredArgContructor 와 private final EntityManager 타입 필드를 사용하여 스프링 부트가 알아서 @Autowired 걸게 함
+				: https://www.inflearn.com/questions/158967/%EC%95%88%EB%85%95%ED%95%98%EC%84%B8%EC%9A%94-entitymanager%EC%97%90-%EB%8C%80%ED%95%B4-%EA%B6%81%EA%B8%88%ED%95%9C-%EC%A0%90%EC%9D%B4-%EC%9E%88%EC%96%B4-%EC%A7%88%EB%AC%B8-%EB%82%A8%EA%B9%81%EB%8B%88%EB%8B%A4
+				: JPA 책 13.1 .
+
+			sol (1) : @PersistenceContext 활용 >> 얘도 일반적인 필드에 DI 하듯 EntityManager 타입 필드 위에 명시.
+				: 이렇게 하면 동시성 문제가 발생하지 않는 이유 >>  컨테이너가  1개의 스레드마다 1개의 EntityManager 가 할당되도록 제한시켜줌.
+				@PersistContext
 				private EntityManager em;
 
 
@@ -205,7 +293,14 @@ logging.level.org.hibernate.type.descriptor.sql=trace
  
 				EntityManager em = emf.createEntityManager();
 
-	step4. 트랜잭션 관리 
+	step4. 트랜잭션 관리 : 특정 비즈니스 로직에 대해 트랜잭션 관리
+	    : 비즈니스 로직
+		sol1. spring data jpa 사용 : 추상화된 메서드 활용
+		sol2. spring data jpa 미사용 : 직접 entity manager 활용
+			(1) 등록 : em.persist( 저장할객체 );
+
+
+	    : 트랜잭션 관리
 		sol1. 스프링부트 사용 : @Transactional 이용
 			: 트랜잭션 적용할 메서드위에 명시 >> 메서드 실행 시점에 자동으로 begin( ) 시키고, 예 외 없이 메서드 종료 시 commit( ) , 실행 중 예외 발생 시 rollback( ) 해준다.
 
@@ -238,29 +333,7 @@ logging.level.org.hibernate.type.descriptor.sql=trace
 
 
 
-EntityManagerFactory : EntityManager를 생성 가능하게 한다.
-	: persistence.xml || application.properties 정보를 바탕으로 생성되며 , 애플리케이션에 통틀어 1개만 생성하여 "공유"해서 쓴다.
-		: 왜 딱 1개만 ?? >> EntityManagerFactory 만드는 비용이 꽤 크기 때문.
-			: EntityManagerFactory 생성하면 딱 EntityManagerFactory만 생성되는게 아니라,  JPA를 동작시키기 위한 기반 객체와  데이터베이스 커넥션 풀 등도 함께 생성된다.
-				: 기반 객체 == 특정 시스템이나 프레임워크가 작동하기 위해 필수적으로 필요한 기본 구성 요소
-	: 사용이 끝난 엔티티 팩토리는 반드시 종료( .close( ) )시켜줘야된다
 
-
-엔티티매니저 EntityManager : JPA 의 대부분의 기능을 제공하는 객체 
-	: EntityManagerFactory 로 생성 가능하고, 한 애플리케이션에 여러개 존재 가능하다
-		: 엔티티 매니저는 db커넥션과 밀접한 관계가 있어 스레드 간에 공유하거나 재사용하면 안된다.
-	: 내부에 데이터 소스(db커넥션)를 유지하면서 db와 통신함. 가상의 db라고 봐도 무방.
-	: 사용이 끝난 엔티티 매니저는 반드시 종료( .close( ) )시켜줘야된다
-
-
-엔티티트랜잭션 EntityTransaction  :  트랜잭션 제어 객체
-	: JPA 를 사용시 "반드시" 트랜잭션 안에서 데이터 변경해야됨.
-		: 트랜젝션 없이 데이터 변경 시 예외 발생함.
-	: EntityManager 로 EntityTransaction 객체를 얻을 수 있음.
-	: 트랜잭션의 시작( .start( ) )  , 커밋( .commit( ) ) , 롤백( .rollback( ) )  수행 가능
-
-
-비즈니스로직
 
 JPA 가 제공하는 어노테이션
     : (객체와 테이블간의) 매핑정보 설정 관련
