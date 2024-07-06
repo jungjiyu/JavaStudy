@@ -75,7 +75,10 @@ H2 데이터베이스 : 현재 사용하는 주 db가 있더라도, ㅈㄴ 편�
 		: 방언 >> JPA 구현체가 제공하는 방언 클래스로 처리
 	: MySQLDialect , H2Dialect , OracleDialect 
 
-
+Native SQL Query : 특정 db에 종속적인 sql 쿼리
+HQL Hibernate Query Language : Hibernate 프레임워크에서 사용하는 객체 지향 쿼리 언어
+JPQL :JPA 표준에 따라 개발된 객체 지향 쿼리 언어
+	: Hibernate 에서는 JPQL을 지원함
 
 트랜잭션 transaction :  DB 상태를 변경하기 위해 수행하는 작업 단위
 	: https://mommoo.tistory.com/62
@@ -97,6 +100,7 @@ H2 데이터베이스 : 현재 사용하는 주 db가 있더라도, ㅈㄴ 편�
 
 정적인 시점 == 컴파일 시점 <---> 동적
 
+
 동시성 문제 : ( 여러 프로세스나 스레드가) 동시에 같은 데이터에 접근하려 할 때 발생하는 문제
 
 
@@ -114,6 +118,7 @@ thread-safe 하다 : 동시성 문제가 발생하지 않는다. ( 여러 프로
 	ex ) 스프링의 @Autowired 는 Dependency Resolver (의존성 리졸버)이다. 즉, 의존성을 해결하고 주입해준다.
 	ex ) ResourceHttpRequestHandler는 Resource Resolver (리소스 리졸버)이다. 웹 애플리케이션에서 정적 리소스(이미지, CSS 파일, JavaScript 파일 등)을 찾는 데 사용된다.
 
+
 instanceof 연산자의 패턴 매칭 기능 >> instanceof 연산자의 결과가 참인 경우 자동으로 해당 타입으로 형변환 시켜주고, 바로 뒤에 띄어쓰기 하고 적어둔 이름의 변수명으로 활용할 수 있게 해준다.
 	: 자바 16부터 도입됨
 	: ex ) 
@@ -123,6 +128,7 @@ instanceof 연산자의 패턴 매칭 기능 >> instanceof 연산자의 결과�
  
 
 타겟 target . 실제 객체 . >> 클라이언트가 실제로 목적지로하는 객체. 
+
 
 프록시 Proxy :  (클라이언트와 타겟 사이에서) 마치 자신이 타겟인 것처럼 요청을 받고, 그 요청을 타겟에게 위임하는 객체. 대리인.
 	: 주로 기능 확장 (Decorator pattern) 하거나, 접근 제어 (Proxy pattern)하기 위해 사용
@@ -247,6 +253,8 @@ instanceof 연산자의 패턴 매칭 기능 >> instanceof 연산자의 결과�
 	: Dynamic proxy를 사용하기 편하도록 추상화한 것이 Spring AOP 기술
 
 
+
+
 관점 지향 프로그래밍 AOP Aspect Oriented Programming >> 애플리케이션을 횡단 관심사 관점으로 보는 것.	 
 	: 애플리케이션 내 로직을 크게 구분하면
 		(1) 핵심 기능: 해당 객체가 제공하는 고유의 기능
@@ -278,8 +286,15 @@ instanceof 연산자의 패턴 매칭 기능 >> instanceof 연산자의 결과�
 
 
 
+autoconfiguration 자동구성. 자동환경설정.
+	: 스프링부트의 대표적 기능.
+	: 특정 라이브러리를 의존성으로 추가시, 알아서 필요한 빈 설정과 생성이 자동으로 이루어지는 것.
+	: 대표적으론 spring data jpa.
+
+
+
 EntityManagerFactory : EntityManager를 생성 가능하게 한다.
-	: persistence.xml || application.properties 정보를 바탕으로 생성되며 , 애플리케이션에 통틀어 1개만 생성하여 "공유"해서 쓴다.
+	: persistence.xml || application.properties 정보를 바탕으로 생성되며 , 애플리케이션에 통틀어 1개만 생성하여(싱글톤으로) "공유"해서 쓰는게 지향된다.
 		: 왜 딱 1개만 ?? >> EntityManagerFactory 만드는 비용이 꽤 크기 때문.
 			: EntityManagerFactory 생성하면 딱 EntityManagerFactory만 생성되는게 아니라,  JPA를 동작시키기 위한 기반 객체와  데이터베이스 커넥션 풀 등도 함께 생성된다.
 				: 기반 객체 == 특정 시스템이나 프레임워크가 작동하기 위해 필수적으로 필요한 기본 구성 요소
@@ -287,18 +302,11 @@ EntityManagerFactory : EntityManager를 생성 가능하게 한다.
 
 
 엔티티매니저 EntityManager : JPA 의 대부분의 기능을 제공하는 객체 
-	: EntityManagerFactory 로 생성 가능하고, 한 애플리케이션에 여러개 존재 가능하다. 일반적으로 트랜잭션 별로 생성해 사용된다.
+	: EntityManagerFactory 로 생성 가능하고, 스레드 단위로 생성하는게 지향된다.
 		: 엔티티 매니저는 db커넥션과 밀접한 관계가 있어 스레드 간에 공유하거나 재사용하면 안된다.
+		: 엔티티 매니저는 thread-safe 하지 않다.
 	: 내부에 데이터 소스(db커넥션)를 유지하면서 db와 통신함. 가상의 db라고 봐도 무방.
 	: 사용이 끝난 엔티티 매니저는 반드시 종료( .close( ) )시켜줘야된다
-
-
-
-엔티티매니저 프록시 EntityManager proxy : @PersistenceContext 로 자동주입 받는 경우 실제 EntityManager 객체가 주입되는게 아니라, 프록시 객체가 주입된다.
-	: 엔티티매니저의 메서드 호출을 가로채서, 트랜잭션 컨텍스트에서 이미 해당 트랜잭션에 엔티티매니저가 존재하는지 확인한 후 , 있으면 있던 엔티티매니저 객체에게 메서드 호출을 위임해주고 없으면 새로운 엔티티 매니저를 생성 후 해당 트랜잭션 컨텍스트에 저장한 후 위임해준다. 
-	: 엔티티매니저 프록시 객체는 싱글톤으로 관리된다.
-		: 앤티티매니저프록시 객체 자체에서는 트랜잭션 별 처리가 일어나는게 아니라 역할 위임하는 것 밖에 없어서 그렇다.
-
 
 
 엔티티트랜잭션 EntityTransaction  :  트랜잭션 제어 객체
@@ -308,17 +316,51 @@ EntityManagerFactory : EntityManager를 생성 가능하게 한다.
 	: 트랜잭션의 시작( .start( ) )  , 커밋( .commit( ) ) , 롤백( .rollback( ) )  수행 가능
 
 
+
+
+
+
+
+
+
+
 @PersistenceUnit vs @PersistenceContext
+    : 일단 둘 다 spring data jpa 가 없어도 사용할 수 있긴 한데, 자동설정(@Configuration) 을 따로 설정하는 과정이 매우 복잡하니 걍 spring data jpa 추가했을 때만 사용해라.
     : 대부분의 경우에 @PersistenceContext를 사용한다. 엔티티매니저의 생명주기를 직접적으로 관리해야되는 경우에만 @PersistenceUnit를 사용한다.
 	: @PersistenceUnit >>EntityManagerFactory를 주입
 		:  내가 봤을때 PersistenceUnit 라는 이름은 hibernate 설정 당시 사용했던 <persistence-unit> 태그로 감싸진 설정 덩어리 관련 접근을 한다는 의미에서 붙여진 것 같다.
 
 	: @PersistenceContext >> EntityManager 를 주입.
+		엔티티매니저 프록시 EntityManager proxy : @PersistenceContext 로 자동주입 받는 경우 실제 EntityManager 객체가 주입되는게 아니라, 프록시 객체가 주입된다.
+			: 엔티티매니저의 메서드 호출을 가로채서, 트랜잭션 컨텍스트에서 이미 해당 트랜잭션에 엔티티매니저가 존재하는지 확인한 후 , 있으면 있던 엔티티매니저 객체에게 메서드 호출을 위임해주고 없으면 새로운 엔티티 매니저를 생성 후 해당 트랜잭션 컨텍스트에 저장한 후 위임해준다. 
+			: 엔티티매니저 프록시 객체는 싱글톤으로 관리된다.
+			: 앤티티매니저프록시 객체 자체에서는 트랜잭션 별 처리가 일어나는게 아니라 역할 위임하는 것 밖에 없어서 그렇다.
     : https://stackoverflow.com/questions/21038706/persistenceunit-vs-persistencecontext
+
+
 
 
 JPA 구현체로 Hibernate 사용
 	: https://devlog2829.tistory.com/125
+	: tip >> spring data jpa 를 사용안하는 경우 자동 설정( @Configuration 에서 @Bean 같은거 설정 )을 해야하는데  ㅈㄴ 복잡하기 떄문에, 좀 편하게 하겠다고 application.yml , @PersistenceContext 이나 @Transactional 같은 거 사용하지 말고 되도록 걍 교재 따라서 해라.
+	: 전체적인 흐름
+		1. hibernate 의존성 추가
+		2. hibernate 설정
+		3. 비즈니스 로직 메서드에서
+			(1) entityMangerFactory 얻음
+			(2) entityMangerFactory 로 entityManger 얻음
+			(3) entityManger 로 entityTransaction 얻음
+			(4) try ~ catch 문에서 트랜잭션 작업 수행
+				1. try 문 
+					(1) entityTransaction 으로 트랜잭션 시작
+					(2) 비즈니스로직수행
+					(3) entityTransaction 로 커밋
+				2. catch 문 
+					(1) entityTransaction 로 롤백
+				3. finally 문
+					(1) entityManger 닫음
+			(5) entityMangerFactory 닫음
+
 	step1. gradle 이건 maven 이건, (maven repository 에서 따로 찾아서) hibernate-entitymanager 라이브러리를 다운/의존성 추가한다
 		:  hibernate-entitymanager 를 의존성 추가하면, 다음 핵심 라이브러리도 함께 다운받아진다(따로 또 추가하는게 아님 주의)
 			1. hibernate-core : 하이버네이트 라이브러리
@@ -327,21 +369,35 @@ JPA 구현체로 Hibernate 사용
 		: 주의 ) 
 			1.썡 Hibernate 자체를 쓰려면 spring initializer 로 spring data jpa 다운 받는게 아니라 maven repository 에서 따로 찾아서( implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.6.15.Final' )  의존성 추가해야된다. 
 			2. 젤 상단에 뜨는 "hibernate core relocation"이 아닌 "hibernate entitymanager relocation" 을 다운 받아야된다.
-			3. spring data JPA 가 아닌 enitity-manager 를 사용하는 경우, application.properties 로 db 설정과 ddl 설정 하는게 아니라, persistence.xml 로 설정해야된다.
+			3. spring data JPA 는 autoconfiguration 기능  아닌 enitity-manager 를 사용하는 경우, application.properties 에 아무리 spring.jpa.hibernate.ddl-auto=update 를 명시하는 것만으로는 애플리케이션 실행할 때 테이블 자동생성이 되지 않는다. spring data jpa 썼을 떄 테이블 자동생성이 되었던건 spring data jpa가 autoconfiguration(자동 구성) 기능을 제공했었기 때문에 가능한 것이었다. hibernate 만 사용하는데 테이블 자동생성시키고 싶으면 별도의 HibernateConfig 와 같은 설정 
+
 	
 	step2. hibernate 설정 
 	    : 설정할 내용 >> db 접속 정보 , 편의 설정 
 	    : 방법
 	******: https://www.inflearn.com/questions/273750/application-yml-vs-persistence-xml
-		sol1 . 스프링부트 사용 : application.properties 로 설정
+		sol1 . spring data jpa && 스프링부트 사용 : application.properties 로 설정
+			: spring data jpa 를 사용안하는 경우 직접 EntityMangerFactory 를 생성해야하는데 이때 arg 로 persistence-unit  이 들어가야하는데 이걸 직접 설정하긴 ㅈㄴ 복잡하므로 걍 sol2 인 persistence.xml 을 설정하는게 더 편하다.
 			: 편의 설정 >> https://lannstark.tistory.com/14
-   
-				(1) spring.jpa.properties.hibernate.show_sql=true >> hibernate 가 실행한 sql 출력
+				(1) spring.jpa.properties.hibernate.show_sql=true >> hibernate 가 실행한 "s"ql 출력
+					: ex ) delete  from MEMBER where ID=?
 					: spring.jpa.show-sql=true 는 spring boot 가 제공하는 가장 기본적인 sql 문만 출력하기에, 보다 자세한 확인을 위해 spring.jpa.properties.hibernate.show_sql=true 를 추천.
-    				(2) spring.jpa.properties.hibernate.use_sql_comments=true >> SQL 내부에 /* */의 주석을 추가
-				(3) spring.jpa.properties.hibernate.format_sql=true >> 예쁘게 출력
+
+    				(2) spring.jpa.properties.hibernate.use_sql_comments=true >>hibernate 가 실행한 "H"QL문을  /* */ 로 감싸 출력해준다.
+					: ex )   /* delete com.example.jpa1.entity.Member */ 
+
+				(3) spring.jpa.properties.hibernate.format_sql=true >> 실행된 SQL문을 예쁘게 출력
+					: ex ) 
+						delete 
+   						     from
+     						       MEMBER 
+     						   where
+       						     ID=?
+
     				(4) spring.jpa.properties.hibernate.highlight_sql=true >> 색깔입혀 출력
     				(5) logging.level.org.hibernate.type.descriptor.sql=trace >> ? 에 어떤 값이 들어가는지 구체적으로 출력
+					: ex) TRACE 21000 --- [jpa1] [nio-8080-exec-2] o.h.type.descriptor.sql.BasicBinder      : binding parameter [1] as [INTEGER] - [193]
+
 
 # h2 db 설정
 spring.h2.console.enabled=true
@@ -360,7 +416,7 @@ logging.level.org.hibernate.SQL=debug
 logging.level.org.hibernate.type.descriptor.sql=trace
 
 
-		sol2 . 스프링부트미사용: (gradle 이건 maven 이건) resources/META-INF/persistence.xml로 설정
+		sol2 .  spring data jpa 미사용|| 스프링부트미사용: (gradle 이건 maven 이건) resources/META-INF/persistence.xml로 설정
 			: /META-INF 폴더랑 persistence.xml 파일은 직접 생성해야된다.
 			: 파일 내용
 				: persistence-unit 영속성 유닛
@@ -399,7 +455,7 @@ logging.level.org.hibernate.type.descriptor.sql=trace
 	step3. 엔티티매니져 생성 
 		: https://assu10.github.io/dev/2023/09/16/springboot-database-5/
 		: 서비스 클래스에서 수행
-		sol1. 스프링부트 사용 :  @PersistenceContext를 통해 스프링빈을 DI 받아 씀.	
+		sol1. spring data jpa && 스프링부트 사용 :  @PersistenceContext를 통해 스프링빈을 DI 받아 씀.	
 			: https://sjh9708.tistory.com/60
 			: application.properties에 기입된 정보를 토대로 EntityManagerFactory가 생성됨
 			: EntityManager는 thread-safe 하지 않기 떄문에, 싱글톤관리하여 다른 스레드들끼리 같은 EntityManager 를 공유하면 동시성 문제가 생길 수 도 있다. 따라서 EntityManager 는 스레드 별로 생성되어야한다. 
@@ -438,10 +494,11 @@ logging.level.org.hibernate.type.descriptor.sql=trace
 				private EntityManager em;
 
 
-		sol2. 스프링부트 미사용 : 엔티티매니저 직접 생성
+		sol2.  spring data jpa 미사용|| 스프링부트미사용 : 엔티티매니저 직접 생성
 			: 엔티티매니저를 직접 생성할 시, CRUD 작업 다 끝났음 반드시 entityManager 와 entityFactory 를 .close( ) 적용해서 종료시켜야된다. 
 			step1. 엔티티매니저팩토리 생성 : 엔티티매니저 생성을 위해 필요함
 				: 이건 애플리케이션 통틀어 하나만 있어야됨
+				: 주의 >> createEntityManagerFactory 자체는 알아서 싱글톤으로 관리해주는 기능이 없다. 그러니까 여러번 호출하면, 이미 기존에 생성한 엔티티매니저팩토리가 있더라도 또 만들기 떄문에, 알아서 싱글톤으로 한번만 호출해 써야된다.
 				EntityManagerFactory emf = Persistence.createEntityManagerFactory("설정했던peristence-unit명");
 
 			step2. 엔티티매니저팩토리로 엔티티 매니저 생성 : 
@@ -454,13 +511,16 @@ logging.level.org.hibernate.type.descriptor.sql=trace
 		sol1. spring data jpa 사용 : 추상화된 메서드 활용
 		sol2. spring data jpa 미사용 : 직접 entity manager 활용
 			(1) 등록 : em.persist( 저장할객체 );
+			(2) 수정 : 유일하게 entityManager 활용 없이, 저장할객체를 직접 수정
+			(3) 삭제 : em.remove( 삭제할객체 ) 
+			(4) 한 건 조회 : 객체타입 새변수명 = em.find( 객체타입.class, 아이디값);
 
 
 	    : 트랜잭션 관리
-		sol1. 스프링부트 사용 : @Transactional 이용
+		sol1. spring data jpa && 스프링부트 사용 : @Transactional 이용
 			: 트랜잭션 적용할 메서드위에 명시 >> 메서드 실행 시점에 자동으로 begin( ) 시키고, 예 외 없이 메서드 종료 시 commit( ) , 실행 중 예외 발생 시 rollback( ) 해준다.
 
-		sol2. 스프링부트 미사용 : 직접 EntityTransaction 객체 생성 후 직접 begin( ) , commit( ) , rollback( ) 시킨다.
+		sol2.  spring data jpa 미사용|| 스프링부트미사용 : 직접 EntityTransaction 객체 생성 후 직접 begin( ) , commit( ) , rollback( ) 시킨다.
 			: EntityTransaction 의 종료는 .close( ) 하는게 아니라,  commit( ) || rollback( ) 둘 중 하나.
 			step1. 엔티티트랜젝션객체 생성 : 트랜잭션 관리를 위해 필요함
 				: 서비스 클래스의 메서드 마다 생성.
@@ -676,32 +736,12 @@ https://kghworks.tistory.com/161
 
 
 
-EntityManagerFactory : EntityManager를 생성 가능하게 한다.
-	: persistence.xml || application.properties 정보를 바탕으로 생성되며 , 애플리케이션에 통틀어 1개만 생성하여 "공유"해서 쓴다.
-		: 왜 딱 1개만 ?? >> EntityManagerFactory 만드는 비용이 꽤 크기 때문.
-			: EntityManagerFactory 생성하면 딱 EntityManagerFactory만 생성되는게 아니라,  JPA를 동작시키기 위한 기반 객체와  데이터베이스 커넥션 풀 등도 함께 생성된다.
-				: 기반 객체 == 특정 시스템이나 프레임워크가 작동하기 위해 필수적으로 필요한 기본 구성 요소
-	: 사용이 끝난 엔티티 팩토리는 반드시 종료( .close( ) )시켜줘야된다
 
-
-엔티티매니저 EntityManager : JPA 의 대부분의 기능을 제공하는 객체 
-	: EntityManagerFactory 로 생성 가능하고, 한 애플리케이션에 여러개 존재 가능하다
-		: 엔티티 매니저는 db커넥션과 밀접한 관계가 있어 스레드 간에 공유하거나 재사용하면 안된다.
-	: 내부에 데이터 소스(db커넥션)를 유지하면서 db와 통신함. 가상의 db라고 봐도 무방.
-	: 사용이 끝난 엔티티 매니저는 반드시 종료( .close( ) )시켜줘야된다
-
-
-엔티티트랜잭션 EntityTransaction  :  트랜잭션 제어 객체
-	: JPA 를 사용시 "반드시" 트랜잭션 안에서 데이터 변경해야됨.
-		: 트랜젝션 없이 데이터 변경 시 예외 발생함.
-	: EntityManager 로 EntityTransaction 객체를 얻을 수 있음.
-	: 트랜잭션의 시작( .start( ) )  , 커밋( .commit( ) ) , 롤백( .rollback( ) )  수행 가능
-
-
-
-
-
-
+ JPA 엔티티 생명 주기
+	1. New (Transient): 아직 데이터베이스에 저장되지 않은 새 엔티티.
+	2. Managed (Persistent): 데이터베이스에 저장되어 있으며, 엔티티 매니저에 의해 관리되는 상태.
+	3. Detached: 데이터베이스에 저장되어 있지만, 엔티티 매니저에 의해 더 이상 관리되지 않는 상태.
+	4. Removed: 데이터베이스에서 삭제될 예정인 상태
 
 
 JPA 가 제공하는 어노테이션
@@ -727,8 +767,37 @@ JPA 가 제공하는 어노테이션
 		    1. name : 컬럼명 설정
 			: 미설정시 디폴트로 필드명이 컬럼명이된다.
 
+	(4) @GeneratedValue : 식별자 값을 자동생성시켜준다
+		: 속성 
+		    1. strategy : 자동 생성 전략 설정. 어떤 DBMS 기준으로 자동 생성할 건지.
+			(1) GenerationType.AUTO >> 하이버네이트가  hibernate.dialect에 설정된 DB 방언 종류에 따라 알아서 매치시켜줌
+				: 비추가 되는 건 , 버전 별로 다를 수 있기 때문에 직접 설정하는게 명확하다고 한다. AUTO는 좀 못미덥다.
+		******(2) GenerationType.IDENTITY  >>  기본 키 생성을 데이터베이스에 위임
+				: 주로 MySQL, PostgreSQL, SQL Server, DB2에서 사용	
+				: em.persist( )로 객체를 영속화 시키는 시점에 곧바로 insert 쿼리가 DB로 전송되고, 거기서 반환받은 식별자 값을 가지고 1차 캐시에 엔티티를 등록시켜 관리
+					: 이 전략을 사용할 시, MySQL 의 경우 AUTO_INCREMENT를 활용하여 생성된다.
+					: 앞서 말했듯이 기본키 생성을 데이터베이스에 위임하기 때문에, JPA 입장에선 영속성 컨텍스트로 엔티티를 관리하려면 1차 캐시에 Id값을 key 값으로 들고 있어야 하는데, db 에 INSERT SQL 을 실행하기 전엔 도저히 AUTO_INCREMENT 되는 값을 알 수 없으므로, "persist( ) 시점"에 insert 쿼리가 실행된다.
+				: 주의 >> 이 전략을 사용하는 경우 애플리케이션단에서 직접 id 를 set 하고, persist( ) 하면 javax.persistence.PersistenceException 와 같은 오류가 발생한다. 
+					: 만약 ID 필드에 값이 설정되어 있으면, JPA는 이 엔티티가 이미 데이터베이스에 존재한다고 간주하기 때문.
+						:
+
+			(3) GenerationType.SEQUENCE >> 
+ 
+
+
+
+    : 엔티티팩토리 관련
+	@PersistenceUnit : entityManagerFactory 를 주입시켜준다
+
+
+
     : 엔티티매니저 관련
 	@PersistenceContext : entityManager 주입시켜준다.
 
+
+
     : 트랜잭션 관련
 	@Transactional : 해당 메서드를 트랜잭션 처리해준다.
+
+
+
