@@ -1,1 +1,28 @@
+영속성 관리
+	: JPA 제공 기능
+		1. 엔티티 와 테이블 매핑하는 설계 부분
+		2. 엔티티를 실제 사용하는 부분
+
+엔티티 매니저 팩토리 >> 엔티티매니저를 생성 가능한 공장.
+	: DB 를 하나만 사용하는 애플리케이션은 일반적으로 앤티티매니저팩토리는 하나만 생성.
+		: 비용이 많이 들어서
+	: persistence.xml (혹은 application.properties ?) 에 작성한 peristence-unit 설정 내용을 기반으로 생성됨
+	: 생성 방법 >> EntityMangerFactory emf = Persistence.createEntityManagerFactory(" peristence-unit명");
+
+엔티티 매니저 >> 엔티티 관리자 . 엔티티 저장/수정/삭제/조회 등 엔티티와 관련된 모든 일 처리.
+	: 일종의 가상의 데이터베이스.
+	: 앤티티 매니저 팩토리와는 다르게 비용이 거의 안든다.
+	: 생성 방법 >> 
+
+
+
+
+
+
+
+
+
+
+
+
 
