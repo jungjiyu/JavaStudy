@@ -75,10 +75,56 @@ H2 데이터베이스 : 현재 사용하는 주 db가 있더라도, ㅈㄴ 편�
 		: 방언 >> JPA 구현체가 제공하는 방언 클래스로 처리
 	: MySQLDialect , H2Dialect , OracleDialect 
 
-Native SQL Query : 특정 db에 종속적인 sql 쿼리
-HQL Hibernate Query Language : Hibernate 프레임워크에서 사용하는 객체 지향 쿼리 언어
-JPQL :JPA 표준에 따라 개발된 객체 지향 쿼리 언어
-	: Hibernate 에서는 JPQL을 지원함
+
+
+
+"타입에 안전하다" : 타입관련 오류가 발생할 가능성이 낮다.
+"정적 타입"을 사용한다 : 컴파일 시점에 타입을 체크하고, 결정한다
+
+
+Native SQL Query : 특정 db에 종속적인 sql 쿼리. 일반적인 SQL 문
+
+JPQL Java Persistence Query Language : 객체지향 쿼리 언어(엔티티중심의쿼리언어) 표준 스펙.명세. (실제로 구현된 것은 아님)
+	: SQL 문을 추상화 한 것.
+	: JPA 제공 메서드 만으로는 불가능한 복잡한 쿼리문을 날리고 싶을 때 사용한다
+	: tip >> SQL 과는 다르게 "테이블"이 아닌 "엔티티"를 중심으로 쿼리한다. 
+		: SQL문을 나타내는 문자열에 등장하는 얘들은 테이블명, 컬럼명 .. 그런거다
+		: JPQL문을 나타내는 문자열에 등장하는 얘들은 엔티티명, 필드명 .. 그런거다
+	: 사용 절차
+		step1. 쿼리객체 생성 >> TypedQuery<반환타입> query =  em.createQuery( JPQL문, 반환타입명.class ); 
+		step2. 생성한 쿼리객체를 대상으로 getResultList( ) 호출 >> List<반환타입> 결과변수 = query.getResultList( );
+			: getSingleResult( ) 이란 것 도 있는데, 대부분 getResultList( ) 를 쓰는 편이다 >>
+				: getResultList 의 경우 결과가 몇개이든(0 개이든 1개이든 100개이든) List 타입으로 반환해준다. 그러니까 다양한 갯수의 결과를 받을 수 있다.
+				: getSingleResult( ) 의 경우 "반드시" "딱" 1개의 결과만 받아야된다. 0개를 받아도 예외( javax.persistence.NoResultException)를 발생시킨다.
+
+	: 주의 >> 일반적인 SQL 문과는 다르게 JPQL 은 대소문자를 구분한다.
+	: 참고 >> JPQL 이 SQL 과 유사하긴 하지만, oracle , mySQL 벤더 간의 문법이 쬐끔씩만 차이 나는것에비하면 JPQL 은 일반적인 SQL 문과 꽤나 다르다 ( HQL 에는 '*' 표현자체가 없다 ) 
+
+
+HQL Hibernate Query Language : Hibernate 에서 사용하는, JPQL에 맞춘 ,  "객체 지향" 쿼리 언어
+	: JPQL 을 구현한 것이 HQL 이라고 봄 된다.
+
+
+
+QueryDSL >> HQL 쿼리를 (직접 HQL 문을 작성할 필요 없이) 코드로 HQL 문을 구현할 수 있게 해주고 ,  정적타입(static type)을 이용하는  프레임워크
+	: (정적타입을 사용하기 때문에) QueryDSL 은 타입에 안전하다.
+	: 복잡한 쿼리나 동적 쿼리 작성이 편리
+	: ex ) 
+		HQL 로는 다음과 같이 문자열로 직접 써야되는 걸
+String username = "java";
+String jpql = "select m from Member m where m.username = :username"; // 문자열 형식의 HQL 문
+List<Member> result = em.createQuery(query, Member.class).getResultList();
+		QueryDSL 로는 다음과 같이 코드로 쓸 수 있다 
+String username = "java";
+List<Member> result = queryFactory
+        .select(member)
+        .from(member)
+        .where(usernameEq(username))
+        .fetch();
+
+	: Spring Data JPA 처럼, 필수적이진 않지만 사용하면 편해서 많이들 추가적으로 쓴다.
+	: https://ittrue.tistory.com/292
+
 
 트랜잭션 transaction :  DB 상태를 변경하기 위해 수행하는 작업 단위
 	: https://mommoo.tistory.com/62
@@ -510,10 +556,20 @@ logging.level.org.hibernate.type.descriptor.sql=trace
 	    : 비즈니스 로직
 		sol1. spring data jpa 사용 : 추상화된 메서드 활용
 		sol2. spring data jpa 미사용 : 직접 entity manager 활용
-			(1) 등록 : em.persist( 저장할객체 );
-			(2) 수정 : 유일하게 entityManager 활용 없이, 저장할객체를 직접 수정
-			(3) 삭제 : em.remove( 삭제할객체 ) 
-			(4) 한 건 조회 : 객체타입 새변수명 = em.find( 객체타입.class, 아이디값);
+		    case (1) : 간단한(Hibernate 제공 메서드로 커버 가능한) 쿼리 수행
+			1. 등록 : em.persist( 저장할객체 );
+			2. 수정 : 유일하게 entityManager 활용 없이, 저장할객체를 직접 수정
+			3. 삭제 : em.remove( 삭제할객체 ) 
+			4. 한 건 조회 : 객체타입 새변수명 = em.find( 객체타입.class, 아이디값);
+
+		    case (2) : 복잡한 쿼리 수행>> HQL(JPQL) 활용
+			: 사용 절차
+				step1. 쿼리객체 생성 >> TypedQuery<반환타입> query =  em.createQuery( JPQL문, 반환타입명.class ); 
+				step2. 생성한 쿼리객체를 대상으로 getResultList( ) 호출 >> List<반환타입> 결과변수 = query.getResultList( );
+					: getSingleResult( ) 이란 것 도 있는데, 대부분 getResultList( ) 를 쓰는 편이다 >>
+					: getResultList 의 경우 결과가 몇개이든(0 개이든 1개이든 100개이든) List 타입으로 반환해준다. 그러니까 다양한 갯수의 결과를 받을 수 있다.
+					: getSingleResult( ) 의 경우 "반드시" "딱" 1개의 결과만 받아야된다. 0개를 받아도 예외( javax.persistence.NoResultException)를 발생시킨다.
+
 
 
 	    : 트랜잭션 관리
@@ -590,6 +646,8 @@ JPA 가 제공하는 어노테이션
 
 기반 객체 == 특정 시스템이나 프레임워크가 작동하기 위해 필수적으로 필요한 기본 구성 요소
 	: ex ) JPA 의 기반 객체로는 DataSource, EntityManager 등이 있다.
+
+
 ------------------------------------------------------------------------------------------------------------
 tip 
 	: import 되는 대상 >> 패키지
@@ -737,11 +795,16 @@ https://kghworks.tistory.com/161
 
 
 
- JPA 엔티티 생명 주기
-	1. New (Transient): 아직 데이터베이스에 저장되지 않은 새 엔티티.
-	2. Managed (Persistent): 데이터베이스에 저장되어 있으며, 엔티티 매니저에 의해 관리되는 상태.
-	3. Detached: 데이터베이스에 저장되어 있지만, 엔티티 매니저에 의해 더 이상 관리되지 않는 상태.
-	4. Removed: 데이터베이스에서 삭제될 예정인 상태
+ JPA 엔티티 생명 주기 << 뒷 단원서 자세히
+	1. 비영속상태 New / Transient : 새 엔티티 객체를 생성만 한 상태.  영속성 컨텍스트에 아직 추가 안되있음
+	2. 영속상태 Managed / Persistent : 영속성 컨텍스트에 의해 관리되고 있고(=영속성컨텍스트에 저장된 상태), 데이터베이스와 동기화 된 상태.
+		: 영속성컨텍스트에 저장되기 위해선 PK 값이 있어야된다.
+	3. 준영속상태 Detached: 영속성 컨텍스트에서 분리되었지만(=영속성컨텍스트에서 지워졌지만), 데이터베이스에는 여전히 저장되어있는상태.
+	4. 삭제 Removed: 데이터베이스에서 삭제될 예정(=삭제 요청된)인 상태
+
+
+
+주의 >> 의외로 자료형 깐깐하다. bigint 타입의 컬럼에 integer 값 넣음 에러 나고, Long 타입 값넣어야된다.
 
 
 JPA 가 제공하는 어노테이션
@@ -776,19 +839,25 @@ JPA 가 제공하는 어노테이션
 				: 주로 MySQL, PostgreSQL, SQL Server, DB2에서 사용	
 				: em.persist( )로 객체를 영속화 시키는 시점에 곧바로 insert 쿼리가 DB로 전송되고, 거기서 반환받은 식별자 값을 가지고 1차 캐시에 엔티티를 등록시켜 관리
 					: 이 전략을 사용할 시, MySQL 의 경우 AUTO_INCREMENT를 활용하여 생성된다.
-					: 앞서 말했듯이 기본키 생성을 데이터베이스에 위임하기 때문에, JPA 입장에선 영속성 컨텍스트로 엔티티를 관리하려면 1차 캐시에 Id값을 key 값으로 들고 있어야 하는데, db 에 INSERT SQL 을 실행하기 전엔 도저히 AUTO_INCREMENT 되는 값을 알 수 없으므로, "persist( ) 시점"에 insert 쿼리가 실행된다.
+					: IDENTITY 전략을 사용하는경우 persist( ) 하는 즉시 insert 가 날라가야하는 이유 >> 어떤 전략을 사용하건간에 Hibernate 입장에선 영속성 컨텍스트로 엔티티를 관리하려면 Id값을 알고 있어야 하는데, mySQL 과 같은 db에서는 그냥은 다음번 AUTO_INCREMENT된 id 값을 알 수 없고 실제로 insert 를 해야만 얻을 수 있기 때문에, 영속성 컨텍스트에의 저장 요청과 동시에 바로 insert 문을 날리는것이다.
+
 				: 주의 >> 이 전략을 사용하는 경우 애플리케이션단에서 직접 id 를 set 하고, persist( ) 하면 javax.persistence.PersistenceException 와 같은 오류가 발생한다. 
-					: 만약 ID 필드에 값이 설정되어 있으면, JPA는 이 엔티티가 이미 데이터베이스에 존재한다고 간주하기 때문.
-						:
+					: GenerationType.IDENTITY 전략을 사용하는 상태에서 ID 필드에 값이 설정되어 있으면, Hibernate 는 이 엔티티가 이미 영속성컨텍스트에 존재한다고 간주하는데 ( 순서가 일단 persist( ) 호출되고 , db로 insert 문 날리고, db 에서 PK 구해오고, 영속성컨텍스트에 저장해놓는거였으니까 ) , 찾아보니까 없어서 에러나는 것이다. 
+					: https://stackoverflow.com/questions/72290970/org-hibernate-persistentobjectexception-detached-entity-passed-to-persist-err
 
-			(3) GenerationType.SEQUENCE >> 
- 
 
+			(3) GenerationType.SEQUENCE >>  특정 DB의 시퀀스를 활용하여 Id값을 증가시킴
+				: 모든 DB가 시퀀스 객체가 있는건 아니기에, 특정 DB 에 한하여 사용 가능 >>  오라클, PostgreSQL, DB2, H2 데이터베이스
+				: IDENTITY 전략과는 다르게, persist 한다고 해서 바로 insert 문이 날라가진 않는다. 단순히 sequence 값만 시퀀스 객체에서 조회해오면되기 때문에, sequence 값을 구하기 위해 ( insert 문이 아닌 ) select 문만 실행된다. 트랜잭션이 다 끝나는 commit 시점에서야 insert 문이 실행된다.
+
+
+			(4) GenerationType.TABLE >>테이블을 만들어서, DB의 시퀀스를 흉내내는 전략.
+				: 모든 데이터베이스에 적용 가능하나, 성능적인 손해가 있어서 잘 쓰지 않는다
 
 
     : 엔티티팩토리 관련
 	@PersistenceUnit : entityManagerFactory 를 주입시켜준다
-
+		
 
 
     : 엔티티매니저 관련
